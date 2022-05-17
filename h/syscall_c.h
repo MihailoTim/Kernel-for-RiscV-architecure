@@ -2,8 +2,8 @@
 // Created by os on 4/29/22.
 //
 
-#ifndef TM200047_SYSCALL_C_H
-#define TM200047_SYSCALL_C_H
+#ifndef SYSCALL_C_H
+#define SYSCALL_C_H
 
 #include "../lib/hw.h"
 
@@ -13,6 +13,7 @@ extern "C" {
 
 void *mem_alloc(size_t size);
 
+int mem_free(void* ptr);
 
 #ifdef __cplusplus
 }

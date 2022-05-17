@@ -9,16 +9,18 @@ int timer = 0;
 
 void RiscV::handleSupervisorTrap() {
     uint64 scause = RiscV::r_scause();
-    //interrupt from ecal
+    //interrupt from ecall
     if(scause == 0x09) {
-        uint64 sepc = RiscV::r_sepc()+4;
-        uint64 a0;
-        asm("mv %[a0], a0" : [a0] "=r" (a0));
-        if(a0==0x01){
-            __putc('X');
+        uint64 volatile sepc = RiscV::r_sepc()+4;
+
+        uint64 syscallID; //get the syscall arguments from registers a0-a7
+        asm("mv %[syscallID], a0" : [syscallID] "=r" (syscallID));
+
+        switch(syscallID){
+            case 0x01 : executeMemAllocSyscall();break;
+            case 0x02 : executeMemFreeSyscall();break;
         }
-        uint64 addr = (uint64)HEAP_START_ADDR;
-        asm("mv a0, %[addr]" : : [addr] "r" (addr));
+
         RiscV::w_sepc(sepc);
     }
 
@@ -34,5 +36,4 @@ void RiscV::handleSupervisorTrap() {
         timer=0;
         }
     }
-    asm("csrc sip, 0x02");
 }

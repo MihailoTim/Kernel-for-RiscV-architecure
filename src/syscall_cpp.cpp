@@ -7,16 +7,10 @@
 #include "../lib/hw.h"
 
 void* operator new(size_t sz){
-    asm("mv a1, %[sz]" : : [sz] "r" (sz));
-    asm("li a0, 0x01");
-    asm("ecall");
-    uint64 addr;
-    asm("mv %[addr], a0" : [addr] "=r" (addr));
-    void *alloc= (void*)HEAP_START_ADDR;
-    return alloc;
+    return mem_alloc(sz);
 }
 
 void operator delete(void *ptr){
-
+    mem_free(ptr);
 }
 

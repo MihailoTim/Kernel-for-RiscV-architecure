@@ -2,15 +2,16 @@
 // Created by os on 4/28/22.
 //
 
-#ifndef TM200047_UTILITY_HPP
-#define TM200047_UTILITY_HPP
+#ifndef UTILITY_HPP
+#define UTILITY_HPP
 
-#define asm __asm__ volatile
+#define asm __asm__
 
 class Utility {
 public:
-    static void printString(char *string);
+    static void printString(char*);
+    static void printInt(int);
 };
 
 
-#endif //TM200047_UTILITY_HPP
+#endif //UTILITY_HPP

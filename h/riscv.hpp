@@ -2,13 +2,17 @@
 // Created by os on 4/28/22.
 //
 
-#ifndef TM200047_RISCV_HPP
-#define TM200047_RISCV_HPP
+#ifndef RISCV_HPP
+#define RISCV_HPP
 
 
 #include "../lib/hw.h"
+#include "../h/memoryAllocator.hpp"
 
 class RiscV{
+    static void executeMemAllocSyscall();
+
+    static void executeMemFreeSyscall();
 public:
     static uint64 r_scause();
 
@@ -57,5 +61,25 @@ inline void RiscV::w_stvec(uint64 stvec){
     asm("csrw stvec, %[stvec]" : : [stvec] "r" (stvec));
 }
 
+inline void RiscV::executeMemAllocSyscall(){
+        if(!MemoryAllocator::initialized)
+            MemoryAllocator::initialize();
 
-#endif //TM200047_RISCV_HPP
+        uint64 size;
+        asm("mv %[size], a1" : [size] "=r" (size));
+
+        uint64 addr =(uint64)MemoryAllocator::kmalloc(size);
+
+        asm("mv a0, %[addr]" : : [addr] "r" (addr));
+}
+
+inline void RiscV::executeMemFreeSyscall() {
+    void *addr;
+
+    asm("mv %[addr], a1" : [addr] "=r" (addr));
+
+    uint64 status = 0;
+}
+
+
+#endif //RISCV_HPP
