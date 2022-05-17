@@ -28,5 +28,4 @@ public:
 
 void mallocTest();
 
-
 #endif //OS1_KERNEL_TESTS_HPP
