@@ -6,11 +6,13 @@
 #include "../h/utility.hpp"
 
 MemoryAllocator::BlockHeader* MemoryAllocator::freeMemHead = nullptr;
+MemoryAllocator::BlockHeader* MemoryAllocator::allocMemHead = nullptr;
 bool MemoryAllocator::initialized = false;
 
 
 void MemoryAllocator::initialize() {
     freeMemHead = (BlockHeader*)HEAP_START_ADDR;
+    allocMemHead = nullptr;
     freeMemHead->size = (char*)HEAP_END_ADDR - (char*)HEAP_START_ADDR;
     freeMemHead->next = nullptr;
 
@@ -18,7 +20,7 @@ void MemoryAllocator::initialize() {
 }
 
 void* MemoryAllocator::kmalloc(size_t size){
-    if(size<=0)
+    if(size<=0 || freeMemHead == nullptr)
         return nullptr;
 
     size_t byteSize = size<<6; //size of requested chunk in bytes   //NOTE: argument of kmalloc is number of blocks requested
@@ -26,16 +28,12 @@ void* MemoryAllocator::kmalloc(size_t size){
     BlockHeader* blk = freeMemHead, *prev = nullptr;
 
     for(; blk!=nullptr; prev = blk, blk = blk->next) {
-        size_t sz = blk->size;
-        if (sz >= byteSize)
+        if (blk->size >= byteSize)
             break;            //iterate through the list and find the first fitting block of free memory
     }
 
-    if(blk==nullptr)
-        __putc('?');
-
     if(blk != nullptr){
-        size_t  remainingSize = blk->size - byteSize;
+        size_t remainingSize = blk->size - byteSize;
 
         if(remainingSize >= sizeof(BlockHeader) + MEM_BLOCK_SIZE){    //check whether a large enough fragment will remain
 
@@ -58,13 +56,34 @@ void* MemoryAllocator::kmalloc(size_t size){
             else freeMemHead = blk->next;
         }
 
-        blk->prev = nullptr;    //temporary
-        blk->next = nullptr;    //temporary
+
+        //insert the blk chunk in list of allocated memory
+        insertAndMerge(blk, &allocMemHead);
 
         return (char*)blk + sizeof(BlockHeader);
     }
 
     return nullptr;
+}
+
+uint64 MemoryAllocator::kfree(void* ptr){
+    BlockHeader *blk = allocMemHead;
+    for(; blk != nullptr;blk = blk->next)
+        if((uint64)ptr - sizeof(BlockHeader) == (uint64)blk) break;
+    if(blk == nullptr)
+        return -1;
+    else{
+        if(blk->next)
+            blk->next->prev = blk->prev;
+        if(blk->prev)
+            blk->prev->next = blk->next;
+        else
+            freeMemHead = blk->next;
+
+        //insert blk chunk in list of free memory and try to merge with an already existing block
+        insertAndMerge(blk, &freeMemHead);
+    }
+    return 0;
 }
 
 void* MemoryAllocator::memset(void *dest, char c, uint64 len) {
@@ -75,4 +94,34 @@ void* MemoryAllocator::memset(void *dest, char c, uint64 len) {
     return dest;
 }
 
-#include "../h/memoryAllocator.hpp"
+void MemoryAllocator::insertAndMerge(void *addr, BlockHeader **head) {
+    BlockHeader* blk = (BlockHeader*)addr;
+    BlockHeader* iter = *head, *prev=nullptr;
+
+    for(prev = nullptr; iter != nullptr; prev = iter, iter = iter->next)
+        if((char*)iter >= (char*)blk) break;
+
+    blk->next = iter;
+    blk->prev = prev;
+
+    if(iter != nullptr)
+        iter->prev = blk;
+
+    if(prev == nullptr)
+        *head = blk;
+    else
+        prev->next = blk;
+
+    if(*head == freeMemHead && *head!=nullptr){
+        if(blk->next)
+            if(((uint64)blk + blk->size + sizeof(BlockHeader)) == (uint64)blk->next){
+                blk->size += (uint64)blk->next->size + sizeof(BlockHeader);
+                blk->next = blk->next->next;
+            }
+        if(blk->prev)
+            if(((uint64)blk->prev + sizeof(BlockHeader) + blk->prev->size) == (uint64)blk){
+                blk->prev->size += (size_t)blk->size + sizeof(BlockHeader);
+                blk->prev->next = blk->next;
+            }
+    }
+}

@@ -8,6 +8,7 @@
 
 #include "../lib/hw.h"
 #include "../h/memoryAllocator.hpp"
+#include "../h/utility.hpp"
 
 class RiscV{
     static void executeMemAllocSyscall();
@@ -25,6 +26,10 @@ public:
     static uint64 r_stvec();
 
     static void w_stvec(uint64 stvec);
+
+    static uint64 r_sstatus();
+
+    static void w_sstatus(uint64 sstatus);
 
     static void supervisorTrap();
 
@@ -57,6 +62,16 @@ inline uint64 RiscV::r_stvec(){
     return stvec;
 }
 
+inline void RiscV::w_sstatus(uint64 sstatus){
+    asm("csrw sstatus, %[sstatus]" : : [sstatus] "r" (sstatus));
+}
+
+inline uint64 RiscV::r_sstatus(){
+    uint64 sstatus;
+    asm("csrr %[sstatus], sstatus" : [sstatus] "=r" (sstatus));
+    return sstatus;
+}
+
 inline void RiscV::w_stvec(uint64 stvec){
     asm("csrw stvec, %[stvec]" : : [stvec] "r" (stvec));
 }
@@ -74,11 +89,15 @@ inline void RiscV::executeMemAllocSyscall(){
 }
 
 inline void RiscV::executeMemFreeSyscall() {
-    void *addr;
+    uint64 iaddr;
 
-    asm("mv %[addr], a1" : [addr] "=r" (addr));
+    asm("mv %[iaddr], a1" : [iaddr] "=r" (iaddr));
+
+    MemoryAllocator::kfree((void*)iaddr);
 
     uint64 status = 0;
+
+    asm("mv a0, %[status]" : : [status] "r" (status));
 }
 
 

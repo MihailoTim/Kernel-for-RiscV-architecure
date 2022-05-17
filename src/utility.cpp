@@ -6,16 +6,15 @@
 #include "../lib/console.h"
 #include "../lib/hw.h"
 
-void Utility::printString(char *string) {
+void Utility::printString(const char *string) {
     while(*string){
         __putc(*string++);
     }
 }
 
-void Utility::printInt(int xx)
+void Utility::printInt(int xx, int base=10)
 {
-    int base = 10;
-    int sign = (xx<0)? 1: 0;
+    int sign = 0;
     const char digits[] = "0123456789abcdef";
     char buf[16];
     int i;

@@ -9,8 +9,8 @@
 
 class Utility {
 public:
-    static void printString(char*);
-    static void printInt(int);
+    static void printString(const char*);
+    static void printInt(int, int);
 };
 
 

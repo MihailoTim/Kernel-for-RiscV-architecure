@@ -21,11 +21,10 @@ void *mem_alloc(size_t size){
 }
 
 int mem_free(void *ptr){
-    asm("mv a1, %[ptr]" : : [ptr] "r" (ptr));  //put number of blocks required in a1
+    uint64 iptr = (uint64)ptr;
+    asm("mv a1, %[iptr]" : : [iptr] "r" (iptr));  //put number of blocks required in a1
     asm("li a0, 0x02");  //put number of syscall in a0
     asm("ecall"); //call trap routine
-    uint64 status = 0;
-    asm("mv %[status], a0" : [status] "=r" (status));
     return 0;
 }
 
