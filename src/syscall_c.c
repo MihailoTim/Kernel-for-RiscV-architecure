@@ -5,6 +5,7 @@
 #include "../h/syscall_c.h"
 #include "../lib/console.h"
 #include "../lib/hw.h"
+#include "../lib/mem.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,13 +42,10 @@ int thread_create(thread_t* handle, void(*start_routine)(void*), void *arg){
     uint64 ihandle = (uint64)handle;
     uint64 iroutine = (uint64)start_routine;
     uint64 iarg = (uint64)arg;
-
-    uint64 istack;
+    uint64 istack = 0;
 
     if(start_routine)
-        istack = (uint64) mem_alloc(DEFAULT_STACK_SIZE);
-    else
-        istack = 0;
+        istack = (uint64) mem_alloc(DEFAULT_STACK_SIZE*sizeof(uint64));
 
     asm("mv a7, %[istack]" : : [istack] "r" (istack));
     asm("mv a3, %[iarg]" : : [iarg] "r" (iarg));

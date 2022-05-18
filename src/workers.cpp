@@ -4,6 +4,8 @@
 #include "../h/workers.hpp"
 #include "../lib/console.h"
 
+int i=1;
+
 static uint64 fibonacci(int n){
     if(n==1 || n==0) return n;
     if(n%4==0) thread_dispatch();;
@@ -31,10 +33,10 @@ void workerBodyA(){
     Utility::printInt(t1,10);
     __putc('\n');
 
-    uint64 result = fibonacci(20);
-    Utility::printString("A: fibonacci=");
-    Utility::printInt(result,10);
-    __putc('\n');
+//    uint64 result = fibonacci(20);
+//    Utility::printString("A: fibonacci=");
+//    Utility::printInt(result,10);
+//    __putc('\n');
 
     for(;i<6;i++){
         Utility::printString("A: i=");

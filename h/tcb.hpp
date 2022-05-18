@@ -17,7 +17,7 @@ public:
 
     TCB();
 
-    TCB(Body body, void* args);
+    TCB(Body body, void* args, uint64* stack);
 
     ~TCB();
 

@@ -6,13 +6,15 @@
 
 TCB* TCB::running = nullptr;
 
-TCB::TCB(Body body, void* args){
+TCB::TCB(Body body, void* args, uint64* stack){
 
     this->body = body;
 
     this->args = args;
 
-    this->stack = (body == nullptr) ? nullptr : (uint64*)MemoryAllocator::kmalloc(DEFAULT_STACK_SIZE);
+    this->stack = (body == nullptr) ? nullptr : stack;
+//    this->stack = (body == nullptr) ? nullptr : (uint64*)MemoryAllocator::kmalloc((DEFAULT_STACK_SIZE+MEM_BLOCK_SIZE-1)>>6);
+//    this->stack = (body == nullptr) ? nullptr : new uint64[DEFAULT_STACK_SIZE];
 
     this->status = Status::READY;
 

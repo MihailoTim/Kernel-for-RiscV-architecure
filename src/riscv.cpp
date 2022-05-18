@@ -14,6 +14,7 @@ int timer = 0;
 void RiscV::handleSupervisorTrap() {
 
     uint64 volatile scause = RiscV::r_scause();
+    uint64 volatile sstatus = RiscV::r_sstatus();
     uint64 volatile sepc = RiscV::r_sepc()+4;
 
     //interrupt from ecall
@@ -46,6 +47,7 @@ void RiscV::handleSupervisorTrap() {
         asm("csrc sip, 0x02");
     }
 
+    RiscV::w_sstatus(sstatus);
     RiscV::w_sepc(sepc);
 }
 
@@ -71,15 +73,14 @@ void RiscV::executeMemFreeSyscall() {
 }
 
 void RiscV::executeThreadCreateSyscall(){
-    uint64 volatile iroutine, iargs, ihandle, istack;
+    uint64 iroutine, iargs, ihandle, istack;
 
+    asm("mv %[istack], a7" : [istack] "=r"(istack));
     asm("mv %[ihandle], a1" : [ihandle] "=r"(ihandle));
     asm("mv %[iroutine], a2" : [iroutine] "=r"(iroutine));
     asm("mv %[iargs], a3" : [iargs] "=r"(iargs));
-    asm("mv %[istack], a7" : [istack] "=r"(istack));
 
-
-    TCB *tcb = new TCB((TCB::Body)iroutine, (void*)iargs);
+    TCB *tcb = new TCB((TCB::Body)iroutine, (void*)iargs, (uint64*)istack);
 
     uint64 status;
 
