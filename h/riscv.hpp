@@ -9,12 +9,17 @@
 #include "../lib/hw.h"
 #include "../h/memoryAllocator.hpp"
 #include "../h/utility.hpp"
+#include "../h/scheduler.hpp"
 
 class RiscV{
     static void executeMemAllocSyscall();   //wrapper function for moving parameters and calling MemoryAllocator
 
     static void executeMemFreeSyscall();    //wrapper function for moving parameters and calling MemoryAllocator
 public:
+    static void pushRegisters();
+
+    static void popRegisters();
+
     static uint64 r_scause();
 
     static void w_scause(uint64 scause);
@@ -79,9 +84,6 @@ inline void RiscV::w_stvec(uint64 stvec){
 }
 
 inline void RiscV::executeMemAllocSyscall(){
-        if(!MemoryAllocator::initialized)
-            MemoryAllocator::initialize();
-
         uint64 size;
         asm("mv %[size], a1" : [size] "=r" (size));
 
@@ -104,6 +106,8 @@ inline void RiscV::executeMemFreeSyscall() {
 
 inline void RiscV::initialize() {
     RiscV::w_stvec((uint64) &RiscV::supervisorTrap);
+    MemoryAllocator::initialize();
+    Scheduler::initialize();
 }
 
 #endif //RISCV_HPP

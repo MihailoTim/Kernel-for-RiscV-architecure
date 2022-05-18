@@ -31,6 +31,10 @@ private:
 
     friend class RiscV;
 
+    friend class Queue;
+
+    friend class TCB;
+
 };
 
 
