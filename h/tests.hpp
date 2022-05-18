@@ -28,4 +28,10 @@ public:
 
 void mallocTest();
 
+void mallocGapFillTest();
+
+void mallocEverything();
+
+void badFree();
+
 #endif //OS1_KERNEL_TESTS_HPP

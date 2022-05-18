@@ -11,10 +11,12 @@ void RiscV::handleSupervisorTrap() {
 
     uint64 scause = RiscV::r_scause();
     uint64 volatile sepc = RiscV::r_sepc()+4;
+
     //interrupt from ecall
     if(scause == 0x09) {
 
         uint64 syscallID; //get the syscall arguments from registers a0-a7
+
         asm("mv %[syscallID], a0" : [syscallID] "=r" (syscallID));
 
         switch(syscallID){

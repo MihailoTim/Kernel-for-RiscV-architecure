@@ -11,9 +11,9 @@
 #include "../h/utility.hpp"
 
 class RiscV{
-    static void executeMemAllocSyscall();
+    static void executeMemAllocSyscall();   //wrapper function for moving parameters and calling MemoryAllocator
 
-    static void executeMemFreeSyscall();
+    static void executeMemFreeSyscall();    //wrapper function for moving parameters and calling MemoryAllocator
 public:
     static uint64 r_scause();
 
@@ -31,9 +31,11 @@ public:
 
     static void w_sstatus(uint64 sstatus);
 
-    static void supervisorTrap();
+    static void supervisorTrap();      //supervisorTrap defined in /src/supervisorTrap.S
 
     static void handleSupervisorTrap();
+
+    static void initialize();
 };
 
 inline uint64 RiscV::r_scause(){
@@ -89,16 +91,19 @@ inline void RiscV::executeMemAllocSyscall(){
 }
 
 inline void RiscV::executeMemFreeSyscall() {
-    uint64 iaddr;
-
-    asm("mv %[iaddr], a1" : [iaddr] "=r" (iaddr));
-
-    MemoryAllocator::kfree((void*)iaddr);
-
-    uint64 status = 0;
+    uint64 iaddr, status;
+    if(MemoryAllocator::initialized) {
+        asm("mv %[iaddr], a1" : [iaddr] "=r"(iaddr));
+        status = MemoryAllocator::kfree((void *) iaddr);;
+    }
+    else
+        status = -1;
 
     asm("mv a0, %[status]" : : [status] "r" (status));
 }
 
+inline void RiscV::initialize() {
+    RiscV::w_stvec((uint64) &RiscV::supervisorTrap);
+}
 
 #endif //RISCV_HPP

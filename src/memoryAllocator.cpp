@@ -6,14 +6,19 @@
 #include "../h/utility.hpp"
 
 MemoryAllocator::BlockHeader* MemoryAllocator::freeMemHead = nullptr;
+
 MemoryAllocator::BlockHeader* MemoryAllocator::allocMemHead = nullptr;
+
 bool MemoryAllocator::initialized = false;
 
 
 void MemoryAllocator::initialize() {
     freeMemHead = (BlockHeader*)HEAP_START_ADDR;
+
     allocMemHead = nullptr;
-    freeMemHead->size = (char*)HEAP_END_ADDR - (char*)HEAP_START_ADDR;
+
+    freeMemHead->size = (char*)HEAP_END_ADDR - (char*)HEAP_START_ADDR - sizeof(BlockHeader);
+
     freeMemHead->next = nullptr;
 
     initialized = true;
@@ -23,12 +28,12 @@ void* MemoryAllocator::kmalloc(size_t size){
     if(size<=0 || freeMemHead == nullptr)
         return nullptr;
 
-    size_t byteSize = size<<6; //size of requested chunk in bytes   //NOTE: argument of kmalloc is number of blocks requested
+    size_t byteSize = size<<MEM_BLOCK_OFFS; //size of requested chunk in bytes   //NOTE: argument of kmalloc is number of blocks requested
 
     BlockHeader* blk = freeMemHead, *prev = nullptr;
 
     for(; blk!=nullptr; prev = blk, blk = blk->next) {
-        if (blk->size >= byteSize)
+        if (blk->size >= byteSize + sizeof(BlockHeader))
             break;            //iterate through the list and find the first fitting block of free memory
     }
 
@@ -36,8 +41,6 @@ void* MemoryAllocator::kmalloc(size_t size){
         size_t remainingSize = blk->size - byteSize;
 
         if(remainingSize >= sizeof(BlockHeader) + MEM_BLOCK_SIZE){    //check whether a large enough fragment will remain
-
-            memset((char*)blk+sizeof(BlockHeader), 17, byteSize); //FOR TESTING PURPOSES ONLY: fill acquired space with 1s
 
             blk->size = byteSize;
             size_t offset = sizeof(BlockHeader) + byteSize;   //offset for new freeMem chunk
@@ -56,11 +59,11 @@ void* MemoryAllocator::kmalloc(size_t size){
             else freeMemHead = blk->next;
         }
 
-
         //insert the blk chunk in list of allocated memory
+        Utility::memset((char*)blk+sizeof(BlockHeader), 17, blk->size); //FOR TESTING PURPOSES ONLY: fill acquired space with 1s
         insertAndMerge(blk, &allocMemHead);
 
-        return (char*)blk + sizeof(BlockHeader);
+        return (char*)blk + sizeof(BlockHeader);    //return address of start of the data block, not start of the header
     }
 
     return nullptr;
@@ -68,8 +71,10 @@ void* MemoryAllocator::kmalloc(size_t size){
 
 uint64 MemoryAllocator::kfree(void* ptr){
     BlockHeader *blk = allocMemHead;
+
     for(; blk != nullptr;blk = blk->next)
         if((uint64)ptr - sizeof(BlockHeader) == (uint64)blk) break;
+
     if(blk == nullptr)
         return -1;
     else{
@@ -78,28 +83,21 @@ uint64 MemoryAllocator::kfree(void* ptr){
         if(blk->prev)
             blk->prev->next = blk->next;
         else
-            freeMemHead = blk->next;
+            allocMemHead = blk->next;
 
         //insert blk chunk in list of free memory and try to merge with an already existing block
+        Utility::memset((char*)blk+sizeof(BlockHeader), 34, blk->size); //FOR TESTING PURPOSES ONLY: fill acquired space with 1s
         insertAndMerge(blk, &freeMemHead);
     }
     return 0;
 }
 
-void* MemoryAllocator::memset(void *dest, char c, uint64 len) {
-    char *mem = (char*)dest;
-    for(uint64 i = 0; i < len; i++){
-        mem[i] = c;
-    }
-    return dest;
-}
-
-void MemoryAllocator::insertAndMerge(void *addr, BlockHeader **head) {
+void MemoryAllocator::insertAndMerge(void *addr, BlockHeader **head) {   //insert a fragment from given address and if the fragment is being freed, try to merge with other fragments
     BlockHeader* blk = (BlockHeader*)addr;
     BlockHeader* iter = *head, *prev=nullptr;
 
     for(prev = nullptr; iter != nullptr; prev = iter, iter = iter->next)
-        if((char*)iter >= (char*)blk) break;
+        if((uint64)iter >= (uint64)blk) break;
 
     blk->next = iter;
     blk->prev = prev;
@@ -112,13 +110,13 @@ void MemoryAllocator::insertAndMerge(void *addr, BlockHeader **head) {
     else
         prev->next = blk;
 
-    if(*head == freeMemHead && *head!=nullptr){
-        if(blk->next)
+    if(*head == freeMemHead){
+        if(blk->next)   //try to merge with next
             if(((uint64)blk + blk->size + sizeof(BlockHeader)) == (uint64)blk->next){
                 blk->size += (uint64)blk->next->size + sizeof(BlockHeader);
                 blk->next = blk->next->next;
             }
-        if(blk->prev)
+        if(blk->prev)   //try to merge with previous
             if(((uint64)blk->prev + sizeof(BlockHeader) + blk->prev->size) == (uint64)blk){
                 blk->prev->size += (size_t)blk->size + sizeof(BlockHeader);
                 blk->prev->next = blk->next;

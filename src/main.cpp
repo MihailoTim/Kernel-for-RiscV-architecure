@@ -8,11 +8,17 @@
 #include "../h/syscall_c.h"
 #include "../h/tests.hpp"
 
-int main()
-{
-    RiscV::w_stvec((uint64) &RiscV::supervisorTrap);
+int main() {
+
+    RiscV::initialize();
 
     mallocTest();
+
+    mallocGapFillTest();
+
+    mallocEverything();
+
+    badFree();
 
     return 0;
 }
