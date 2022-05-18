@@ -6,13 +6,15 @@
 
 TCB* TCB::running = nullptr;
 
-TCB::TCB(Body body){
+TCB::TCB(Body body, void* args){
 
     this->body = body;
 
+    this->args = args;
+
     this->stack = (body == nullptr) ? nullptr : (uint64*)MemoryAllocator::kmalloc(DEFAULT_STACK_SIZE);
 
-    this->finished = false;
+    this->status = Status::READY;
 
     this->context = {(body == nullptr) ? 0 : (uint64)&stack[DEFAULT_STACK_SIZE],
                      (uint64)body };
@@ -21,8 +23,13 @@ TCB::TCB(Body body){
         Scheduler::put(this);
 }
 
-TCB::~TCB(){
+void TCB::free(){
+    status = Status::FINISHED;
     MemoryAllocator::kfree(stack);
+}
+
+TCB::~TCB(){
+    free();
 }
 
 void TCB::yield() {
@@ -36,17 +43,14 @@ void TCB::yield() {
 void TCB::dispatch() {
     TCB* old = running;
 
-    if(!old->finished)
+    if(old->status != Status::FINISHED)
         Scheduler::put(old);
 
     running = Scheduler::get();
-    if(running){
+    if(running) {
+        running->status = Status::RUNNING;
         contextSwitch(&old->context, &running->context);
     }
-}
-
-TCB* TCB::createThread(Body body) {
-    return new TCB(body);
 }
 
 void* TCB::operator new(size_t size){

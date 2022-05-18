@@ -8,6 +8,8 @@
 #include "../h/queue.hpp"
 #include "../h/utility.hpp"
 
+class TCB;
+
 class Scheduler {
     static Queue* queue;
 public:

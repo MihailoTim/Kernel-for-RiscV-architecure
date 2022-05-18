@@ -2,19 +2,27 @@
 // Created by os on 4/28/22.
 //
 
-#ifndef RISCV_HPP
-#define RISCV_HPP
+#ifndef OS1_KERNEL_RISCV_HPP
+#define OS1_KERNEL_RISCV_HPP
 
 
-#include "../lib/hw.h"
+#include "../h/riscv.hpp"
 #include "../h/memoryAllocator.hpp"
-#include "../h/utility.hpp"
+#include "../h/tcb.hpp"
+#include "../lib/console.h"
+#include "../h/syscall_cpp.hpp"
 #include "../h/scheduler.hpp"
 
 class RiscV{
     static void executeMemAllocSyscall();   //wrapper function for moving parameters and calling MemoryAllocator
 
     static void executeMemFreeSyscall();    //wrapper function for moving parameters and calling MemoryAllocator
+
+    static void executeThreadCreateSyscall();
+
+    static void executeThreadExitSyscall();
+
+    static void executeThreadDispatch();
 public:
     static void pushRegisters();
 
@@ -83,31 +91,10 @@ inline void RiscV::w_stvec(uint64 stvec){
     asm("csrw stvec, %[stvec]" : : [stvec] "r" (stvec));
 }
 
-inline void RiscV::executeMemAllocSyscall(){
-        uint64 size;
-        asm("mv %[size], a1" : [size] "=r" (size));
-
-        uint64 addr =(uint64)MemoryAllocator::kmalloc(size);
-
-        asm("mv a0, %[addr]" : : [addr] "r" (addr));
-}
-
-inline void RiscV::executeMemFreeSyscall() {
-    uint64 iaddr, status;
-    if(MemoryAllocator::initialized) {
-        asm("mv %[iaddr], a1" : [iaddr] "=r"(iaddr));
-        status = MemoryAllocator::kfree((void *) iaddr);;
-    }
-    else
-        status = -1;
-
-    asm("mv a0, %[status]" : : [status] "r" (status));
-}
-
 inline void RiscV::initialize() {
     RiscV::w_stvec((uint64) &RiscV::supervisorTrap);
     MemoryAllocator::initialize();
     Scheduler::initialize();
 }
 
-#endif //RISCV_HPP
+#endif //OS1_KERNEL_RISCV_HPP

@@ -11,35 +11,34 @@
 #include "../h/tcb.hpp"
 #include "../h/workers.hpp"
 
+void wrapperA(void *args){
+    workerBodyA();
+}
+
+void wrapperB(void *args){
+    workerBodyB();
+}
+
 
 int main() {
 
     RiscV::initialize();
 
-    mallocEverything();
+    thread_t thrMain, thrA, thrB;
 
-    TCB *thread[3];
+    thread_create(&thrMain,nullptr, nullptr);
 
-    thread[0] = TCB::createThread(nullptr);
+    thread_create(&thrA, wrapperA, nullptr);
 
-    TCB::running = thread[0];
+    thread_create(&thrB, wrapperB, nullptr);
 
-    thread[1] = TCB::createThread(workerBodyA);
+    TCB::running =(TCB*)thrMain;
 
-    thread[2] = TCB::createThread(workerBodyB);
-
-
-    Utility::printString("Threads created\n");
-
-    while(!thread[1]->isFinished() || !thread[2]->isFinished()){
+    while(!((TCB*)thrA)->isFinished() || !((TCB*)thrB)->isFinished()){
         TCB::yield();
     }
 
     Utility::printString("Threads finished\n");
-
-    delete thread[0];
-
-    delete thread[1];
 
     return 0;
 }

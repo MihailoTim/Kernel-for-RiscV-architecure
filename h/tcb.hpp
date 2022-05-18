@@ -6,48 +6,53 @@
 #define OS1_KERNEL_TCB_HPP
 
 #include "../lib/hw.h"
+#include "../h/scheduler.hpp"
 #include "../h/riscv.hpp"
 
 class TCB {
 public:
+    using Body = void(*)(void*);
+
     static TCB *running;
 
-    using Body = void(*)();
-
     TCB();
+
+    TCB(Body body, void* args);
 
     ~TCB();
 
     static void yield();
 
-    static TCB *createThread(Body body);
-
     void* operator new(size_t size);
 
     void operator delete(void* addr);
 
-    bool isFinished(){return finished;}
+    void setFinished(bool finished){this->status = Status::FINISHED;}
 
-    void setFinished(bool finished){this->finished = finished;}
+    bool isFinished(){ return this->status == Status::FINISHED;}
+
+    void free();
 
 private:
     struct Context{
         uint64 sp, ra;
     };
 
-    TCB(Body body);
+    enum Status{RUNNING, READY, FINISHED};
 
     static void dispatch();
 
     static void contextSwitch(Context *oldContext, Context *runningContext);
 
     Context context;
+    Status status;
+
     Body body;
+    void *args;
     uint64 *stack;
-    bool finished;
 
     friend class Scheduler;
-
+    friend class RiscV;
 };
 
 

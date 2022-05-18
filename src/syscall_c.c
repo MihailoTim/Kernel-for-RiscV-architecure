@@ -6,8 +6,6 @@
 #include "../lib/console.h"
 #include "../lib/hw.h"
 
-#define MEM_BLOCK_OFFS 6
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -38,6 +36,52 @@ int mem_free(void *ptr){
     asm("mv %[status], a0" : [status] "=r" (status));
     return status;
 }
+
+int thread_create(thread_t* handle, void(*start_routine)(void*), void *arg){
+    uint64 ihandle = (uint64)handle;
+    uint64 iroutine = (uint64)start_routine;
+    uint64 iarg = (uint64)arg;
+
+    uint64 istack;
+
+    if(start_routine)
+        istack = (uint64) mem_alloc(DEFAULT_STACK_SIZE);
+    else
+        istack = 0;
+
+    asm("mv a7, %[istack]" : : [istack] "r" (istack));
+    asm("mv a3, %[iarg]" : : [iarg] "r" (iarg));
+    asm("mv a2, %[iroutine]" : : [iroutine] "r" (iroutine));
+    asm("mv a1, %[ihandle]" : : [ihandle] "r" (ihandle));
+    asm("li a0, 0x11");
+
+    asm("ecall");
+
+    uint64 status;
+
+    asm("mv %[status], a0" : [status] "=r" (status));
+
+    return status;
+}
+
+int thread_exit(){
+    asm("li a0, 0x12");
+
+    asm("ecall");
+
+    uint64 status;
+
+    asm("mv %[status], a0" : [status] "=r" (status));
+
+    return status;
+}
+
+void thread_dispatch(){
+    asm("li a0, 0x13");
+
+    asm("ecall");
+}
+
 
 #ifdef __cplusplus
 }

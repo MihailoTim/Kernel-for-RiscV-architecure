@@ -6,7 +6,7 @@
 
 static uint64 fibonacci(int n){
     if(n==1 || n==0) return n;
-    if(n%4==0) TCB::yield();
+    if(n%4==0) thread_dispatch();;
     return fibonacci(n-1)+ fibonacci(n-2);
 }
 
@@ -21,7 +21,7 @@ void workerBodyA(){
 
     Utility::printString("A: yield\n");
     asm("li t1, 7");
-    TCB::yield();
+    thread_dispatch();
 
     uint64 t1=0;
 
@@ -42,8 +42,7 @@ void workerBodyA(){
         __putc('\n');
     }
 
-    TCB::running->setFinished(true);
-    TCB::yield();
+    thread_exit();
 
 }
 
@@ -58,7 +57,7 @@ void workerBodyB(){
 
     Utility::printString("B: yield\n");
     asm("li t1, 5");
-    TCB::yield();
+    thread_dispatch();
 
     uint64 result = fibonacci(23);
     Utility::printString("A: fibonacci=");
@@ -71,7 +70,6 @@ void workerBodyB(){
         __putc('\n');
     }
 
-    TCB::running->setFinished(true);
-    TCB::yield();
 
+    thread_exit();
 }
