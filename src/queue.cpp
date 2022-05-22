@@ -4,6 +4,14 @@
 
 #include "../h/queue.hpp"
 
+void* Queue::operator new(size_t size) {
+    return MemoryAllocator::kmalloc((size+MEM_BLOCK_SIZE-1)>>MEM_BLOCK_OFFS);
+}
+
+void Queue::operator delete(void *addr){
+    MemoryAllocator::kfree(addr);
+}
+
 void Queue::empty() {
     while(head){
         Node *tmp = head;

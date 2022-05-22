@@ -23,7 +23,7 @@ class RiscV{
     static void executeThreadExitSyscall();
 
     static void executeThreadDispatch();
-public:
+
     static void pushRegisters();
 
     static void popRegisters();
@@ -44,9 +44,16 @@ public:
 
     static void w_sstatus(uint64 sstatus);
 
+    static void popSppSpie();
+
     static void supervisorTrap();      //supervisorTrap defined in /src/supervisorTrap.S
 
     static void handleSupervisorTrap();
+
+    friend class TCB;
+
+    friend class Utility;
+public:
 
     static void initialize();
 };
@@ -89,12 +96,6 @@ inline uint64 RiscV::r_sstatus(){
 
 inline void RiscV::w_stvec(uint64 stvec){
     asm("csrw stvec, %[stvec]" : : [stvec] "r" (stvec));
-}
-
-inline void RiscV::initialize() {
-    RiscV::w_stvec((uint64) &RiscV::supervisorTrap);
-    MemoryAllocator::initialize();
-    Scheduler::initialize();
 }
 
 #endif //OS1_KERNEL_RISCV_HPP

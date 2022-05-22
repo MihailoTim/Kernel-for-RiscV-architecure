@@ -4,6 +4,7 @@
 #include "../h/memoryAllocator.hpp"
 #include "../lib/console.h"
 #include "../h/utility.hpp"
+#include "../tests/printing.hpp"
 
 MemoryAllocator::BlockHeader* MemoryAllocator::freeMemHead = nullptr;
 
@@ -25,8 +26,10 @@ void MemoryAllocator::initialize() {
 }
 
 void* MemoryAllocator::kmalloc(size_t size){
-    if(size<=0 || freeMemHead == nullptr)
+    if(size<=0 || freeMemHead == nullptr) {
+        printString("NEMA MEMORIJE\n");
         return nullptr;
+    }
 
     size_t byteSize = size<<MEM_BLOCK_OFFS; //size of requested chunk in bytes   //NOTE: argument of kmalloc is number of blocks requested
 

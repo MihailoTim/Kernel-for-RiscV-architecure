@@ -13,7 +13,7 @@ void Utility::printString(const char *string) {
     }
 }
 
-void Utility::printInt(int x, int base=10)
+void Utility::printInt(int x, int base)
 {
     int sign = 0;
     const char digits[] = "0123456789abcdef";

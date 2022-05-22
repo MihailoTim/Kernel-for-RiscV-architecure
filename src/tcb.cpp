@@ -6,6 +6,10 @@
 
 TCB* TCB::running = nullptr;
 
+void TCB::initialize() {
+    TCB::running = new TCB(nullptr, nullptr, nullptr);
+}
+
 TCB::TCB(Body body, void* args, uint64* stack){
 
     this->body = body;
@@ -13,15 +17,13 @@ TCB::TCB(Body body, void* args, uint64* stack){
     this->args = args;
 
     this->stack = (body == nullptr) ? nullptr : stack;
-//    this->stack = (body == nullptr) ? nullptr : (uint64*)MemoryAllocator::kmalloc((DEFAULT_STACK_SIZE+MEM_BLOCK_SIZE-1)>>6);
-//    this->stack = (body == nullptr) ? nullptr : new uint64[DEFAULT_STACK_SIZE];
 
     this->status = Status::READY;
 
-    this->context = {(body == nullptr) ? 0 : (uint64)&stack[DEFAULT_STACK_SIZE],
-                     (uint64)body };
+    this->context = {(body == nullptr) ? 0 : (uint64)((char*)stack + DEFAULT_STACK_SIZE),
+                     (uint64)&wrapper };
 
-    if(body!=nullptr)
+    if(running)
         Scheduler::put(this);
 }
 
@@ -32,14 +34,6 @@ void TCB::free(){
 
 TCB::~TCB(){
     free();
-}
-
-void TCB::yield() {
-    RiscV::pushRegisters();
-
-    dispatch();
-
-    RiscV::popRegisters();
 }
 
 void TCB::dispatch() {
@@ -53,6 +47,14 @@ void TCB::dispatch() {
         running->status = Status::RUNNING;
         contextSwitch(&old->context, &running->context);
     }
+}
+
+void TCB::wrapper(void *args) {
+    RiscV::popSppSpie();
+
+    running->body(running->args);
+
+    thread_exit();
 }
 
 void* TCB::operator new(size_t size){

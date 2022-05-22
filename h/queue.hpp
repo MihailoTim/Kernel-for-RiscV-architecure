@@ -39,6 +39,10 @@ public:
     TCB* pop();
 
     TCB* peek();
+
+    void* operator new(size_t size);
+
+    void operator delete(void* addr);
 };
 
 

@@ -8,9 +8,9 @@
 #include "../h/tcb.hpp"
 #include "../h/utility.hpp"
 
-void workerBodyA();
+void workerBodyX(void*);
 
-void workerBodyB();
+void workerBodyY(void*);
 
 
 #endif //OS1_KERNEL_WORKERS_HPP

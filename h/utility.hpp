@@ -15,7 +15,7 @@ class Utility {
 public:
     static void printString(const char*);
 
-    static void printInt(int, int);
+    static void printInt(int, int = 10);
 
     static void printMemTrace();
 

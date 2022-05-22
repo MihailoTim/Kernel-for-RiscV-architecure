@@ -11,9 +11,18 @@
 
 class TCB {
 public:
+
+    bool isFinished(){ return this->status == Status::FINISHED;}
+
+private:
+
     using Body = void(*)(void*);
 
-    static TCB *running;
+    struct Context{
+        uint64 sp, ra;
+    };
+
+    enum Status{RUNNING, READY, FINISHED};
 
     TCB();
 
@@ -21,7 +30,7 @@ public:
 
     ~TCB();
 
-    static void yield();
+    static void wrapper(void* args);
 
     void* operator new(size_t size);
 
@@ -29,18 +38,13 @@ public:
 
     void setFinished(bool finished){this->status = Status::FINISHED;}
 
-    bool isFinished(){ return this->status == Status::FINISHED;}
-
     void free();
 
-private:
-    struct Context{
-        uint64 sp, ra;
-    };
-
-    enum Status{RUNNING, READY, FINISHED};
+    static void yield();
 
     static void dispatch();
+
+    static void initialize();
 
     static void contextSwitch(Context *oldContext, Context *runningContext);
 
@@ -50,6 +54,8 @@ private:
     Body body;
     void *args;
     uint64 *stack;
+
+    static TCB *running;
 
     friend class Scheduler;
     friend class RiscV;

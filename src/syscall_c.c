@@ -45,7 +45,7 @@ int thread_create(thread_t* handle, void(*start_routine)(void*), void *arg){
     uint64 istack = 0;
 
     if(start_routine)
-        istack = (uint64) mem_alloc(DEFAULT_STACK_SIZE*sizeof(uint64));
+        istack = (uint64) mem_alloc(DEFAULT_STACK_SIZE);
 
     asm("mv a7, %[istack]" : : [istack] "r" (istack));
     asm("mv a3, %[iarg]" : : [iarg] "r" (iarg));
@@ -78,6 +78,14 @@ void thread_dispatch(){
     asm("li a0, 0x13");
 
     asm("ecall");
+}
+
+char getc(){
+    return __getc();
+}
+
+void putc(char c){
+    __putc(c);
 }
 
 

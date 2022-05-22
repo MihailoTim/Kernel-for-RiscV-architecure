@@ -11,14 +11,26 @@
 
 int timer = 0;
 
+void RiscV::initialize() {
+    RiscV::w_stvec((uint64) &RiscV::supervisorTrap);
+    MemoryAllocator::initialize();
+    Scheduler::initialize();
+    TCB::initialize();
+}
+
+void RiscV::popSppSpie() {
+    asm("csrw sepc, ra");
+    asm("sret");
+}
+
 void RiscV::handleSupervisorTrap() {
 
-    uint64 volatile scause = RiscV::r_scause();
-    uint64 volatile sstatus = RiscV::r_sstatus();
-    uint64 volatile sepc = RiscV::r_sepc()+4;
+    uint64 scause = RiscV::r_scause();
 
     //interrupt from ecall
     if(scause == 0x09) {
+        uint64 volatile sstatus = RiscV::r_sstatus();
+        uint64 volatile sepc = RiscV::r_sepc()+4;
 
         uint64 syscallID; //get the syscall arguments from registers a0-a7
 
@@ -31,10 +43,17 @@ void RiscV::handleSupervisorTrap() {
             case 0x12 : executeThreadExitSyscall();break;
             case 0x13 : executeThreadDispatch();break;
         }
+
+        RiscV::w_sstatus(sstatus);
+        RiscV::w_sepc(sepc);
     }
 
     //timer interrupt
     if(scause == (0x01UL<<63 | 0x1)){
+
+        uint64 sstatus = RiscV::r_sstatus();
+        uint64 sepc = RiscV::r_sepc();
+
         timer++;
         if(timer==5) {
         __putc('t');
@@ -45,10 +64,10 @@ void RiscV::handleSupervisorTrap() {
         timer=0;
         }
         asm("csrc sip, 0x02");
-    }
 
-    RiscV::w_sstatus(sstatus);
-    RiscV::w_sepc(sepc);
+        RiscV::w_sstatus(sstatus);
+        RiscV::w_sepc(sepc);
+    }
 }
 
 void RiscV::executeMemAllocSyscall(){
@@ -103,7 +122,7 @@ void RiscV::executeThreadExitSyscall() {
     else{
         TCB* old = TCB::running;
         old->status = TCB::Status::FINISHED;
-        TCB::yield();
+        TCB::dispatch();
         old->free();
     }
 
@@ -113,5 +132,5 @@ void RiscV::executeThreadExitSyscall() {
 void RiscV::executeThreadDispatch(){
     TCB* old = TCB::running;
     old->status = TCB::Status::READY;
-    TCB::yield();
+    TCB::dispatch();
 }

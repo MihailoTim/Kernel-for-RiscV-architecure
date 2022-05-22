@@ -6,3 +6,5 @@ _ZN3TCB13contextSwitchEPNS_7ContextES1_:
 
     ld sp, 0*8(a1)
     ld ra, 1*8(a1)
+
+    ret
