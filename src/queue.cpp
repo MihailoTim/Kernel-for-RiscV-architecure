@@ -32,8 +32,11 @@ Queue& Queue::push(TCB *tcb){
 TCB* Queue::pop() {
     if(head){
         TCB* tcb = head->tcb;
+        Node *tmp = head;
         head = head->next;
+        MemoryAllocator::kfree(tmp);
         size--;
+
         return tcb;
     }
     else

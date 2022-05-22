@@ -68,6 +68,10 @@ void RiscV::handleSupervisorTrap() {
         RiscV::w_sstatus(sstatus);
         RiscV::w_sepc(sepc);
     }
+
+    if(scause == (0x01UL<<63 | 0x9)){
+        Utility::printString("Hardware interrupt");
+    }
 }
 
 void RiscV::executeMemAllocSyscall(){
@@ -123,7 +127,6 @@ void RiscV::executeThreadExitSyscall() {
         TCB* old = TCB::running;
         old->status = TCB::Status::FINISHED;
         TCB::dispatch();
-        old->free();
     }
 
     asm("mv a0, %[status]" : : [status] "r" (status));

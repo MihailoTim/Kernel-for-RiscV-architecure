@@ -69,6 +69,7 @@ void* MemoryAllocator::kmalloc(size_t size){
         return (char*)blk + sizeof(BlockHeader);    //return address of start of the data block, not start of the header
     }
 
+    printString("NEMA MEMORIJE\n");
     return nullptr;
 }
 
