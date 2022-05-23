@@ -43,6 +43,9 @@ void RiscV::handleSupervisorTrap() {
             case 0x12 : executeThreadExitSyscall();break;
             case 0x13 : executeThreadDispatchSyscall();break;
             case 0x21 : executeSemOpenSyscall();break;
+            case 0x22 : executeSemCloseSyscall();break;
+            case 0x23 : executeSemWaitSyscall();break;
+            case 0x24 : executeSemSignalSyscall();break;
         }
 
         RiscV::w_sstatus(sstatus);
@@ -67,6 +70,7 @@ void RiscV::handleSupervisorTrap() {
 
             TCB::dispatch();
         }
+
         RiscV::w_sstatus(sstatus);
         RiscV::w_sepc(sepc);
     }
@@ -143,4 +147,55 @@ void RiscV::executeThreadDispatchSyscall(){
 
 void RiscV::executeSemOpenSyscall() {
 
+    uint64 ihandle, iinit;
+
+    asm("mv %[ihandle], a1" : [ihandle] "=r"(ihandle));
+    asm("mv %[iinit], a2" : [iinit] "=r"(iinit));
+
+    SCB *scb = new SCB(iinit);
+
+    uint64 status;
+
+    if(scb == nullptr){
+        status = -1;
+    }
+    else{
+        *((SCB**)ihandle) = scb;
+    }
+
+    asm("mv a0, %[status]" : : [status] "r" (status));
+
+}
+
+void RiscV::executeSemCloseSyscall() {
+    uint64 ihandle;
+
+    asm("mv %[ihandle], a1" : [ihandle] "=r"(ihandle));
+
+    delete (SCB*)ihandle;
+}
+
+void RiscV::executeSemWaitSyscall() {
+    uint64 ihandle;
+
+    asm("mv %[ihandle], a1" : [ihandle] "=r"(ihandle));
+
+    ((SCB*)ihandle)->wait();
+
+    uint64 status = 0;
+
+    asm("mv a0, %[status]" : : [status] "r" (status));
+
+}
+
+void RiscV::executeSemSignalSyscall() {
+    uint64 ihandle;
+
+    asm("mv %[ihandle], a1" : [ihandle] "=r"(ihandle));
+
+    ((SCB*)ihandle)->signal();
+
+    uint64 status = 0;
+
+    asm("mv a0, %[status]" : : [status] "r" (status));
 }

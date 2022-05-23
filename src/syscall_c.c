@@ -85,8 +85,8 @@ int sem_open(sem_t *handle, unsigned init){
     uint64 ihandle = (uint64)handle;
     uint64 iinit = (uint64)init;
 
-    asm("mv a1, %[ihandle]" : : [ihandle] "r" (ihandle));
     asm("mv a2, %[iinit]" : : [iinit] "r" (iinit));
+    asm("mv a1, %[ihandle]" : : [ihandle] "r" (ihandle));
     asm("li a0, 0x21");
 
 
@@ -98,6 +98,55 @@ int sem_open(sem_t *handle, unsigned init){
 
     return status;
 
+}
+
+int sem_close(sem_t handle){
+
+    uint64 ihandle = (uint64)handle;
+
+    asm("mv a1, %[ihandle]" : : [ihandle] "r" (ihandle));
+    asm("li a0, 0x22");
+
+
+    asm("ecall");
+
+    uint64 status;
+
+    asm("mv %[status], a0" : [status] "=r" (status));
+
+    return status;
+}
+
+int sem_wait(sem_t handle){
+    uint64 ihandle = (uint64)handle;
+
+    asm("mv a1, %[ihandle]" : : [ihandle] "r" (ihandle));
+    asm("li a0, 0x23");
+
+
+    asm("ecall");
+
+    uint64 status;
+
+    asm("mv %[status], a0" : [status] "=r" (status));
+
+    return status;
+}
+
+int sem_signal(sem_t handle){
+    uint64 ihandle = (uint64)handle;
+
+    asm("mv a1, %[ihandle]" : : [ihandle] "r" (ihandle));
+    asm("li a0, 0x24");
+
+
+    asm("ecall");
+
+    uint64 status;
+
+    asm("mv %[status], a0" : [status] "=r" (status));
+
+    return status;
 }
 
 char getc(){

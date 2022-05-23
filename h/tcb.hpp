@@ -6,8 +6,9 @@
 #define OS1_KERNEL_TCB_HPP
 
 #include "../lib/hw.h"
-#include "../h/scheduler.hpp"
-#include "../h/riscv.hpp"
+#include "./scheduler.hpp"
+#include "./riscv.hpp"
+#include "./scheduler.hpp"
 
 class TCB {
 public:
@@ -22,7 +23,7 @@ private:
         uint64 sp, ra;
     };
 
-    enum Status{RUNNING, READY, FINISHED};
+    enum Status{RUNNING, READY, FINISHED, BLOCKED};
 
     struct Node{
         TCB *tcb;
@@ -71,6 +72,7 @@ private:
     friend class Scheduler;
     friend class RiscV;
     friend class Queue;
+    friend class SCB;
 };
 
 

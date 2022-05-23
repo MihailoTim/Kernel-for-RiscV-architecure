@@ -35,6 +35,8 @@ private:
 
     friend class TCB;
 
+    friend class SCB;
+
 };
 
 

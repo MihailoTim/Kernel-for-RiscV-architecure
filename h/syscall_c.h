@@ -28,6 +28,12 @@ void thread_dispatch();
 
 int sem_open(sem_t *handle, unsigned init);
 
+int sem_close(sem_t handle);
+
+int sem_wait(sem_t handle);
+
+int sem_signal(sem_t handle);
+
 char getc();
 
 void putc(char c);

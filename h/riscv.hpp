@@ -12,6 +12,7 @@
 #include "../lib/console.h"
 #include "../h/syscall_cpp.hpp"
 #include "../h/scheduler.hpp"
+#include "../h/scb.hpp"
 
 class RiscV{
     enum BitMaskSstatus{
@@ -37,6 +38,12 @@ class RiscV{
     static void executeThreadDispatchSyscall();
 
     static void executeSemOpenSyscall();
+
+    static void executeSemCloseSyscall();
+
+    static void executeSemWaitSyscall();
+
+    static void executeSemSignalSyscall();
 
     static void pushRegisters();
 
