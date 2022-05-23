@@ -6,15 +6,19 @@
 
 TCB* TCB::running = nullptr;
 
+uint64 TCB::timeSliceCounter = 0;
+
 void TCB::initialize() {
-    TCB::running = new TCB(nullptr, nullptr, nullptr);
+    TCB::running = new TCB(nullptr, nullptr, nullptr, DEFAULT_TIME_SLICE);
 }
 
-TCB::TCB(Body body, void* args, uint64* stack){
+TCB::TCB(Body body, void* args, uint64* stack, uint64 timeSlice){
 
     this->body = body;
 
     this->args = args;
+
+    this->timeSlice = timeSlice;
 
     this->stack = (body == nullptr) ? nullptr : stack;
 

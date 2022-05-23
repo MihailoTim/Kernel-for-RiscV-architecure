@@ -3,7 +3,7 @@
 
 #include "../h/syscall_c.h"
 
-#include "printing.hpp"
+#include "../h/printing.hpp"
 
 uint64 fibonacci(uint64 n);
 

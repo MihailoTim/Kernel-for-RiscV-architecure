@@ -24,9 +24,14 @@ private:
 
     enum Status{RUNNING, READY, FINISHED};
 
+    struct Node{
+        TCB *tcb;
+        Node *next, *prev;
+    };
+
     TCB();
 
-    TCB(Body body, void* args, uint64* stack);
+    TCB(Body body, void* args, uint64* stack, uint64 timeSlice);
 
     ~TCB();
 
@@ -55,10 +60,17 @@ private:
     void *args;
     uint64 *stack;
 
+    uint64 timeSlice;
+
+    Node* node;
+
     static TCB *running;
+
+    static uint64 timeSliceCounter;
 
     friend class Scheduler;
     friend class RiscV;
+    friend class Queue;
 };
 
 

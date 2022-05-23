@@ -12,7 +12,7 @@ void Scheduler::initialize(){
 }
 
 void Scheduler::put(TCB *tcb) {
-    queue->push(tcb);
+        queue->push(tcb);
 }
 
 TCB* Scheduler::get(){

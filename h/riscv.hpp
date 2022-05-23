@@ -14,6 +14,18 @@
 #include "../h/scheduler.hpp"
 
 class RiscV{
+    enum BitMaskSstatus{
+        SSTATUS_SIE = (1<<1),
+        SSTATUS_SPIE = (1<<5),
+        SSTATUS_SPP = (1<<8),
+    };
+
+    enum BitMaskSip{
+        SIP_SSIE = (1<<1),
+        SIP_STIE = (1<<5),
+        SIP_SEIE = (1<<9),
+    };
+
     static void executeMemAllocSyscall();   //wrapper function for moving parameters and calling MemoryAllocator
 
     static void executeMemFreeSyscall();    //wrapper function for moving parameters and calling MemoryAllocator
@@ -22,7 +34,9 @@ class RiscV{
 
     static void executeThreadExitSyscall();
 
-    static void executeThreadDispatch();
+    static void executeThreadDispatchSyscall();
+
+    static void executeSemOpenSyscall();
 
     static void pushRegisters();
 
@@ -44,6 +58,14 @@ class RiscV{
 
     static void w_sstatus(uint64 sstatus);
 
+    static void ms_sstatus(uint64 mask);
+
+    static void mc_sstatus(uint64 mask);
+
+    static void ms_sip(uint64 mask);
+
+    static void mc_sip(uint64 mask);
+
     static void popSppSpie();
 
     static void supervisorTrap();      //supervisorTrap defined in /src/supervisorTrap.S
@@ -54,6 +76,10 @@ class RiscV{
 
     friend class Utility;
 public:
+
+    static void enableInterrupts();
+
+    static void disableInterrupts();
 
     static void initialize();
 };
@@ -98,4 +124,27 @@ inline void RiscV::w_stvec(uint64 stvec){
     asm("csrw stvec, %[stvec]" : : [stvec] "r" (stvec));
 }
 
+inline void  RiscV::ms_sstatus(uint64 mask) {
+    asm("csrs sstatus, %[mask]" : : [mask] "r" (mask));
+}
+
+inline void  RiscV::mc_sstatus(uint64 mask) {
+    asm("csrc sstatus, %[mask]" : : [mask] "r" (mask));
+}
+
+inline void  RiscV::ms_sip(uint64 mask) {
+    asm("csrs sip, %[mask]" : : [mask] "r" (mask));
+}
+
+inline void  RiscV::mc_sip(uint64 mask) {
+    asm("csrc sip, %[mask]" : : [mask] "r" (mask));
+}
+
+inline void RiscV::enableInterrupts() {
+    RiscV::ms_sstatus(SSTATUS_SIE);
+}
+
+inline void RiscV::disableInterrupts() {
+    RiscV::mc_sstatus(SSTATUS_SIE);
+}
 #endif //OS1_KERNEL_RISCV_HPP

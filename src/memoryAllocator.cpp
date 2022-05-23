@@ -4,7 +4,7 @@
 #include "../h/memoryAllocator.hpp"
 #include "../lib/console.h"
 #include "../h/utility.hpp"
-#include "../tests/printing.hpp"
+#include "../h/printing.hpp"
 
 MemoryAllocator::BlockHeader* MemoryAllocator::freeMemHead = nullptr;
 
@@ -27,7 +27,6 @@ void MemoryAllocator::initialize() {
 
 void* MemoryAllocator::kmalloc(size_t size){
     if(size<=0 || freeMemHead == nullptr) {
-        printString("NEMA MEMORIJE\n");
         return nullptr;
     }
 
@@ -69,7 +68,6 @@ void* MemoryAllocator::kmalloc(size_t size){
         return (char*)blk + sizeof(BlockHeader);    //return address of start of the data block, not start of the header
     }
 
-    printString("NEMA MEMORIJE\n");
     return nullptr;
 }
 

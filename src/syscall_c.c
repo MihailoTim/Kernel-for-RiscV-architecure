@@ -80,6 +80,26 @@ void thread_dispatch(){
     asm("ecall");
 }
 
+int sem_open(sem_t *handle, unsigned init){
+
+    uint64 ihandle = (uint64)handle;
+    uint64 iinit = (uint64)init;
+
+    asm("mv a1, %[ihandle]" : : [ihandle] "r" (ihandle));
+    asm("mv a2, %[iinit]" : : [iinit] "r" (iinit));
+    asm("li a0, 0x21");
+
+
+    asm("ecall");
+
+    uint64 status;
+
+    asm("mv %[status], a0" : [status] "=r" (status));
+
+    return status;
+
+}
+
 char getc(){
     return __getc();
 }

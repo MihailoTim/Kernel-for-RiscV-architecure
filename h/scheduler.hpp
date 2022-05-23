@@ -7,8 +7,7 @@
 
 #include "../h/queue.hpp"
 #include "../h/utility.hpp"
-
-class TCB;
+#include "../h/tcb.hpp"
 
 class Scheduler {
     static Queue* queue;

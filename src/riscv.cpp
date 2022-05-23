@@ -8,6 +8,7 @@
 #include "../lib/console.h"
 #include "../h/syscall_cpp.hpp"
 #include "../h/scheduler.hpp"
+#include "../h/printing.hpp"
 
 int timer = 0;
 
@@ -25,8 +26,7 @@ void RiscV::popSppSpie() {
 
 void RiscV::handleSupervisorTrap() {
 
-    uint64 scause = RiscV::r_scause();
-
+    uint64 volatile scause = RiscV::r_scause();
     //interrupt from ecall
     if(scause == 0x09) {
         uint64 volatile sstatus = RiscV::r_sstatus();
@@ -41,7 +41,8 @@ void RiscV::handleSupervisorTrap() {
             case 0x02 : executeMemFreeSyscall();break;
             case 0x11 : executeThreadCreateSyscall();break;
             case 0x12 : executeThreadExitSyscall();break;
-            case 0x13 : executeThreadDispatch();break;
+            case 0x13 : executeThreadDispatchSyscall();break;
+            case 0x21 : executeSemOpenSyscall();break;
         }
 
         RiscV::w_sstatus(sstatus);
@@ -51,26 +52,28 @@ void RiscV::handleSupervisorTrap() {
     //timer interrupt
     if(scause == (0x01UL<<63 | 0x1)){
 
-        uint64 sstatus = RiscV::r_sstatus();
-        uint64 sepc = RiscV::r_sepc();
+        uint64 volatile sstatus = RiscV::r_sstatus();
+        uint64 volatile sepc = RiscV::r_sepc();
+        mc_sip(SIP_SSIE);
 
-        timer++;
-        if(timer==5) {
-        __putc('t');
-        __putc('i');
-        __putc('m');
-        __putc('e');
-        __putc('r');
-        timer=0;
+        TCB::timeSliceCounter++;
+        if(TCB::timeSliceCounter >= TCB::running->timeSlice) {
+
+            TCB::timeSliceCounter = 0;
+
+            TCB* old = TCB::running;
+
+            old->status = TCB::Status::READY;
+
+            TCB::dispatch();
         }
-        asm("csrc sip, 0x02");
-
         RiscV::w_sstatus(sstatus);
         RiscV::w_sepc(sepc);
     }
 
     if(scause == (0x01UL<<63 | 0x9)){
-        Utility::printString("Hardware interrupt");
+        console_handler();
+        //Utility::printString("Hardware interrupt");
     }
 }
 
@@ -103,7 +106,7 @@ void RiscV::executeThreadCreateSyscall(){
     asm("mv %[iroutine], a2" : [iroutine] "=r"(iroutine));
     asm("mv %[iargs], a3" : [iargs] "=r"(iargs));
 
-    TCB *tcb = new TCB((TCB::Body)iroutine, (void*)iargs, (uint64*)istack);
+    TCB *tcb = new TCB((TCB::Body)iroutine, (void*)iargs, (uint64*)istack, DEFAULT_TIME_SLICE);
 
     uint64 status;
 
@@ -132,8 +135,12 @@ void RiscV::executeThreadExitSyscall() {
     asm("mv a0, %[status]" : : [status] "r" (status));
 }
 
-void RiscV::executeThreadDispatch(){
+void RiscV::executeThreadDispatchSyscall(){
     TCB* old = TCB::running;
     old->status = TCB::Status::READY;
     TCB::dispatch();
+}
+
+void RiscV::executeSemOpenSyscall() {
+
 }

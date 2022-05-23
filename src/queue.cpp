@@ -21,6 +21,7 @@ void Queue::empty() {
 }
 
 Queue& Queue::push(TCB *tcb){
+    //TODO: find way to not allocate a node every time
     tail = (!head ? head : tail->next) = (Node*)MemoryAllocator::kmalloc(sizeof(Node));
     tail->tcb = tcb;
     tail->next =nullptr;

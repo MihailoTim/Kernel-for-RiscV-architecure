@@ -8,7 +8,9 @@
 #include "../lib/hw.h"
 
 #define MEM_BLOCK_OFFS 6
+
 typedef void* thread_t;
+typedef void* sem_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,6 +25,8 @@ int thread_create(thread_t* handle, void(*start_routine)(void*), void *arg);
 int thread_exit();
 
 void thread_dispatch();
+
+int sem_open(sem_t *handle, unsigned init);
 
 char getc();
 

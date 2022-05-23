@@ -43,6 +43,8 @@ public:
     void* operator new(size_t size);
 
     void operator delete(void* addr);
+
+    friend class Scheduler;
 };
 
 
