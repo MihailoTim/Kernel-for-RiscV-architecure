@@ -13,12 +13,12 @@ void Scheduler::initialize(){
 
 void Scheduler::put(TCB *tcb) {
     if(tcb->node){
-        queue->appendTail(tcb->node);
+        queue->push(tcb->node);
     }
     else{
         Queue::Node *node = (Queue::Node*)MemoryAllocator::kmalloc(sizeof(Queue::Node));
         node->tcb = tcb;
-        tcb->node = queue->appendTail((void *) node);
+        tcb->node = queue->push((void *) node);
     }
 }
 

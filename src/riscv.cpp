@@ -46,6 +46,7 @@ void RiscV::handleSupervisorTrap() {
             case 0x22 : executeSemCloseSyscall();break;
             case 0x23 : executeSemWaitSyscall();break;
             case 0x24 : executeSemSignalSyscall();break;
+            case 0x31 : executeTimeSleepSyscall();break;
         }
 
         RiscV::w_sstatus(sstatus);
@@ -194,6 +195,25 @@ void RiscV::executeSemSignalSyscall() {
     asm("mv %[ihandle], a1" : [ihandle] "=r"(ihandle));
 
     ((SCB*)ihandle)->signal();
+
+    uint64 status = 0;
+
+    asm("mv a0, %[status]" : : [status] "r" (status));
+}
+
+void RiscV::executeTimeSleepSyscall() {
+    uint64 itime;
+
+    asm("mv %[itime], a1" : [itime] "=r"(itime));
+
+    printInt(itime);
+
+    TCB::running->sleepTime = itime;
+
+
+//    Scheduler::putToSleep(TCB::running);
+
+    TCB::dispatch();
 
     uint64 status = 0;
 

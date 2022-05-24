@@ -5,14 +5,11 @@
 #ifndef OS1_KERNEL_RISCV_HPP
 #define OS1_KERNEL_RISCV_HPP
 
-
-#include "../h/riscv.hpp"
 #include "../h/memoryAllocator.hpp"
-#include "../h/tcb.hpp"
 #include "../lib/console.h"
-#include "../h/syscall_cpp.hpp"
 #include "../h/scheduler.hpp"
 #include "../h/scb.hpp"
+#include "./printing.hpp"
 
 class RiscV{
     enum BitMaskSstatus{
@@ -44,6 +41,8 @@ class RiscV{
     static void executeSemWaitSyscall();
 
     static void executeSemSignalSyscall();
+
+    static void executeTimeSleepSyscall();
 
     static void pushRegisters();
 

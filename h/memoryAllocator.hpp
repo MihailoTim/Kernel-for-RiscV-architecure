@@ -33,6 +33,8 @@ private:
 
     friend class Queue;
 
+    friend class PriorityQueue;
+
     friend class TCB;
 
     friend class SCB;

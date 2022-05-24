@@ -11,14 +11,21 @@ SCB::SCB(uint64 init){
 
 SCB::~SCB(){
     TCB* tmp;
-    while((tmp = (TCB*)blocked->pop())){
+    while((tmp = (TCB*)blocked->pop())) {
         Scheduler::put(tmp);
     }
-    delete blocked;
 }
 
 void SCB::block() {
-    blocked->push(TCB::running);
+    TCB* tcb = TCB::running;
+    if(tcb->node){
+        blocked->push(tcb->node);
+    }
+    else{
+        Queue::Node *node = (Queue::Node*)MemoryAllocator::kmalloc(sizeof(Queue::Node));
+        node->tcb = tcb;
+        tcb->node = blocked->push((void *) node);
+    }
     TCB::running->status = TCB::BLOCKED;
     TCB::dispatch();
 }
@@ -32,8 +39,10 @@ void SCB::deblock(){
 }
 
 void SCB::wait(){
-    if(--val<0)
+    if(--val<0) {
+        printString("blocked\n");
         block();
+    }
 }
 
 void SCB::signal(){

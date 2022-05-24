@@ -45,7 +45,7 @@ TCB::~TCB(){
 void TCB::dispatch() {
     TCB* old = running;
 
-    if(old->status == (Status::READY || Status::RUNNING))
+    if(old->status == (Status::RUNNING || Status::READY))
         Scheduler::put(old);
 
     running = Scheduler::get();

@@ -5,7 +5,7 @@
 #include "../h/queue.hpp"
 
 void* Queue::operator new(size_t size) {
-    return MemoryAllocator::kmalloc((size+MEM_BLOCK_SIZE-1)>>MEM_BLOCK_OFFS);
+    return MemoryAllocator::kmalloc((size+MEM_BLOCK_SIZE-1)>>6);
 }
 
 void Queue::operator delete(void *addr){
@@ -20,16 +20,7 @@ void Queue::empty() {
     }
 }
 
-void* Queue::push(void *tcb) {
-    tail = (!head ? head : tail->next) = (Node*) MemoryAllocator::kmalloc(sizeof(Node));
-    tail->tcb = tcb;
-    tail->next = nullptr;
-    size++;
-
-    return tail;
-}
-
-void* Queue::appendTail(void *t) {
+void* Queue::push(void *t) {
     tail = (!head ? head : tail->next) = (Node*)t;
 
     return (void*)tail;

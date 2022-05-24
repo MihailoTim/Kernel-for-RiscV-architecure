@@ -19,20 +19,41 @@ char string[11] = "this is ni";
 
 
 void consumerA(void *arg){
-    while(head!=10){
-        sem_wait(itemAvailable);
-        __putc(buffer[head++]);
-        sem_signal(spaceAvailable);
-    }
+    printString("consumer A now sleeping\n");
+    time_sleep(500);
+    while(true);
+//    while(head!=10){
+//        sem_wait(itemAvailable);
+//        __putc(buffer[head++]);
+//        sem_signal(spaceAvailable);
+//    }
+//    printString("\nconsumer done\n");
 }
 
 void producerA(void *arg){
-    while(tail!=10) {
-        sem_wait(spaceAvailable);
-        buffer[tail] = string[tail];
-        tail++;
-        sem_signal(itemAvailable);
-    }
+    printString("producer A now sleeping\n");
+    time_sleep(1000);
+    while(true);
+//    while(tail!=10) {
+//        sem_wait(spaceAvailable);
+//        buffer[tail] = string[tail];
+//        tail++;
+//        sem_signal(itemAvailable);
+//    }
+//    printString("\nproducer done\n");
+}
+
+void producerB(void *arg){
+    printString("producer B now sleeping\n");
+    time_sleep(800);
+    while(true);
+//    while(tail!=10) {
+//        sem_wait(spaceAvailable);
+//        buffer[tail] = string[tail];
+//        tail++;
+//        sem_signal(itemAvailable);
+//    }
+//    printString("\nproducer done\n");
 }
 
 int main() {
@@ -40,12 +61,25 @@ int main() {
     RiscV::initialize();
 
     RiscV::enableInterrupts();
-
+//
     userMain();
 
-//    printString("\nEnd of main\n");
+//    sem_open(&spaceAvailable, 10);
+//
+//    sem_open(&itemAvailable, 0);
+//
+//    thread_t threadA, threadB;
+//    thread_create(&threadA, consumerA, nullptr);
+//
+//    thread_create(&threadB, producerA, nullptr);
+//
+//    time_sleep(100);
+//
+//
+//    while(!((TCB*)threadA)->isFinished() || !((TCB*)threadA)->isFinished())
+//        thread_dispatch();
 
-
+    printString("\nEnd of main\n");
 
     RiscV::disableInterrupts();
 

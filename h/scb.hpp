@@ -5,19 +5,12 @@
 #ifndef OS1_KERNEL_SCB_HPP
 #define OS1_KERNEL_SCB_HPP
 
-#include "../lib/hw.h"
-#include "./queue.hpp"
-#include "./tcb.hpp"
-#include "./memoryAllocator.hpp"
-#include "./printing.hpp"
+#include "riscv.hpp"
 //semaphore control block
 
 class SCB {
 
-public:
     int val;
-
-private:
 
     Queue *blocked;
 

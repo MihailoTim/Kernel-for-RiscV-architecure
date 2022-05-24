@@ -6,9 +6,7 @@
 #define OS1_KERNEL_TCB_HPP
 
 #include "../lib/hw.h"
-#include "./scheduler.hpp"
 #include "./riscv.hpp"
-#include "./scheduler.hpp"
 
 class TCB {
 public:
@@ -59,6 +57,8 @@ private:
     uint64 timeSlice;
 
     void* node;
+
+    uint64 sleepTime = 0;
 
     static TCB *running;
 

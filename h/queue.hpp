@@ -6,7 +6,6 @@
 #define OS1_KERNEL_QUEUE_HPP
 
 #include "../h/memoryAllocator.hpp"
-#include "../h/utility.hpp"
 
 class TCB;
 
@@ -35,9 +34,7 @@ public:
         empty();
     }
 
-    void* push(void *tcb);
-
-    void* appendTail(void* t);
+    virtual void* push(void* t);
 
     void* pop();
 
@@ -48,6 +45,8 @@ public:
     friend class Scheduler;
 
     friend class SCB;
+
+    friend class Sleeper;
 };
 
 

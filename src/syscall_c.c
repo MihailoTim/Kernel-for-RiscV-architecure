@@ -149,6 +149,22 @@ int sem_signal(sem_t handle){
     return status;
 }
 
+int time_sleep(time_t time){
+    uint64 itime = (uint64)time;
+
+    asm("mv a1, %[itime]" : : [itime] "r" (itime));
+    asm("li a0, 0x31");
+
+
+    asm("ecall");
+
+    uint64 status;
+
+    asm("mv %[status], a0" : [status] "=r" (status));
+
+    return status;
+}
+
 char getc(){
     return __getc();
 }

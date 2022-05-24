@@ -6,7 +6,6 @@
 #define OS1_KERNEL_SCHEDULER_HPP
 
 #include "../h/queue.hpp"
-#include "../h/utility.hpp"
 #include "../h/tcb.hpp"
 
 class Scheduler {
