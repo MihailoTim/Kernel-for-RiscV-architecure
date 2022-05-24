@@ -25,11 +25,6 @@ private:
 
     enum Status{RUNNING, READY, FINISHED, BLOCKED};
 
-    struct Node{
-        TCB *tcb;
-        Node *next, *prev;
-    };
-
     TCB();
 
     TCB(Body body, void* args, uint64* stack, uint64 timeSlice);
@@ -63,7 +58,7 @@ private:
 
     uint64 timeSlice;
 
-    Node* node;
+    void* node;
 
     static TCB *running;
 

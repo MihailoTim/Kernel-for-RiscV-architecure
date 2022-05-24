@@ -11,7 +11,7 @@ SCB::SCB(uint64 init){
 
 SCB::~SCB(){
     TCB* tmp;
-    while((tmp = blocked->pop())){
+    while((tmp = (TCB*)blocked->pop())){
         Scheduler::put(tmp);
     }
     delete blocked;
@@ -24,7 +24,7 @@ void SCB::block() {
 }
 
 void SCB::deblock(){
-    TCB *tcb = blocked->pop();
+    TCB *tcb = (TCB*)blocked->pop();
     if(tcb) {
         tcb->status = TCB::READY;
         Scheduler::put(tcb);

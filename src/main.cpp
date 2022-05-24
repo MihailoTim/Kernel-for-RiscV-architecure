@@ -39,36 +39,14 @@ int main() {
 
     RiscV::initialize();
 
-//    thread_t threads[2];
-//    thread_create(&threads[0], wrapper1, nullptr);
-//    printString("ThreadA created\n");
-//
-//    thread_create(&threads[1], wrapper2, nullptr);
-//    printString("ThreadB created\n");
-//
-//    while(!((TCB*)threads[0])->isFinished() || !((TCB*)threads[1])->isFinished())
-//        thread_dispatch();
-
     RiscV::enableInterrupts();
-//
-//    userMain();
+
+    userMain();
+
+//    printString("\nEnd of main\n");
 
 
-    sem_open(&spaceAvailable, 10);
 
-    sem_open(&itemAvailable, 0);
-
-    thread_t threadA, threadB;
-
-    thread_create(&threadA, producerA, nullptr);
-
-    thread_create(&threadB, consumerA, nullptr);
-
-    while(!((TCB*)threadA)->isFinished() || !((TCB*)threadA)->isFinished())
-        thread_dispatch();
-
-    printString("\nEnd of main\n");
-//
     RiscV::disableInterrupts();
 
     return 0;

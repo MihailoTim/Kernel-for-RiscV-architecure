@@ -24,6 +24,8 @@ TCB::TCB(Body body, void* args, uint64* stack, uint64 timeSlice){
 
     this->status = Status::READY;
 
+    this->node = nullptr;
+
     this->context = {(body == nullptr) ? 0 : (uint64)((char*)stack + DEFAULT_STACK_SIZE),
                      (uint64)&wrapper };
 
@@ -43,7 +45,7 @@ TCB::~TCB(){
 void TCB::dispatch() {
     TCB* old = running;
 
-    if(old->status != Status::FINISHED)
+    if(old->status == (Status::READY || Status::RUNNING))
         Scheduler::put(old);
 
     running = Scheduler::get();

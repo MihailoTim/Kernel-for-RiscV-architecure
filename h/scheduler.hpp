@@ -11,13 +11,18 @@
 
 class Scheduler {
     static Queue* queue;
-public:
 
     static void put(TCB *t);
 
     static TCB* get();
 
     static void initialize();
+
+    friend class RiscV;
+
+    friend class SCB;
+
+    friend class TCB;
 };
 
 

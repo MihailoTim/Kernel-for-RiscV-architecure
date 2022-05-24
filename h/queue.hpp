@@ -11,9 +11,10 @@
 class TCB;
 
 class Queue {
+protected:
     struct Node{
-        TCB *tcb;
-        Node *next, *prev;
+        void *tcb;
+        Node *next;
     };
 
     void empty();
@@ -34,17 +35,19 @@ public:
         empty();
     }
 
-    Queue& push(TCB *tcb);
+    void* push(void *tcb);
 
-    TCB* pop();
+    void* appendTail(void* t);
 
-    TCB* peek();
+    void* pop();
 
     void* operator new(size_t size);
 
     void operator delete(void* addr);
 
     friend class Scheduler;
+
+    friend class SCB;
 };
 
 

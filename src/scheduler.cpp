@@ -12,9 +12,16 @@ void Scheduler::initialize(){
 }
 
 void Scheduler::put(TCB *tcb) {
-        queue->push(tcb);
+    if(tcb->node){
+        queue->appendTail(tcb->node);
+    }
+    else{
+        Queue::Node *node = (Queue::Node*)MemoryAllocator::kmalloc(sizeof(Queue::Node));
+        node->tcb = tcb;
+        tcb->node = queue->appendTail((void *) node);
+    }
 }
 
 TCB* Scheduler::get(){
-    return queue->pop();
+    return (TCB*)queue->pop();
 }

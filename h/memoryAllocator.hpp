@@ -37,6 +37,8 @@ private:
 
     friend class SCB;
 
+    friend class Scheduler;
+
 };
 
 

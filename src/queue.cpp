@@ -20,33 +20,31 @@ void Queue::empty() {
     }
 }
 
-Queue& Queue::push(TCB *tcb){
-    //TODO: find way to not allocate a node every time
-    tail = (!head ? head : tail->next) = (Node*)MemoryAllocator::kmalloc(sizeof(Node));
+void* Queue::push(void *tcb) {
+    tail = (!head ? head : tail->next) = (Node*) MemoryAllocator::kmalloc(sizeof(Node));
     tail->tcb = tcb;
-    tail->next =nullptr;
+    tail->next = nullptr;
     size++;
 
-    return *this;
+    return tail;
 }
 
-TCB* Queue::pop() {
+void* Queue::appendTail(void *t) {
+    tail = (!head ? head : tail->next) = (Node*)t;
+
+    return (void*)tail;
+}
+
+void* Queue::pop() {
     if(head){
-        TCB* tcb = head->tcb;
-        Node *tmp = head;
+        void* tcb = head->tcb;
+//        Node *tmp = head;
         head = head->next;
-        MemoryAllocator::kfree(tmp);
+//        MemoryAllocator::kfree(tmp);
         size--;
 
         return tcb;
     }
-    else
-        return nullptr;
-}
-
-TCB* Queue::peek() {
-    if(head)
-        return head->tcb;
     else
         return nullptr;
 }
