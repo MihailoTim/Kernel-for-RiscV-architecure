@@ -59,6 +59,7 @@ private:
     TCB* next;
 
     uint64 sleepTime = 0;
+    uint64 wakeTime = 0;
 
     static TCB *running;
 

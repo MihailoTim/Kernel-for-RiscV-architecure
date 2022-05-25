@@ -27,9 +27,51 @@ Semaphore::~Semaphore(){
 };
 
 int Semaphore::wait(){
-    sem_wait(myHandle);
+    return sem_wait(myHandle);
 }
 
 int Semaphore::signal() {
-    sem_signal(myHandle);
+    return sem_signal(myHandle);
+}
+
+Thread::Thread(void (*body)(void*), void *arg) {
+    this->body = body;
+    this->args = arg;
+}
+
+void Thread::wrapper(void *arg) {
+    Thread* thr = (Thread*)arg;
+    if(thr->body)
+        thr->body(thr->args);
+    else
+        thr->run();
+}
+
+Thread::Thread() {
+    this->body = nullptr;
+    this->args = nullptr;
+}
+
+int Thread::sleep(time_t time) {
+    return 0;
+}
+
+void Thread::dispatch() {
+    thread_dispatch();
+}
+
+int Thread::start() {
+    return thread_create(&myHandle, &Thread::wrapper, this);
+}
+
+Thread::~Thread() {
+    delete (uint64*)myHandle;
+}
+
+char Console::getc() {
+    return ::getc();
+}
+
+void Console::putc(char c) {
+    ::putc(c);
 }

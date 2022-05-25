@@ -26,6 +26,12 @@ int thread_exit();
 
 void thread_dispatch();
 
+int thread_attach_body(thread_t handle, void(*start_routine)(void*), void *arg);
+
+int thread_initialize(thread_t* handle);
+
+int thread_start(thread_t handle);
+
 int sem_open(sem_t *handle, unsigned init);
 
 int sem_close(sem_t handle);

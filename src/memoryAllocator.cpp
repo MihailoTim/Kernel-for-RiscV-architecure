@@ -88,7 +88,7 @@ uint64 MemoryAllocator::kfree(void* ptr){
             allocMemHead = blk->next;
 
         //insert blk chunk in list of free memory and try to merge with an already existing block
-//        Utility::memset((char*)blk+sizeof(BlockHeader), 34, blk->size); //FOR TESTING PURPOSES ONLY: fill acquired space with 1s
+//        Utility::memset((char*)blk+sizeof(BlockHeader), 0, blk->size); //FOR TESTING PURPOSES ONLY: fill acquired space with 1s
         insertAndMerge(blk, &freeMemHead);
     }
     return 0;

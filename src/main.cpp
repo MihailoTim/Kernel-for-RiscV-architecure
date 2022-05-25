@@ -4,6 +4,7 @@
 #include "../h/riscv.hpp"
 #include "../h/utility.hpp"
 #include "../tests/userMain.hpp"
+#include "../h/syscall_cpp.hpp"
 
 char buffer[10];
 int head = 0;
@@ -31,6 +32,10 @@ void producerA(void *arg){
     printString("\nproducer done\n");
 }
 
+void wrapper(void* arg){
+    userMain();
+}
+
 int main() {
 
     RiscV::initialize();
@@ -39,25 +44,40 @@ int main() {
 
     userMain();
 
-    thread_dispatch();
+    printString("Scheduler:\n");
+    Scheduler::showScheduler();
 
-    sem_open(&spaceAvailable, 10);
+    userMain();
 
-    sem_open(&itemAvailable, 0);
+    printInt(RiscV::globalTime);
 
-    thread_t threadA, threadB;
-    int status = thread_create(&threadA, consumerA, nullptr);
+    time_sleep(1000);
 
-    if(status == -1)
-        printString("Thread create fault\n");
 
-    status = thread_create(&threadB, producerA, nullptr);
-
-    if(status == -1)
-        printString("Thread create fault\n");
-
-    while( !((TCB*)threadA)->isFinished() || !((TCB*)threadB)->isFinished() )
-        thread_dispatch();
+//    thread_t thr;
+//    thread_create(&thr, wrapper, nullptr);
+//
+//    while(!(((TCB*)thr)->isFinished())) {
+//        thread_dispatch();
+//    }
+//
+//    sem_open(&spaceAvailable, 10);
+//
+//    sem_open(&itemAvailable, 0);
+//
+//    thread_t threadA, threadB;
+//    int status = thread_create(&threadA, consumerA, nullptr);
+//
+//    if(status == -1)
+//        printString("Thread create fault\n");
+//
+//    status = thread_create(&threadB, producerA, nullptr);
+//
+//    if(status == -1)
+//        printString("Thread create fault\n");
+//
+//    while( !((TCB*)threadA)->isFinished() || !((TCB*)threadB)->isFinished() )
+//        thread_dispatch();
 
     printString("\nEnd of main\n");
 

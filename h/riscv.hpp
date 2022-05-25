@@ -34,6 +34,14 @@ class RiscV{
 
     static void executeThreadDispatchSyscall();
 
+    static void executeThreadAttachBodySyscall();
+
+    static void executeThreadAttachRunSyscall();
+
+    static void executeThreadInitializeSyscall();
+
+    static void executeThreadStartSyscall();
+
     static void executeSemOpenSyscall();
 
     static void executeSemCloseSyscall();
@@ -82,6 +90,8 @@ class RiscV{
 
     friend class Utility;
 public:
+
+    static uint64 globalTime;
 
     static void enableInterrupts();
 

@@ -34,7 +34,6 @@ TCB::TCB(Body body, void* args, uint64* stack, uint64 timeSlice){
 }
 
 void TCB::free(){
-    status = Status::FINISHED;
     MemoryAllocator::kfree(stack);
 }
 
@@ -45,7 +44,7 @@ TCB::~TCB(){
 void TCB::dispatch() {
     TCB* old = running;
 
-    if(old->status == Status::READY) {
+    if(old->status == Status::READY || old->status == Status::RUNNING) {
         Scheduler::put(old);
     }
 

@@ -80,6 +80,59 @@ void thread_dispatch(){
     asm("ecall");
 }
 
+int thread_attach_body(thread_t handle, void(*start_routine)(void*), void *arg){
+    uint64 ihandle = (uint64)handle;
+    uint64 iroutine = (uint64)start_routine;
+    uint64 iarg = (uint64)arg;
+
+    asm("mv a3, %[iarg]" : : [iarg] "r" (iarg));
+    asm("mv a2, %[iroutine]" : : [iroutine] "r" (iroutine));
+    asm("mv a1, %[ihandle]" : : [ihandle] "r" (ihandle));
+    asm("li a0, 0x14");
+
+    asm("ecall");
+
+    uint64 status;
+
+    asm("mv %[status], a0" : [status] "=r" (status));
+
+    return status;
+}
+
+int thread_initialize(thread_t* handle){
+    uint64 ihandle = (uint64)handle;
+    uint64 istack = 0;
+
+    istack = (uint64) mem_alloc(DEFAULT_STACK_SIZE);
+
+    asm("mv a2, %[istack]" : : [istack] "r" (istack));
+    asm("mv a1, %[ihandle]" : : [ihandle] "r" (ihandle));
+    asm("li a0, 0x15");
+
+    asm("ecall");
+
+    uint64 status;
+
+    asm("mv %[status], a0" : [status] "=r" (status));
+
+    return status;
+}
+
+int thread_start(thread_t handle){
+    uint64 ihandle = (uint64)handle;
+
+    asm("mv a1, %[ihandle]" : : [ihandle] "r" (ihandle));
+    asm("li a0, 0x16");
+
+    asm("ecall");
+
+    uint64 status;
+
+    asm("mv %[status], a0" : [status] "=r" (status));
+
+    return status;
+}
+
 int sem_open(sem_t *handle, unsigned init){
 
     uint64 ihandle = (uint64)handle;

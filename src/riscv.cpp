@@ -10,7 +10,7 @@
 #include "../h/scheduler.hpp"
 #include "../h/printing.hpp"
 
-int timer = 0;
+uint64 RiscV::globalTime = 0;
 
 void RiscV::initialize() {
     RiscV::w_stvec((uint64) &RiscV::supervisorTrap);
@@ -42,6 +42,9 @@ void RiscV::handleSupervisorTrap() {
             case 0x11 : executeThreadCreateSyscall();break;
             case 0x12 : executeThreadExitSyscall();break;
             case 0x13 : executeThreadDispatchSyscall();break;
+            case 0x14 : executeThreadAttachBodySyscall();break;
+            case 0x15 : executeThreadInitializeSyscall();break;
+            case 0x16 : executeThreadStartSyscall();break;
             case 0x21 : executeSemOpenSyscall();break;
             case 0x22 : executeSemCloseSyscall();break;
             case 0x23 : executeSemWaitSyscall();break;
@@ -59,6 +62,8 @@ void RiscV::handleSupervisorTrap() {
         uint64 volatile sstatus = RiscV::r_sstatus();
         uint64 volatile sepc = RiscV::r_sepc();
         mc_sip(SIP_SSIE);
+
+        globalTime += 1;
 
         TCB::timeSliceCounter++;
         if(TCB::timeSliceCounter >= TCB::running->timeSlice) {
@@ -78,7 +83,8 @@ void RiscV::handleSupervisorTrap() {
 
     if(scause == (0x01UL<<63 | 0x9)){
         console_handler();
-        //Utility::printString("Hardware interrupt");
+//        int cause = plic_claim();
+//        plic_complete(cause);
     }
 }
 
@@ -119,6 +125,69 @@ void RiscV::executeThreadCreateSyscall(){
         status = -1;
     }
     else{
+        *((TCB**)ihandle) = tcb;
+    }
+
+    asm("mv a0, %[status]" : : [status] "r" (status));
+}
+
+void RiscV::executeThreadAttachBodySyscall(){
+    uint64 iroutine, iargs, ihandle;
+
+    asm("mv %[ihandle], a1" : [ihandle] "=r"(ihandle));
+    asm("mv %[iroutine], a2" : [iroutine] "=r"(iroutine));
+    asm("mv %[iargs], a3" : [iargs] "=r"(iargs));
+
+    TCB* tcb =(TCB*)ihandle;
+
+    uint64 status = 0;
+
+    if(tcb == nullptr){
+        status = -1;
+    }
+    else{
+        tcb->body = (TCB::Body)iroutine;
+        tcb->args = (void*)iargs;
+    }
+
+    asm("mv a0, %[status]" : : [status] "r" (status));
+}
+
+void RiscV::executeThreadInitializeSyscall() {
+    uint64 ihandle, istack;
+
+    asm("mv %[istack], a2" : [istack] "=r"(istack));
+    asm("mv %[ihandle], a1" : [ihandle] "=r"(ihandle));
+
+    TCB *tcb = new TCB(nullptr, nullptr, (uint64*)istack, DEFAULT_TIME_SLICE);
+
+    uint64 status = 0;
+
+    if(tcb == nullptr){
+        status = -1;
+    }
+    else{
+        *((TCB**)ihandle) = tcb;
+    }
+
+    asm("mv a0, %[status]" : : [status] "r" (status));
+}
+
+void RiscV::executeThreadStartSyscall(){
+    uint64 ihandle;
+
+    asm("mv %[ihandle], a1" : [ihandle] "=r"(ihandle));
+
+    TCB* tcb =(TCB*)ihandle;
+
+    uint64 status = 0;
+
+    if(tcb == nullptr){
+        status = -1;
+    }
+    else{
+        tcb->status = TCB::Status::READY;
+        Scheduler::put(tcb);
         *((TCB**)ihandle) = tcb;
     }
 
@@ -206,14 +275,11 @@ void RiscV::executeTimeSleepSyscall() {
 
     asm("mv %[itime], a1" : [itime] "=r"(itime));
 
-    printInt(itime);
+    TCB* tcb = TCB::running;
+    tcb->sleepTime = globalTime;
+    tcb->wakeTime = globalTime + itime;
 
-    TCB::running->sleepTime = itime;
-
-
-//    Scheduler::putToSleep(TCB::running);
-
-    TCB::dispatch();
+    Scheduler::sleep(tcb);
 
     uint64 status = 0;
 

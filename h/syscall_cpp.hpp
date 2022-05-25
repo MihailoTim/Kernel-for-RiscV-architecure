@@ -28,5 +28,35 @@ private:
     sem_t myHandle;
 };
 
+class Thread{
+
+public:
+
+    Thread(void(*body)(void*), void*arg);
+    virtual ~Thread();
+
+    int start();
+
+    static void dispatch();
+    static int sleep(time_t time);
+
+protected:
+
+    Thread();
+    virtual void run(){}
+
+private:
+    thread_t myHandle;
+    using Body = void(*)(void*);
+    Body body;
+    void* args;
+    static void wrapper(void *arg);
+};
+
+class Console{
+public:
+    static char getc();
+    static void putc(char);
+};
 
 #endif //SYSCALL_CPP_HPP

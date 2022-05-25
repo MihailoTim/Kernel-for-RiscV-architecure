@@ -19,6 +19,8 @@ void Scheduler::put(TCB *tcb) {
 
 
 TCB* Scheduler::get(){
+    if(readyTail == nullptr)
+        return nullptr;
     TCB* tmp = readyHead;
     readyHead = readyHead->next;
     tmp->next = nullptr;
