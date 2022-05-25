@@ -41,7 +41,6 @@ public:
     static int sleep(time_t time);
 
 protected:
-
     Thread();
     virtual void run(){}
 
@@ -51,6 +50,14 @@ private:
     Body body;
     void* args;
     static void wrapper(void *arg);
+};
+
+class PeriodicThread : public Thread{
+    time_t period;
+protected:
+    PeriodicThread(time_t period);
+    virtual void periodicActivation(){}
+    void run();
 };
 
 class Console{

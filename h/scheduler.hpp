@@ -12,11 +12,15 @@ class Scheduler {
 
     static TCB *readyHead, *readyTail;
 
-    static TCB *sleepingHead, *sleepingTail;
+    static TCB *sleepingHead;
 
     static void put(TCB *t);
 
     static TCB* get();
+
+    static void sleep(TCB *t);
+
+    static void awake();
 
     static void initialize();
 
@@ -28,6 +32,8 @@ class Scheduler {
 
 public:
     static void showScheduler();
+
+    static void showSleeping();
 };
 
 

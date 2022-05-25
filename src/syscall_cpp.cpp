@@ -53,7 +53,7 @@ Thread::Thread() {
 }
 
 int Thread::sleep(time_t time) {
-    return 0;
+    return time_sleep(time);
 }
 
 void Thread::dispatch() {
@@ -66,6 +66,18 @@ int Thread::start() {
 
 Thread::~Thread() {
     delete (uint64*)myHandle;
+}
+
+PeriodicThread::PeriodicThread(time_t period) : Thread(){
+    this->period = period;
+    this->start();
+}
+
+void PeriodicThread::run() {
+    while(true){
+        this->periodicActivation();
+        sleep(period);
+    }
 }
 
 char Console::getc() {

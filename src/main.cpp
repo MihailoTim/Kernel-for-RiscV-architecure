@@ -33,8 +33,19 @@ void producerA(void *arg){
 }
 
 void wrapper(void* arg){
-    userMain();
+    printInt(RiscV::globalTime);
+    time_sleep(1000);
+    printInt(RiscV::globalTime);
 }
+
+class Periodic : PeriodicThread{
+public:
+    Periodic(time_t period) : PeriodicThread(period){}
+
+    void periodicActivation() override{
+        printString("Hello world\n");
+    }
+};
 
 int main() {
 
@@ -42,18 +53,15 @@ int main() {
 
     RiscV::enableInterrupts();
 
+//    Periodic *thread = new Periodic(1000);
+//
+//    if(thread);
+//
+//    while(true)
+//        thread_dispatch();
+
     userMain();
-
-    printString("Scheduler:\n");
-    Scheduler::showScheduler();
-
-    userMain();
-
-    printInt(RiscV::globalTime);
-
-    time_sleep(1000);
-
-
+//
 //    thread_t thr;
 //    thread_create(&thr, wrapper, nullptr);
 //

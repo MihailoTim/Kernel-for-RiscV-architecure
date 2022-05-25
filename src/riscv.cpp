@@ -277,9 +277,13 @@ void RiscV::executeTimeSleepSyscall() {
 
     TCB* tcb = TCB::running;
     tcb->sleepTime = globalTime;
-    tcb->wakeTime = globalTime + itime;
+    tcb->wakeTime = globalTime + itime/100;
 
     Scheduler::sleep(tcb);
+
+    tcb->status = TCB::Status::BLOCKED;
+
+    TCB::dispatch();
 
     uint64 status = 0;
 
