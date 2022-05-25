@@ -62,7 +62,7 @@ void* MemoryAllocator::kmalloc(size_t size){
         }
 
         //insert the blk chunk in list of allocated memory
-        Utility::memset((char*)blk+sizeof(BlockHeader), 17, blk->size); //FOR TESTING PURPOSES ONLY: fill acquired space with 1s
+//        Utility::memset((char*)blk+sizeof(BlockHeader), 17, blk->size); //FOR TESTING PURPOSES ONLY: fill acquired space with 1s
         insertAndMerge(blk, &allocMemHead);
 
         return (char*)blk + sizeof(BlockHeader);    //return address of start of the data block, not start of the header
@@ -88,7 +88,7 @@ uint64 MemoryAllocator::kfree(void* ptr){
             allocMemHead = blk->next;
 
         //insert blk chunk in list of free memory and try to merge with an already existing block
-        Utility::memset((char*)blk+sizeof(BlockHeader), 34, blk->size); //FOR TESTING PURPOSES ONLY: fill acquired space with 1s
+//        Utility::memset((char*)blk+sizeof(BlockHeader), 34, blk->size); //FOR TESTING PURPOSES ONLY: fill acquired space with 1s
         insertAndMerge(blk, &freeMemHead);
     }
     return 0;

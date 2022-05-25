@@ -56,7 +56,7 @@ private:
 
     uint64 timeSlice;
 
-    void* node;
+    TCB* next;
 
     uint64 sleepTime = 0;
 

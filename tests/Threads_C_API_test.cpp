@@ -3,6 +3,7 @@
 //
 
 #include "./Threads_C_API_test.hpp"
+#include "../h/scheduler.hpp"
 
 bool finishedA = false;
 bool finishedB = false;
@@ -62,7 +63,7 @@ void workerBodyC(void* arg) {
         printString("C: i="); printInt(i); printString("\n");
     }
 
-    printString("A finished!\n");
+    printString("C finished!\n");
     finishedC = true;
     thread_dispatch();
 }

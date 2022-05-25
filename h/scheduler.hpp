@@ -9,7 +9,10 @@
 #include "../h/tcb.hpp"
 
 class Scheduler {
-    static Queue* queue;
+
+    static TCB *readyHead, *readyTail;
+
+    static TCB *sleepingHead, *sleepingTail;
 
     static void put(TCB *t);
 
@@ -22,6 +25,9 @@ class Scheduler {
     friend class SCB;
 
     friend class TCB;
+
+public:
+    static void showScheduler();
 };
 
 

@@ -12,7 +12,7 @@ class SCB {
 
     int val;
 
-    Queue *blocked;
+    TCB *blockedHead, *blockedTail;
 
     SCB(uint64 init);
 

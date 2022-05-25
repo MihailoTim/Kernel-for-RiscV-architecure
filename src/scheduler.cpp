@@ -5,23 +5,30 @@
 #include "../h/scheduler.hpp"
 #include "../lib/console.h"
 
-Queue* Scheduler::queue = nullptr;
+TCB* Scheduler::readyHead = nullptr;
+TCB* Scheduler::readyTail = nullptr;
+
 
 void Scheduler::initialize(){
-    queue = new Queue();
 }
 
 void Scheduler::put(TCB *tcb) {
-    if(tcb->node){
-        queue->push(tcb->node);
-    }
-    else{
-        Queue::Node *node = (Queue::Node*)MemoryAllocator::kmalloc(sizeof(Queue::Node));
-        node->tcb = tcb;
-        tcb->node = queue->push((void *) node);
-    }
+    tcb->next = nullptr;
+    readyTail = (!readyHead ? readyHead : readyTail->next) = tcb;
 }
 
+
 TCB* Scheduler::get(){
-    return (TCB*)queue->pop();
+    TCB* tmp = readyHead;
+    readyHead = readyHead->next;
+    tmp->next = nullptr;
+    return tmp;
+}
+
+void Scheduler::showScheduler() {
+    TCB* iter = readyHead;
+    while(iter){
+        printInt((uint64)iter, 16);
+        iter = iter->next;
+    }
 }

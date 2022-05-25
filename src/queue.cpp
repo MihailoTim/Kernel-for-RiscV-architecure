@@ -20,22 +20,32 @@ void Queue::empty() {
     }
 }
 
-void* Queue::push(void *t) {
-    tail = (!head ? head : tail->next) = (Node*)t;
+Queue& Queue::push(TCB *tcb){
+    tail = (!head ? head : tail->next) = (Node*)MemoryAllocator::kmalloc(sizeof(Node));
+    tail->tcb = tcb;
+    tail->next =nullptr;
+    size++;
 
-    return (void*)tail;
+    return *this;
 }
 
-void* Queue::pop() {
+TCB* Queue::pop() {
     if(head){
-        void* tcb = head->tcb;
-//        Node *tmp = head;
+        TCB* tcb = head->tcb;
+        Node *tmp = head;
         head = head->next;
-//        MemoryAllocator::kfree(tmp);
+        MemoryAllocator::kfree(tmp);
         size--;
 
         return tcb;
     }
+    else
+        return nullptr;
+}
+
+TCB* Queue::peek() {
+    if(head)
+        return head->tcb;
     else
         return nullptr;
 }

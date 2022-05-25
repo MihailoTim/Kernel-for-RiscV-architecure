@@ -10,10 +10,9 @@
 class TCB;
 
 class Queue {
-protected:
     struct Node{
-        void *tcb;
-        Node *next;
+        TCB *tcb;
+        Node *next, *prev;
     };
 
     void empty();
@@ -34,20 +33,19 @@ public:
         empty();
     }
 
-    virtual void* push(void* t);
+    Queue& push(TCB *tcb);
 
-    void* pop();
+    TCB* pop();
+
+    TCB* peek();
 
     void* operator new(size_t size);
 
     void operator delete(void* addr);
 
     friend class Scheduler;
-
-    friend class SCB;
-
-    friend class Sleeper;
 };
+
 
 
 #endif //OS1_KERNEL_QUEUE_HPP

@@ -5,44 +5,33 @@
 #include "../h/scb.hpp"
 
 SCB::SCB(uint64 init){
-    blocked = new Queue();
     val = init;
+    blockedHead = nullptr;
+    blockedTail = nullptr;
 }
 
-SCB::~SCB(){
-    TCB* tmp;
-    while((tmp = (TCB*)blocked->pop())) {
-        Scheduler::put(tmp);
-    }
-}
+SCB::~SCB(){}
 
 void SCB::block() {
-    TCB* tcb = TCB::running;
-    if(tcb->node){
-        blocked->push(tcb->node);
-    }
-    else{
-        Queue::Node *node = (Queue::Node*)MemoryAllocator::kmalloc(sizeof(Queue::Node));
-        node->tcb = tcb;
-        tcb->node = blocked->push((void *) node);
-    }
+    blockedTail = (!blockedHead ? blockedHead : blockedTail->next) = TCB::running;
+    TCB::running->next = nullptr;
     TCB::running->status = TCB::BLOCKED;
     TCB::dispatch();
 }
 
 void SCB::deblock(){
-    TCB *tcb = (TCB*)blocked->pop();
+    TCB* tcb = blockedHead;
+    blockedHead = blockedHead->next;
+    tcb->next = nullptr;
     if(tcb) {
         tcb->status = TCB::READY;
         Scheduler::put(tcb);
     }
 }
 
-void SCB::wait(){
-    if(--val<0) {
-        printString("blocked\n");
+void SCB::wait() {
+    if (--val < 0)
         block();
-    }
 }
 
 void SCB::signal(){

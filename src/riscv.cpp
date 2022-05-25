@@ -113,7 +113,7 @@ void RiscV::executeThreadCreateSyscall(){
 
     TCB *tcb = new TCB((TCB::Body)iroutine, (void*)iargs, (uint64*)istack, DEFAULT_TIME_SLICE);
 
-    uint64 status;
+    uint64 status = 0;
 
     if(tcb == nullptr){
         status = -1;
