@@ -76,7 +76,5 @@ void printInt(int xx, int base, int sgn)
     while(--i >= 0)
         putc(buf[i]);
 
-    putc('\n');
-
     UNLOCK();
 }

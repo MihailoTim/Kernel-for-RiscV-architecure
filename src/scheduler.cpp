@@ -45,14 +45,16 @@ void Scheduler::sleep(TCB *t) {
 
 void Scheduler::awake(){
     while(sleepingHead){
-        if(sleepingHead->wakeTime <= RiscV::globalTime){
-            put(sleepingHead);
-            readyTail->next = nullptr;
+        TCB* tmp = sleepingHead;
+
+        if(tmp->wakeTime <= RiscV::globalTime){
+            sleepingHead = sleepingHead->next;
+            put(tmp);
+            tmp->next = nullptr;
         }
         else{
             break;
         }
-        sleepingHead = sleepingHead->next;
     }
 }
 
@@ -68,6 +70,7 @@ void Scheduler::showSleeping(){
     TCB* iter = sleepingHead;
     while(iter){
         printInt((uint64)iter, 16);
+        printString("\n");
         iter = iter->next;
     }
 }

@@ -32,10 +32,14 @@ void producerA(void *arg){
     printString("\nproducer done\n");
 }
 
-void wrapper(void* arg){
+void wrapperA(void* arg){
     printInt(RiscV::globalTime);
-    time_sleep(1000);
+    time_sleep(30);
     printInt(RiscV::globalTime);
+}
+
+void wrapperB(void* arg){
+    printString("Hello world\n");
 }
 
 class Periodic : PeriodicThread{
@@ -53,7 +57,7 @@ int main() {
 
     RiscV::enableInterrupts();
 
-//    Periodic *thread = new Periodic(1000);
+//    Periodic *thread = new Periodic(10);
 //
 //    if(thread);
 //
@@ -62,13 +66,16 @@ int main() {
 
     userMain();
 //
-//    thread_t thr;
-//    thread_create(&thr, wrapper, nullptr);
+//    thread_t thrA;
+//    thread_create(&thrA, wrapperA, nullptr);
 //
-//    while(!(((TCB*)thr)->isFinished())) {
+//    thread_t thrB;
+//    thread_create(&thrB, wrapperB, nullptr);
+//
+//    while(!(((TCB*)thrA)->isFinished())) {
 //        thread_dispatch();
 //    }
-//
+
 //    sem_open(&spaceAvailable, 10);
 //
 //    sem_open(&itemAvailable, 0);

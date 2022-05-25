@@ -2,6 +2,7 @@
 // Created by os on 5/25/22.
 //
 #include "ThreadSleep_C_API_test.hpp"
+#include "../h/riscv.hpp"
 
 bool finished[2];
 
@@ -9,7 +10,6 @@ void sleepyRun(void *arg) {
     time_t sleep_time = *((time_t *) arg);
     int i = 6;
     while (--i > 0) {
-
         printString("Hello ");
         printInt(sleep_time);
         printString(" !\n");
