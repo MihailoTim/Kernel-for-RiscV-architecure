@@ -36,10 +36,6 @@ class RiscV{
 
     static void executeThreadAttachBodySyscall();
 
-    static void executeThreadAttachRunSyscall();
-
-    static void executeThreadInitializeSyscall();
-
     static void executeThreadStartSyscall();
 
     static void executeSemOpenSyscall();

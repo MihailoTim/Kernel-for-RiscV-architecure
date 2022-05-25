@@ -46,9 +46,6 @@ protected:
 
 private:
     thread_t myHandle;
-    using Body = void(*)(void*);
-    Body body;
-    void* args;
     static void wrapper(void *arg);
 };
 

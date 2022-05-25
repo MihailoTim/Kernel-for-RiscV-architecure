@@ -43,8 +43,7 @@ void RiscV::handleSupervisorTrap() {
             case 0x12 : executeThreadExitSyscall();break;
             case 0x13 : executeThreadDispatchSyscall();break;
             case 0x14 : executeThreadAttachBodySyscall();break;
-            case 0x15 : executeThreadInitializeSyscall();break;
-            case 0x16 : executeThreadStartSyscall();break;
+            case 0x15 : executeThreadStartSyscall();break;
             case 0x21 : executeSemOpenSyscall();break;
             case 0x22 : executeSemCloseSyscall();break;
             case 0x23 : executeSemWaitSyscall();break;
@@ -125,6 +124,8 @@ void RiscV::executeThreadCreateSyscall(){
         status = -1;
     }
     else{
+        if(tcb->body)
+            Scheduler::put(tcb);
         *((TCB**)ihandle) = tcb;
     }
 
@@ -132,13 +133,15 @@ void RiscV::executeThreadCreateSyscall(){
 }
 
 void RiscV::executeThreadAttachBodySyscall(){
-    uint64 iroutine, iargs, ihandle;
+    uint64 iroutine, iargs, ihandle, istack;
 
+
+    asm("mv %[istack], a7" : [istack] "=r"(istack));
     asm("mv %[ihandle], a1" : [ihandle] "=r"(ihandle));
     asm("mv %[iroutine], a2" : [iroutine] "=r"(iroutine));
     asm("mv %[iargs], a3" : [iargs] "=r"(iargs));
 
-    TCB* tcb =(TCB*)ihandle;
+    TCB *tcb = new TCB((TCB::Body)iroutine, (void*)iargs, (uint64*)istack, DEFAULT_TIME_SLICE);
 
     uint64 status = 0;
 
@@ -148,25 +151,6 @@ void RiscV::executeThreadAttachBodySyscall(){
     else{
         tcb->body = (TCB::Body)iroutine;
         tcb->args = (void*)iargs;
-    }
-
-    asm("mv a0, %[status]" : : [status] "r" (status));
-}
-
-void RiscV::executeThreadInitializeSyscall() {
-    uint64 ihandle, istack;
-
-    asm("mv %[istack], a2" : [istack] "=r"(istack));
-    asm("mv %[ihandle], a1" : [ihandle] "=r"(ihandle));
-
-    TCB *tcb = new TCB(nullptr, nullptr, (uint64*)istack, DEFAULT_TIME_SLICE);
-
-    uint64 status = 0;
-
-    if(tcb == nullptr){
-        status = -1;
-    }
-    else{
         *((TCB**)ihandle) = tcb;
     }
 
@@ -188,7 +172,7 @@ void RiscV::executeThreadStartSyscall(){
     else{
         tcb->status = TCB::Status::READY;
         Scheduler::put(tcb);
-        *((TCB**)ihandle) = tcb;
+        TCB::dispatch();
     }
 
     asm("mv a0, %[status]" : : [status] "r" (status));

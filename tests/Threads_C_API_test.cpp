@@ -105,8 +105,6 @@
 //    thread_create(&threads[3], workerBodyD, nullptr);
 //    printString("ThreadD created\n");
 //
-//    Scheduler::showScheduler();
-//
 //    while (!(finishedA && finishedB && finishedC && finishedD)) {
 //        thread_dispatch();
 //    }

@@ -35,21 +35,16 @@ int Semaphore::signal() {
 }
 
 Thread::Thread(void (*body)(void*), void *arg) {
-    this->body = body;
-    this->args = arg;
+    thread_attach_body(&myHandle, body, arg);
 }
 
 void Thread::wrapper(void *arg) {
     Thread* thr = (Thread*)arg;
-    if(thr->body)
-        thr->body(thr->args);
-    else
-        thr->run();
+    thr->run();
 }
 
 Thread::Thread() {
-    this->body = nullptr;
-    this->args = nullptr;
+    thread_attach_body(&myHandle, &Thread::wrapper, this);
 }
 
 int Thread::sleep(time_t time) {
@@ -61,7 +56,7 @@ void Thread::dispatch() {
 }
 
 int Thread::start() {
-    return thread_create(&myHandle, &Thread::wrapper, this);
+    return thread_start(myHandle);
 }
 
 Thread::~Thread() {
