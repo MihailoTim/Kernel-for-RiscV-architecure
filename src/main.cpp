@@ -42,7 +42,7 @@ void wrapperB(void* arg){
     printString("Hello world\n");
 }
 
-class Periodic : PeriodicThread{
+class Periodic : public PeriodicThread{
 public:
     Periodic(time_t period) : PeriodicThread(period){}
 
@@ -57,7 +57,9 @@ int main() {
 
     RiscV::enableInterrupts();
 
-//    Periodic *thread = new Periodic(10);
+//    Periodic *thread = new Periodic(1);
+//
+//    thread->start();
 //
 //    if(thread);
 //

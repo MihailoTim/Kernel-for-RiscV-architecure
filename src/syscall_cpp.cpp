@@ -6,6 +6,12 @@
 #include "../lib/console.h"
 #include "../lib/hw.h"
 
+struct Args{
+    void* pt;
+    uint64 time;
+    Args(void *p, uint64 t) : pt(p), time(t){}
+};
+
 void* operator new(size_t sz){
     return mem_alloc(sz);
 }
@@ -63,15 +69,15 @@ Thread::~Thread() {
     delete (uint64*)myHandle;
 }
 
-PeriodicThread::PeriodicThread(time_t period) : Thread(){
-    this->period = period;
-    this->start();
-}
+PeriodicThread::PeriodicThread(time_t period) : Thread(&PeriodicThread::wrapper, new Args((void*)this, period)){}
 
-void PeriodicThread::run() {
+void PeriodicThread::wrapper(void *arg) {
+    PeriodicThread *pt =(PeriodicThread*) ((Args*)arg)->pt;
+    uint64 time = ((Args*)arg)->time;
+
     while(true){
-        this->periodicActivation();
-        sleep(period);
+        pt->periodicActivation();
+        pt->sleep(time);
     }
 }
 

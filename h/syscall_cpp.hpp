@@ -50,11 +50,10 @@ private:
 };
 
 class PeriodicThread : public Thread{
-    time_t period;
+    static void wrapper(void *arg);
 protected:
     PeriodicThread(time_t period);
     virtual void periodicActivation(){}
-    void run();
 };
 
 class Console{
