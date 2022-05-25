@@ -14,5 +14,19 @@ void* operator new[](size_t sz);
 
 void operator delete (void *ptr);
 
+class Semaphore{
+
+public:
+    Semaphore(unsigned init = 1);
+    virtual ~Semaphore();
+
+    int wait();
+
+    int signal();
+
+private:
+    sem_t myHandle;
+};
+
 
 #endif //SYSCALL_CPP_HPP
