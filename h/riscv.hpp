@@ -4,12 +4,7 @@
 
 #ifndef OS1_KERNEL_RISCV_HPP
 #define OS1_KERNEL_RISCV_HPP
-
-#include "../h/memoryAllocator.hpp"
-#include "../lib/console.h"
-#include "../h/scheduler.hpp"
-#include "../h/scb.hpp"
-#include "./printing.hpp"
+#include "../lib/hw.h"
 
 class RiscV{
     enum BitMaskSstatus{
@@ -47,6 +42,12 @@ class RiscV{
     static void executeSemSignalSyscall();
 
     static void executeTimeSleepSyscall();
+
+    static void executeGetcSyscall();
+
+    static void executePutcSyscall();
+
+    static void putcWrapper(void *arg);
 
     static void pushRegisters();
 

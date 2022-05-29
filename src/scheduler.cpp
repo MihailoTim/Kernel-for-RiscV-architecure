@@ -3,7 +3,7 @@
 //
 
 #include "../h/scheduler.hpp"
-#include "../lib/console.h"
+#include "../h/printing.hpp"
 
 TCB* Scheduler::readyHead = nullptr;
 TCB* Scheduler::readyTail = nullptr;

@@ -4,7 +4,7 @@
 #include "../h/riscv.hpp"
 #include "../h/utility.hpp"
 #include "../tests/userMain.hpp"
-#include "../h/syscall_cpp.hpp"
+#include "../lib/console.h"
 
 char buffer[10];
 int head = 0;
@@ -16,7 +16,7 @@ char string[11] = "this is ni";
 void consumerA(void *arg){
     while(head!=10){
         sem_wait(itemAvailable);
-        __putc(buffer[head++]);
+        putc(buffer[head++]);
         sem_signal(spaceAvailable);
     }
     printString("\nconsumer done\n");
@@ -51,6 +51,22 @@ public:
     }
 };
 
+bool userMainFinished = false;
+void mainWrapper(void *arg){
+    printString("now in userMain\n");
+//    while(true);
+//    time_sleep(30);
+//    printString("sleep ended\n");
+    char c = 0;
+    for(int i=0;i<100;i++)
+        c = getc();
+    c++;
+//    putc(c);
+//    c++;
+//    userMain();
+    userMainFinished = true;
+}
+
 int main() {
 
     RiscV::initialize();
@@ -66,7 +82,13 @@ int main() {
 //    while(true)
 //        thread_dispatch();
 
-    userMain();
+    thread_t mainThread;
+    thread_create(&mainThread, mainWrapper, nullptr);
+    while(!userMainFinished) {
+//        __putc('a');
+        thread_dispatch();
+    }
+//    userMain();
 //
 //    thread_t thrA;
 //    thread_create(&thrA, wrapperA, nullptr);

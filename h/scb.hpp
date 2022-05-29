@@ -5,7 +5,7 @@
 #ifndef OS1_KERNEL_SCB_HPP
 #define OS1_KERNEL_SCB_HPP
 
-#include "riscv.hpp"
+#include "tcb.hpp"
 //semaphore control block
 
 class SCB {
@@ -31,6 +31,8 @@ class SCB {
     void operator delete(void* addr);
 
     friend class RiscV;
+
+    friend class ConsoleUtil;
 
 };
 

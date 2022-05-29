@@ -3,6 +3,7 @@
 //
 
 #include "../h/printing.hpp"
+#include "../lib/console.h"
 
 uint64 lockPrint = 0;
 
@@ -14,7 +15,7 @@ void printString(char const *string)
     LOCK();
     while (*string != '\0')
     {
-        putc(*string);
+        __putc(*string);
         string++;
     }
     UNLOCK();
@@ -26,7 +27,7 @@ char* getString(char *buf, int max) {
     char c;
 
     for(i=0; i+1 < max; ){
-        cc = getc();
+        cc = __getc();
         if(cc < 1)
             break;
         c = cc;
@@ -74,7 +75,7 @@ void printInt(int xx, int base, int sgn)
         buf[i++] = '-';
 
     while(--i >= 0)
-        putc(buf[i]);
+        __putc(buf[i]);
 
     UNLOCK();
 }

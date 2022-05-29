@@ -9,6 +9,7 @@
 #include "../h/syscall_cpp.hpp"
 #include "../h/scheduler.hpp"
 #include "../h/printing.hpp"
+#include "../h/consoleUtil.hpp"
 
 uint64 RiscV::globalTime = 0;
 
@@ -17,6 +18,7 @@ void RiscV::initialize() {
     MemoryAllocator::initialize();
     Scheduler::initialize();
     TCB::initialize();
+    ConsoleUtil::initialize();
 }
 
 void RiscV::popSppSpie() {
@@ -28,7 +30,7 @@ void RiscV::handleSupervisorTrap() {
 
     uint64 volatile scause = RiscV::r_scause();
     //interrupt from ecall
-    if(scause == 0x09) {
+    if(scause == 0x09 || scause == 0x08) {
         uint64 volatile sstatus = RiscV::r_sstatus();
         uint64 volatile sepc = RiscV::r_sepc()+4;
 
@@ -49,6 +51,8 @@ void RiscV::handleSupervisorTrap() {
             case 0x23 : executeSemWaitSyscall();break;
             case 0x24 : executeSemSignalSyscall();break;
             case 0x31 : executeTimeSleepSyscall();break;
+            case 0x41 : executeGetcSyscall();break;
+            case 0x42 : executePutcSyscall();break;
         }
 
         RiscV::w_sstatus(sstatus);
@@ -63,6 +67,8 @@ void RiscV::handleSupervisorTrap() {
         mc_sip(SIP_SSIE);
 
         globalTime += 1;
+
+        Scheduler::awake();
 
         TCB::timeSliceCounter++;
         if(TCB::timeSliceCounter >= TCB::running->timeSlice) {
@@ -81,10 +87,32 @@ void RiscV::handleSupervisorTrap() {
     }
 
     if(scause == (0x01UL<<63 | 0x9)){
-        console_handler();
-//        int cause = plic_claim();
-//        plic_complete(cause);
+        uint64 volatile sstatus = RiscV::r_sstatus();
+        uint64 volatile sepc = RiscV::r_sepc();
+
+        uint64 status = CONSOLE_STATUS;
+        asm("mv a0, %[status]" : : [status] "r" (status));
+        asm("lb a1, 0(a0)");
+        asm("mv %[status], a1" : [status] "=r" (status));
+        if(status & 1UL)
+        {
+            uint64 data;
+            char c;
+            data = CONSOLE_TX_DATA;
+            asm("mv a0, %[data]" : : [data] "r" (data));
+            asm("lb a1, 0(a0)");
+            asm("mv %[c], a1" : [c] "=r" (c));
+
+            if(ConsoleUtil::pendingGetc!=0) {
+                ConsoleUtil::pendingGetc--;
+                ConsoleUtil::putInput(c);
+            }
+        }
+        plic_complete(plic_claim());
+        RiscV::w_sstatus(sstatus);
+        RiscV::w_sepc(sepc);
     }
+
 }
 
 void RiscV::executeMemAllocSyscall(){
@@ -272,4 +300,40 @@ void RiscV::executeTimeSleepSyscall() {
     uint64 status = 0;
 
     asm("mv a0, %[status]" : : [status] "r" (status));
+}
+
+void RiscV::executeGetcSyscall() {
+    ConsoleUtil::pendingGetc++;
+
+    char c = ConsoleUtil::getInput();
+
+    ConsoleUtil::putOutput(c);
+
+    asm("mv a0, %[c]" : : [c] "r" (c));
+}
+
+void RiscV::executePutcSyscall() {
+    char c;
+
+    asm("mv %[c], a1" : [c] "=r"(c));
+
+    ConsoleUtil::putOutput(c);
+}
+
+void RiscV::putcWrapper(void* arg)
+{
+    while(true)
+    {
+        uint64 status = CONSOLE_STATUS;
+        asm("mv a0, %[status]" : : [status] "r" (status));
+        asm("lb a1, 0(a0)");
+        asm("mv %[status], a1" : [status] "=r" (status));
+        if(status & 1UL<<5){
+            char volatile c = ConsoleUtil::getOutput();
+            uint64 data = CONSOLE_RX_DATA;
+            asm("mv a0, %[data]" : : [data] "r" (data));
+            asm("mv a1, %[c]" : : [c] "r" (c));
+            asm("sb a1,0(a0)");
+        }
+    }
 }

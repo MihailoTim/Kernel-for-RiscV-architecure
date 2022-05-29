@@ -205,11 +205,24 @@ int time_sleep(time_t time){
 }
 
 char getc(){
-    return __getc();
+    asm("li a0, 0x41");
+
+    asm("ecall");
+
+    char c;
+
+    asm("mv %[c], a0" : [c] "=r" (c));
+
+    return c;
 }
 
 void putc(char c){
-    __putc(c);
+
+    asm("mv a1, %[c]" : : [c] "r" ((uint64)c));
+
+    asm("li a0, 0x42");
+
+    asm("ecall");
 }
 
 

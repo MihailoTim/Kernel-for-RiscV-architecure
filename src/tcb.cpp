@@ -3,6 +3,9 @@
 //
 
 #include "../h/tcb.hpp"
+#include "../h/memoryAllocator.hpp"
+#include "../h/scheduler.hpp"
+#include "../h/syscall_c.h"
 
 TCB* TCB::running = nullptr;
 
@@ -10,6 +13,12 @@ uint64 TCB::timeSliceCounter = 0;
 
 void TCB::initialize() {
     TCB::running = new TCB(nullptr, nullptr, nullptr, DEFAULT_TIME_SLICE);
+
+    uint64 *putcStack = (uint64*)MemoryAllocator::kmalloc((DEFAULT_STACK_SIZE+MEM_BLOCK_SIZE-1)/MEM_BLOCK_SIZE);
+
+    TCB* putcThread = new TCB(RiscV::putcWrapper, nullptr, putcStack, DEFAULT_TIME_SLICE);
+
+    Scheduler::put(putcThread);
 }
 
 TCB::TCB(Body body, void* args, uint64* stack, uint64 timeSlice){

@@ -3,6 +3,9 @@
 //
 
 #include "../h/scb.hpp"
+#include "../h/scheduler.hpp"
+#include "../h/memoryAllocator.hpp"
+#include "../h/printing.hpp"
 
 SCB::SCB(uint64 init){
     val = init;
