@@ -9,7 +9,9 @@ uint64 ConsoleUtil::inputHead = 0;
 uint64 ConsoleUtil::inputTail = 0;
 uint64 ConsoleUtil::outputHead = 0;
 uint64 ConsoleUtil::outputTail = 0;
+
 uint64 ConsoleUtil::pendingGetc = 0;
+uint64 ConsoleUtil::pendingPutc = 0;
 
 SCB* ConsoleUtil::outputSem = nullptr;
 SCB* ConsoleUtil::inputSem = nullptr;

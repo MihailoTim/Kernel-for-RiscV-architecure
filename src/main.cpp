@@ -57,10 +57,14 @@ void mainWrapper(void *arg){
 //    while(true);
 //    time_sleep(30);
 //    printString("sleep ended\n");
-    char c = 0;
-    for(int i=0;i<100;i++)
-        c = getc();
-    c++;
+    userMain();
+//    char c = 0;
+//    char string[10];
+//    int i=0;
+//    while((c = getc()) != 'q')
+//        string[i++] = c;
+//    for(int i = 0;i<10;i++)
+//        putc(string[i]);
 //    putc(c);
 //    c++;
 //    userMain();
@@ -84,8 +88,7 @@ int main() {
 
     thread_t mainThread;
     thread_create(&mainThread, mainWrapper, nullptr);
-    while(!userMainFinished) {
-//        __putc('a');
+    while(!userMainFinished || !RiscV::canFinish()) {
         thread_dispatch();
     }
 //    userMain();

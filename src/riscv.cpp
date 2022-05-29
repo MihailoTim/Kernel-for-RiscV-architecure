@@ -26,6 +26,10 @@ void RiscV::popSppSpie() {
     asm("sret");
 }
 
+bool RiscV::canFinish() {
+    return ConsoleUtil::pendingPutc == 0;
+}
+
 void RiscV::handleSupervisorTrap() {
 
     uint64 volatile scause = RiscV::r_scause();
@@ -313,6 +317,8 @@ void RiscV::executeGetcSyscall() {
 }
 
 void RiscV::executePutcSyscall() {
+    ConsoleUtil::pendingPutc++;
+
     char c;
 
     asm("mv %[c], a1" : [c] "=r"(c));
@@ -334,6 +340,8 @@ void RiscV::putcWrapper(void* arg)
             asm("mv a0, %[data]" : : [data] "r" (data));
             asm("mv a1, %[c]" : : [c] "r" (c));
             asm("sb a1,0(a0)");
+            if(ConsoleUtil::pendingPutc>0)
+                ConsoleUtil::pendingPutc--;
         }
     }
 }

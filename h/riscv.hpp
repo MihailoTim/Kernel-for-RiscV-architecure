@@ -90,6 +90,8 @@ public:
 
     static uint64 globalTime;
 
+    static bool canFinish();
+
     static void enableInterrupts();
 
     static void disableInterrupts();

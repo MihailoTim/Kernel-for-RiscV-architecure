@@ -15,7 +15,7 @@ void printString(char const *string)
     LOCK();
     while (*string != '\0')
     {
-        __putc(*string);
+        putc(*string);
         string++;
     }
     UNLOCK();
@@ -27,7 +27,7 @@ char* getString(char *buf, int max) {
     char c;
 
     for(i=0; i+1 < max; ){
-        cc = __getc();
+        cc = getc();
         if(cc < 1)
             break;
         c = cc;
@@ -75,7 +75,7 @@ void printInt(int xx, int base, int sgn)
         buf[i++] = '-';
 
     while(--i >= 0)
-        __putc(buf[i]);
+        putc(buf[i]);
 
     UNLOCK();
 }

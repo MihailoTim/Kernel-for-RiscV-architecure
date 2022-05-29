@@ -10,7 +10,7 @@
 
 class ConsoleUtil {
     static uint64 pendingGetc;
-
+    static uint64 pendingPutc;
 
     static SCB* outputSem;
     static SCB* inputSem;
