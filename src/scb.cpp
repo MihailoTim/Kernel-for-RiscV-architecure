@@ -13,7 +13,9 @@ SCB::SCB(uint64 init){
     blockedTail = nullptr;
 }
 
-SCB::~SCB(){}
+SCB::~SCB(){
+
+}
 
 void SCB::block() {
     blockedTail = (!blockedHead ? blockedHead : blockedTail->next) = TCB::running;

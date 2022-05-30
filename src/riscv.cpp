@@ -5,8 +5,6 @@
 #include "../h/riscv.hpp"
 #include "../h/memoryAllocator.hpp"
 #include "../h/tcb.hpp"
-#include "../lib/console.h"
-#include "../h/syscall_cpp.hpp"
 #include "../h/scheduler.hpp"
 #include "../h/printing.hpp"
 #include "../h/consoleUtil.hpp"
@@ -311,7 +309,13 @@ void RiscV::executeGetcSyscall() {
 
     char c = ConsoleUtil::getInput();
 
-    ConsoleUtil::putOutput(c);
+    if(c!=0x01b)
+        ConsoleUtil::putOutput(c);
+
+    if(c==13) {
+        ConsoleUtil::putOutput(13);
+        ConsoleUtil::putOutput(10);
+    }
 
     asm("mv a0, %[c]" : : [c] "r" (c));
 }

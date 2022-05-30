@@ -39,8 +39,6 @@ private:
 
     void free();
 
-    static void yield();
-
     static void dispatch();
 
     static void initialize();

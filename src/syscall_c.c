@@ -80,7 +80,7 @@ void thread_dispatch(){
     asm("ecall");
 }
 
-int thread_attach_body(thread_t handle, void(*start_routine)(void*), void *arg){
+int thread_attach_body(thread_t *handle, void(*start_routine)(void*), void *arg){
     uint64 ihandle = (uint64)handle;
     uint64 iroutine = (uint64)start_routine;
     uint64 iarg = (uint64)arg;

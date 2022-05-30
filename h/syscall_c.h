@@ -9,8 +9,8 @@
 
 #define MEM_BLOCK_OFFS 6
 
-typedef void* thread_t;
-typedef void* sem_t;
+typedef uint64* thread_t;
+typedef uint64* sem_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,7 +26,7 @@ int thread_exit();
 
 void thread_dispatch();
 
-int thread_attach_body(thread_t handle, void(*start_routine)(void*), void *arg);
+int thread_attach_body(thread_t* handle, void(*start_routine)(void*), void *arg);
 
 int thread_start(thread_t handle);
 

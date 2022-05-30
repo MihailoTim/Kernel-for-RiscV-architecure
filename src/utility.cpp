@@ -3,13 +3,13 @@
 //
 
 #include "../h/utility.hpp"
-#include "../lib/console.h"
+#include "../h/syscall_c.h"
 #include "../lib/hw.h"
 #include "../h/memoryAllocator.hpp"
 
 void Utility::printString(const char *string) {
     while(*string){
-        __putc(*string++);
+        putc(*string++);
     }
 }
 
@@ -34,9 +34,9 @@ void Utility::printInt(int x, int base)
         buf[i++] = '-';
 
     while(--i >= 0)
-        __putc(buf[i]);
+        putc(buf[i]);
 
-    __putc('\n');
+    putc('\n');
 }
 
 void Utility::printMemTrace() {
@@ -49,8 +49,8 @@ void Utility::printMemTrace() {
         iter = iter->next;
     }
 
-    __putc('\n');
-    __putc('\n');
+    putc('\n');
+    putc('\n');
 
     iter = MemoryAllocator::freeMemHead;
 
@@ -61,8 +61,8 @@ void Utility::printMemTrace() {
         iter = iter->next;
     }
 
-    __putc('\n');
-    __putc('\n');
+    putc('\n');
+    putc('\n');
 }
 
 void* Utility::memset(void *dst, char c, uint64 len) {
