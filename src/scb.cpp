@@ -14,7 +14,13 @@ SCB::SCB(uint64 init){
 }
 
 SCB::~SCB(){
-
+    TCB* iter = blockedHead;
+    while(iter !=nullptr) {
+        TCB* tmp = iter;
+        Scheduler::put(iter);
+        iter = iter->next;
+        tmp->next = nullptr;
+    }
 }
 
 void SCB::block() {

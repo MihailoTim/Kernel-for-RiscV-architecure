@@ -34,6 +34,7 @@ void ConsoleUtil::putInput(char c) {
 
 char ConsoleUtil::getInput() {
     inputSem->wait();
+    while(inputHead == inputTail);
     if(inputHead == inputTail)
         return -1;
     char c = inputBuffer[inputHead];

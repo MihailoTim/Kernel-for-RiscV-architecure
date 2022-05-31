@@ -217,7 +217,6 @@ char getc(){
 }
 
 void putc(char c){
-
     asm("mv a1, %[c]" : : [c] "r" ((uint64)c));
 
     asm("li a0, 0x42");

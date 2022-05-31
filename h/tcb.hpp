@@ -9,12 +9,8 @@
 #include "./riscv.hpp"
 
 class TCB {
-public:
-
-    bool isFinished(){ return this->status == Status::FINISHED;}
 
 private:
-
     using Body = void(*)(void*);
 
     struct Context{
@@ -65,7 +61,7 @@ private:
 
     friend class Scheduler;
     friend class RiscV;
-    friend class Queue;
+    friend class ConsoleUtil;
     friend class SCB;
 };
 

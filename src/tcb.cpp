@@ -38,8 +38,6 @@ TCB::TCB(Body body, void* args, uint64* stack, uint64 timeSlice){
     this->context = {(body == nullptr) ? 0 : (uint64)((char*)stack + DEFAULT_STACK_SIZE),
                      (uint64)&wrapper };
 
-//    if(this->body)
-//        Scheduler::put(this);
 }
 
 void TCB::free(){

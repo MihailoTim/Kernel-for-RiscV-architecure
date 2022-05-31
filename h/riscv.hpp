@@ -77,6 +77,10 @@ class RiscV{
 
     static void mc_sip(uint64 mask);
 
+    static void ms_sie(uint64 mask);
+
+    static void mc_sie(uint64 mask);
+
     static void popSppSpie();
 
     static void supervisorTrap();      //supervisorTrap defined in /src/supervisorTrap.S
@@ -95,6 +99,14 @@ public:
     static void enableInterrupts();
 
     static void disableInterrupts();
+
+    static void enableHardwareInterrupts();
+
+    static void disableHardwareInterrupts();
+
+    static void enableTimerInterrupts();
+
+    static void disableTimerInterrupts();
 
     static void initialize();
 };
@@ -155,11 +167,39 @@ inline void  RiscV::mc_sip(uint64 mask) {
     asm("csrc sip, %[mask]" : : [mask] "r" (mask));
 }
 
+inline void  RiscV::ms_sie(uint64 mask) {
+    asm("csrs sie, %[mask]" : : [mask] "r" (mask));
+}
+
+inline void  RiscV::mc_sie(uint64 mask){
+    asm("csrc sie, %[mask]" : : [mask] "r" (mask));
+}
+
 inline void RiscV::enableInterrupts() {
-    RiscV::ms_sstatus(SSTATUS_SIE);
+    enableTimerInterrupts();
+    enableHardwareInterrupts();
 }
 
 inline void RiscV::disableInterrupts() {
-    RiscV::mc_sstatus(SSTATUS_SIE);
+    enableTimerInterrupts();
+    enableHardwareInterrupts();
+}
+
+inline void RiscV::enableHardwareInterrupts() {
+    RiscV::ms_sstatus(SSTATUS_SIE);
+    RiscV::ms_sie(SIP_SEIE);
+}
+
+inline void RiscV::disableHardwareInterrupts(){
+    RiscV::mc_sie(SIP_SEIE);
+}
+
+inline void RiscV::enableTimerInterrupts() {
+    RiscV::ms_sstatus(SSTATUS_SIE);
+    RiscV::ms_sie(SIP_SSIE);
+}
+
+inline void RiscV::disableTimerInterrupts(){
+    RiscV::mc_sie(SIP_SSIE);
 }
 #endif //OS1_KERNEL_RISCV_HPP
