@@ -7,6 +7,10 @@
 #include "../lib/hw.h"
 
 class RiscV{
+    static bool userMainFinished;
+
+    static uint64 globalTime;
+
     enum BitMaskSstatus{
         SSTATUS_SIE = (1<<1),
         SSTATUS_SPIE = (1<<5),
@@ -81,18 +85,13 @@ class RiscV{
 
     static void mc_sie(uint64 mask);
 
+    static void jumpToUserMode();
+
     static void popSppSpie();
 
     static void supervisorTrap();      //supervisorTrap defined in /src/supervisorTrap.S
 
     static void handleSupervisorTrap();
-
-    friend class TCB;
-
-    friend class Utility;
-public:
-
-    static uint64 globalTime;
 
     static bool canFinish();
 
@@ -109,6 +108,16 @@ public:
     static void disableTimerInterrupts();
 
     static void initialize();
+
+    static void finalize();
+
+    friend class TCB;
+
+    friend class Utility;
+
+    friend class System;
+
+    friend class Scheduler;
 };
 
 inline uint64 RiscV::r_scause(){

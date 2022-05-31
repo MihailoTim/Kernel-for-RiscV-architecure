@@ -64,3 +64,12 @@ char ConsoleUtil::getOutput() {
     return c;
 }
 
+void ConsoleUtil::printString(const char *string) {
+    pendingPutc++;
+    while (*string != '\0')
+    {
+        ConsoleUtil::putOutput(*string);
+        string++;
+    }
+    pendingGetc--;
+}

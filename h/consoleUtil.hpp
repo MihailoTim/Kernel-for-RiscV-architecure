@@ -30,6 +30,8 @@ class ConsoleUtil {
 
     static void initialize();
 
+    static void printString(const char *string);
+
     friend class RiscV;
 };
 

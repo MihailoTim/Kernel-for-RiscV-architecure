@@ -10,6 +10,7 @@
 #include "../h/consoleUtil.hpp"
 
 uint64 RiscV::globalTime = 0;
+bool RiscV::userMainFinished = false;
 
 void RiscV::initialize() {
     RiscV::w_stvec((uint64) &RiscV::supervisorTrap);
@@ -17,6 +18,8 @@ void RiscV::initialize() {
     Scheduler::initialize();
     TCB::initialize();
     ConsoleUtil::initialize();
+    RiscV::enableInterrupts();
+    RiscV::jumpToUserMode();
 }
 
 void RiscV::popSppSpie() {
@@ -62,7 +65,7 @@ void RiscV::handleSupervisorTrap() {
     }
 
     //timer interrupt
-    if(scause == (0x01UL<<63 | 0x1)){
+    else if(scause == (0x01UL<<63 | 0x1)){
 
         uint64 volatile sstatus = RiscV::r_sstatus();
         uint64 volatile sepc = RiscV::r_sepc();
@@ -88,7 +91,7 @@ void RiscV::handleSupervisorTrap() {
         RiscV::w_sepc(sepc);
     }
 
-    if(scause == (0x01UL<<63 | 0x9)){
+    else if(scause == (0x01UL<<63 | 0x9)){
         uint64 volatile sstatus = RiscV::r_sstatus();
         uint64 volatile sepc = RiscV::r_sepc();
 
@@ -113,6 +116,14 @@ void RiscV::handleSupervisorTrap() {
         plic_complete(plic_claim());
         RiscV::w_sstatus(sstatus);
         RiscV::w_sepc(sepc);
+    }
+    else if(scause == 0x02){
+        //illegal instruction
+        TCB* old = TCB::running;
+        old->status = TCB::Status::FINISHED;
+        ConsoleUtil::printString("Illegal instruction\n");
+        userMainFinished = true;
+        TCB::dispatch();
     }
 
 }
@@ -348,4 +359,14 @@ void RiscV::putcWrapper(void* arg)
                 ConsoleUtil::pendingPutc--;
         }
     }
+}
+
+void RiscV::jumpToUserMode() {
+    //sstatus is already set to enable interrupts, and its SPP bit is already 0
+    //by ecalling and then returning from trap we will simply enforce the previous privilege set in SPP bit
+    asm("ecall");
+}
+
+void RiscV::finalize() {
+
 }

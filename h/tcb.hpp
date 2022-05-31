@@ -10,7 +10,6 @@
 
 class TCB {
 
-private:
     using Body = void(*)(void*);
 
     struct Context{

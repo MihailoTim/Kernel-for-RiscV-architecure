@@ -8,7 +8,6 @@
 #include "../lib/hw.h"
 
 class MemoryAllocator {
-public:             //temporary public for testing purposes
     struct BlockHeader{
         size_t size;  //size of allocated chunk in bytes
         BlockHeader *prev, *next;  //pointers to previous and next block
@@ -16,8 +15,6 @@ public:             //temporary public for testing purposes
 
     static BlockHeader* freeMemHead;    //head of free memory list
     static BlockHeader* allocMemHead;   //head of allocated memory list
-
-private:
 
     static bool initialized;
 
@@ -31,9 +28,7 @@ private:
 
     friend class RiscV;
 
-    friend class Queue;
-
-    friend class PriorityQueue;
+    friend class Utility;
 
     friend class TCB;
 
