@@ -7,11 +7,12 @@
 #include "../h/syscall_c.h"
 #include "../tests/userMain.hpp"
 #include "../h/tcb.hpp"
+#include "../h/printing.hpp"
 
 bool System::initialized = false;
 
-System::System(){
-    if(isRunnable()) {
+System::System() {
+    if (!initialized) {
         initialized = true;
 
         RiscV::initialize();
@@ -30,8 +31,4 @@ System::System(){
 void System::userMainWrapper(void *arg){
     userMain();
     RiscV::userMainFinished = true;
-}
-
-bool System::isRunnable() {
-    return !initialized;
 }

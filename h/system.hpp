@@ -10,8 +10,6 @@ class System {
 
     static void userMainWrapper(void* arg);
 
-    static bool isRunnable();
-
     static bool initialized;
 
 public:
