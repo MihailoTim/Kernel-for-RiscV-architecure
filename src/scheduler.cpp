@@ -13,16 +13,16 @@ TCB* Scheduler::sleepingHead = nullptr;
 void Scheduler::initialize(){
 }
 
+//put a TCB in scheduler
+//each TCB has a pointer to next TCB, so no external list/queue structures needed
 void Scheduler::put(TCB *tcb) {
     tcb->next = nullptr;
     readyTail = (!readyHead ? readyHead : readyTail->next) = tcb;
 }
 
 
+//get new TCB from scheduler
 TCB* Scheduler::get(){
-
-    awake();
-
     if(readyTail == nullptr)
         return nullptr;
     TCB* tmp = readyHead;
@@ -31,6 +31,7 @@ TCB* Scheduler::get(){
     return tmp;
 }
 
+//put a thread to sleep by linking it in sleeping queue (same thing as with ready threads, link by TCB->next field, no "real" queue needed)
 void Scheduler::sleep(TCB *t) {
     TCB* iter = sleepingHead, *prev = nullptr;
     for(; iter!= nullptr; prev = iter, iter=iter->next)
@@ -43,6 +44,7 @@ void Scheduler::sleep(TCB *t) {
         sleepingHead = t;
 }
 
+//try and awake all threads whose awake time is less than global time
 void Scheduler::awake(){
     while(sleepingHead){
         TCB* tmp = sleepingHead;
@@ -58,6 +60,7 @@ void Scheduler::awake(){
     }
 }
 
+//utility function to print all threads currently in scheduler
 void Scheduler::showScheduler() {
     TCB* iter = readyHead;
     while(iter){
@@ -66,6 +69,7 @@ void Scheduler::showScheduler() {
     }
 }
 
+//utility function to print all threads currently in sleep
 void Scheduler::showSleeping(){
     TCB* iter = sleepingHead;
     while(iter){

@@ -11,6 +11,8 @@ TCB* TCB::running = nullptr;
 
 uint64 TCB::timeSliceCounter = 0;
 
+
+//create a thread for kernel main and a separate thread for console output execution
 void TCB::initialize() {
     TCB::running = new TCB(nullptr, nullptr, nullptr, DEFAULT_TIME_SLICE);
 
@@ -21,6 +23,7 @@ void TCB::initialize() {
     Scheduler::put(putcThread);
 }
 
+//tcb constructor
 TCB::TCB(Body body, void* args, uint64* stack, uint64 timeSlice){
 
     this->body = body;
@@ -40,6 +43,7 @@ TCB::TCB(Body body, void* args, uint64* stack, uint64 timeSlice){
 
 }
 
+//deallocate memory for thread stack
 void TCB::free(){
     MemoryAllocator::kfree(stack);
 }
@@ -48,6 +52,8 @@ TCB::~TCB(){
     free();
 }
 
+//if currently running thread is not finished, asleep or blocked put it in scheduler
+//get new thread from scheduler and switch context
 void TCB::dispatch() {
     TCB* old = running;
 
@@ -62,6 +68,7 @@ void TCB::dispatch() {
     }
 }
 
+//wrapper function to run body function
 void TCB::wrapper(void *args) {
     RiscV::popSppSpie();
 

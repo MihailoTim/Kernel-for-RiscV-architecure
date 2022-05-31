@@ -5,6 +5,7 @@
 
 int main() {
 
+    //entry point for user code
     System();
 
     return 0;

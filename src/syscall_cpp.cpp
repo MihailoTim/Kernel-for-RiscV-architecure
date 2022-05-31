@@ -6,6 +6,8 @@
 #include "../lib/console.h"
 #include "../lib/hw.h"
 
+//CPP API for Threads, Semaphores, and others that rely on C API layer
+
 struct Args{
     void* pt;
     uint64 time;

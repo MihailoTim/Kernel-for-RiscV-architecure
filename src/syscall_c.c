@@ -11,6 +11,13 @@
 extern "C" {
 #endif
 
+
+//syscall_c.c contains definitions of all implemented syscalls accessible to user
+//syscall parameters (if has any) are put into registers a1-a7
+//syscall ID is put into a0
+//"ecall" is called to jump into supervisor mode trap handler
+//return value for syscall is returned by a0 register
+
 void *mem_alloc(size_t size){
     size_t sz = (size + MEM_BLOCK_SIZE -1) >> MEM_BLOCK_OFFS;
 
