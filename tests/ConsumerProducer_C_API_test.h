@@ -9,6 +9,9 @@
 
 #include "buffer.hpp"
 
+#include "../h/scheduler.hpp"
+#include "../h/scb.hpp"
+
 sem_t waitForAll;
 
 struct thread_data {
@@ -38,6 +41,12 @@ void producerKeyboard(void *arg) {
     delete data->buffer;
 
     sem_signal(data->wait);
+
+    printString("ending keyboard\n");
+
+    printString("showing scheduler:\n");
+
+    Scheduler::showScheduler();
 }
 
 void producer(void *arg) {
@@ -52,8 +61,17 @@ void producer(void *arg) {
             thread_dispatch();
         }
     }
+    printString("showing scheduler:\n");
+
+    Scheduler::showScheduler();
 
     sem_signal(data->wait);
+
+    printString("ending producer\n");
+
+    printString("showing scheduler:\n");
+
+    Scheduler::showScheduler();
 }
 
 void consumer(void *arg) {
@@ -64,19 +82,30 @@ void consumer(void *arg) {
     while (!threadEnd) {
         int key = data->buffer->get();
         i++;
-
-        putc(key);
+        if(key < 0)
+            printString("pedjo sisaj ga\n");
+        //putc(key);
 
         if (i % (5 * data->id) == 0) {
             thread_dispatch();
         }
 
         if (i % 80 == 0) {
-            putc('\n');
+            //putc('\n');
         }
     }
 
+    printString("showing scheduler:\n");
+
+    Scheduler::showScheduler();
+
     sem_signal(data->wait);
+
+    printString("ending consumer\n");
+
+    printString("showing scheduler:\n");
+
+    Scheduler::showScheduler();
 }
 
 void producerConsumer_C_API() {
@@ -122,9 +151,11 @@ void producerConsumer_C_API() {
     thread_dispatch();
 
     for (int i = 0; i <= threadNum; i++) {
+        printString("otiso sam da cekam...\n");
         sem_wait(waitForAll);
+        printString("Vratio sam se...\n");
     }
-
+    printString("ending user main\n");
     sem_close(waitForAll);
 }
 

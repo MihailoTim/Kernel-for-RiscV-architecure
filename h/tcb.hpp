@@ -9,6 +9,9 @@
 #include "./riscv.hpp"
 
 class TCB {
+    static void* userAddr;
+
+    static void* mainAddr;
 
     using Body = void(*)(void*);
 
@@ -62,6 +65,7 @@ class TCB {
     friend class RiscV;
     friend class ConsoleUtil;
     friend class SCB;
+    friend class System;
 };
 
 

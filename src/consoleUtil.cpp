@@ -65,13 +65,13 @@ char ConsoleUtil::getOutput() {
 }
 
 void ConsoleUtil::printString(const char *string) {
-    pendingPutc++;
+//    pendingPutc++;
     while (*string != '\0')
     {
         ConsoleUtil::putOutput(*string);
         string++;
     }
-    pendingGetc--;
+//    pendingPutc--;
 }
 
 char ConsoleUtil::putcUtilSyscall()
@@ -85,4 +85,30 @@ char ConsoleUtil::putcUtilSyscall()
     asm("mv %0, a0" : [status] "=r" (status));
 
     return (char)status;
+}
+
+void ConsoleUtil::printInt(int xx, int base, int sgn)
+{
+    char digits[] = "0123456789ABCDEF";
+    char buf[16];
+    int i, neg;
+    uint x;
+
+    neg = 0;
+    if(sgn && xx < 0){
+        neg = 1;
+        x = -xx;
+    } else {
+        x = xx;
+    }
+
+    i = 0;
+    do{
+        buf[i++] = digits[x % base];
+    }while((x /= base) != 0);
+    if(neg)
+        buf[i++] = '-';
+
+    while(--i >= 0)
+        ConsoleUtil::putOutput(buf[i]);
 }

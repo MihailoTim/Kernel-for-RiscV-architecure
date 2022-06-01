@@ -29,6 +29,10 @@ class Scheduler {
 
     friend class TCB;
 
+    friend class System;
+
+public:
+
     static void showScheduler();
 
     static void showSleeping();

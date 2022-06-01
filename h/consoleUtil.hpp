@@ -30,11 +30,13 @@ class ConsoleUtil {
 
     static void initialize();
 
-    static void printString(const char *string);
-
     static char putcUtilSyscall();
 
     friend class RiscV;
+
+public:
+    static void printInt(int xx, int base=10, int sgn=0);
+    static void printString(const char *string);
 };
 
 

@@ -199,6 +199,7 @@ inline void RiscV::disableInterrupts() {
 }
 
 inline void RiscV::enableHardwareInterrupts() {
+    RiscV::mc_sie(SIP_SSIE);
     RiscV::ms_sstatus(SSTATUS_SIE);
     RiscV::ms_sie(SIP_SEIE);
 }

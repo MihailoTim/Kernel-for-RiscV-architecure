@@ -36,6 +36,8 @@ class MemoryAllocator {
 
     friend class Scheduler;
 
+    friend class System;
+
 };
 
 

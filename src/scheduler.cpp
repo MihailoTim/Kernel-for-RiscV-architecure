@@ -4,6 +4,7 @@
 
 #include "../h/scheduler.hpp"
 #include "../h/printing.hpp"
+#include "../h/consoleUtil.hpp"
 
 TCB* Scheduler::readyHead = nullptr;
 TCB* Scheduler::readyTail = nullptr;
@@ -23,7 +24,7 @@ void Scheduler::put(TCB *tcb) {
 
 //get new TCB from scheduler
 TCB* Scheduler::get(){
-    if(readyTail == nullptr)
+    if(readyHead == nullptr)
         return nullptr;
     TCB* tmp = readyHead;
     readyHead = readyHead->next;
@@ -64,7 +65,8 @@ void Scheduler::awake(){
 void Scheduler::showScheduler() {
     TCB* iter = readyHead;
     while(iter){
-        printInt((uint64)iter, 16);
+        ConsoleUtil::printInt((uint64)iter, 16);
+        ConsoleUtil::printString("\n");
         iter = iter->next;
     }
 }

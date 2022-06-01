@@ -6,15 +6,22 @@
 #include "../h/memoryAllocator.hpp"
 #include "../h/scheduler.hpp"
 #include "../h/syscall_c.h"
+#include "../h/consoleUtil.hpp"
 
 TCB* TCB::running = nullptr;
 
 uint64 TCB::timeSliceCounter = 0;
 
+void* TCB::userAddr = nullptr;
+
+void* TCB::mainAddr = nullptr;
+
 
 //create a thread for kernel main and a separate thread for console output execution
 void TCB::initialize() {
     TCB::running = new TCB(nullptr, nullptr, nullptr, DEFAULT_TIME_SLICE);
+
+    mainAddr = (void*)TCB::running;
 
     uint64 *putcStack = (uint64*)MemoryAllocator::kmalloc((DEFAULT_STACK_SIZE+MEM_BLOCK_SIZE-1)/MEM_BLOCK_SIZE);
 
@@ -62,6 +69,7 @@ void TCB::dispatch() {
     }
 
     running = Scheduler::get();
+
     if(running) {
         running->status = Status::RUNNING;
         contextSwitch(&old->context, &running->context);

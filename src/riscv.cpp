@@ -19,8 +19,9 @@ void RiscV::initialize() {
     Scheduler::initialize();
     TCB::initialize();
     ConsoleUtil::initialize();
-    RiscV::enableInterrupts();
-    RiscV::jumpToUserMode();
+//    RiscV::enableInterrupts();
+    RiscV::enableHardwareInterrupts();
+//    RiscV::jumpToUserMode();
 }
 
 //get previous privilege and previous interrupt status
@@ -304,7 +305,6 @@ void RiscV::executeSemOpenSyscall() {
 
     //create new Semaphore Control Block and write it into ihandle if not null
     SCB *scb = new SCB(iinit);
-
     uint64 status = 0;
 
     if(scb == nullptr){
@@ -478,5 +478,5 @@ void RiscV::jumpToUserMode() {
 }
 
 void RiscV::finalize() {
-
+    RiscV::disableInterrupts();
 }
