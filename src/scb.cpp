@@ -17,9 +17,9 @@ SCB::~SCB(){
     TCB* iter = blockedHead;
     while(iter !=nullptr) {
         TCB* tmp = iter;
-        Scheduler::put(iter);
         iter = iter->next;
-        tmp->next = nullptr;
+        tmp->next = 0;
+        Scheduler::put(tmp);
     }
 }
 

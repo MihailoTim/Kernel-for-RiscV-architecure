@@ -32,6 +32,8 @@ class ConsoleUtil {
 
     static void printString(const char *string);
 
+    static char putcUtilSyscall();
+
     friend class RiscV;
 };
 

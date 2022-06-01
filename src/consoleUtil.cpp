@@ -34,7 +34,7 @@ void ConsoleUtil::putInput(char c) {
 
 char ConsoleUtil::getInput() {
     inputSem->wait();
-    while(inputHead == inputTail);
+
     if(inputHead == inputTail)
         return -1;
     char c = inputBuffer[inputHead];
@@ -72,4 +72,17 @@ void ConsoleUtil::printString(const char *string) {
         string++;
     }
     pendingGetc--;
+}
+
+char ConsoleUtil::putcUtilSyscall()
+{
+    asm("li a0, 0x43");
+
+    asm("ecall");
+
+    uint64 status;
+
+    asm("mv %0, a0" : [status] "=r" (status));
+
+    return (char)status;
 }

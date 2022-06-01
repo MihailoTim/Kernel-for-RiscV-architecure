@@ -67,6 +67,7 @@ void RiscV::handleSupervisorTrap() {
             case 0x31 : executeTimeSleepSyscall();break;
             case 0x41 : executeGetcSyscall();break;
             case 0x42 : executePutcSyscall();break;
+            case 0x43 : executePutcUtilSyscall();break;
         }
 
         //write previously save sstatus and incremented sepc
@@ -448,17 +449,26 @@ void RiscV::putcWrapper(void* arg)
         if(status & 1UL<<5){
 
             //get character from output buffer with possible block if nothing in buffer
-            char volatile c = ConsoleUtil::getOutput();
-            uint64 data = CONSOLE_RX_DATA;
-            asm("mv a0, %[data]" : : [data] "r" (data));
-            asm("mv a1, %[c]" : : [c] "r" (c));
-            asm("sb a1,0(a0)");
+//                char volatile c = ConsoleUtil::putcUtilSyscall();
+                char volatile c = ConsoleUtil::putcUtilSyscall();
+                uint64 data = CONSOLE_RX_DATA;
+                asm("mv a0, %[data]" : : [data] "r"(data));
+                asm("mv a1, %[c]" : : [c] "r"(c));
+                asm("sb a1,0(a0)");
 
             //decrement number of pending putc requests
             if(ConsoleUtil::pendingPutc>0)
                 ConsoleUtil::pendingPutc--;
         }
+        else
+            thread_dispatch();
     }
+}
+
+void RiscV::executePutcUtilSyscall() {
+    char c = ConsoleUtil::getOutput();
+    asm("mv a0, %[c]" : : [c] "r" ((uint64)(c)) );
+
 }
 
 void RiscV::jumpToUserMode() {

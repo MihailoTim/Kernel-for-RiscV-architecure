@@ -51,6 +51,8 @@ class RiscV{
 
     static void executePutcSyscall();
 
+    static void executePutcUtilSyscall();
+
     static void putcWrapper(void *arg);
 
     static void pushRegisters();
@@ -118,6 +120,8 @@ class RiscV{
     friend class System;
 
     friend class Scheduler;
+
+    friend class ConsoleUtil;
 };
 
 inline uint64 RiscV::r_scause(){
