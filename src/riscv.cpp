@@ -341,10 +341,13 @@ void RiscV::executeSemWaitSyscall() {
 
     asm("mv %[ihandle], a1" : [ihandle] "=r"(ihandle));
 
-    //call wait method on ihandle scb
-    ((SCB*)ihandle)->wait();
-
     uint64 status = 0;
+    //call wait method on ihandle scb
+
+    if(((SCB*)ihandle) != nullptr)
+        ((SCB*)ihandle)->wait();
+    else
+        status = -1;
 
     //return status
     asm("mv a0, %[status]" : : [status] "r" (status));
@@ -359,9 +362,13 @@ void RiscV::executeSemSignalSyscall() {
     asm("mv %[ihandle], a1" : [ihandle] "=r"(ihandle));
 
     //call signal method on ihandle scb
-    ((SCB*)ihandle)->signal();
 
     uint64 status = 0;
+
+    if(((SCB*)ihandle) != nullptr)
+        ((SCB*)ihandle)->signal();
+    else
+        status = -1;
 
     //return status
     asm("mv a0, %[status]" : : [status] "r" (status));

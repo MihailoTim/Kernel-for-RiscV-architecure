@@ -9,10 +9,6 @@
 #include "./riscv.hpp"
 
 class TCB {
-    static void* userAddr;
-
-    static void* mainAddr;
-
     using Body = void(*)(void*);
 
     struct Context{
@@ -34,8 +30,6 @@ class TCB {
     void* operator new(size_t size);
 
     void operator delete(void* addr);
-
-    void setFinished(bool finished){this->status = Status::FINISHED;}
 
     void free();
 

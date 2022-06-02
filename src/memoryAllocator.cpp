@@ -4,6 +4,7 @@
 #include "../h/memoryAllocator.hpp"
 #include "../h/utility.hpp"
 #include "../h/printing.hpp"
+#include "../h/consoleUtil.hpp"
 
 MemoryAllocator::BlockHeader* MemoryAllocator::freeMemHead = nullptr;
 
@@ -34,7 +35,7 @@ void* MemoryAllocator::kmalloc(size_t size){
     BlockHeader* blk = freeMemHead, *prev = nullptr;
 
     for(; blk!=nullptr; prev = blk, blk = blk->next) {
-        if (blk->size >= byteSize + sizeof(BlockHeader))
+        if (blk->size > byteSize + sizeof(BlockHeader))
             break;            //iterate through the list and find the first fitting block of free memory
     }
 
@@ -61,7 +62,6 @@ void* MemoryAllocator::kmalloc(size_t size){
         }
 
         //insert the blk chunk in list of allocated memory
-//        Utility::memset((char*)blk+sizeof(BlockHeader), 17, blk->size); //FOR TESTING PURPOSES ONLY: fill acquired space with 1s
         insertAndMerge(blk, &allocMemHead);
 
         return (char*)blk + sizeof(BlockHeader);    //return address of start of the data block, not start of the header
@@ -87,7 +87,6 @@ uint64 MemoryAllocator::kfree(void* ptr){
             allocMemHead = blk->next;
 
         //insert blk chunk in list of free memory and try to merge with an already existing block
-//        Utility::memset((char*)blk+sizeof(BlockHeader), 0, blk->size); //FOR TESTING PURPOSES ONLY: fill acquired space with 1s
         insertAndMerge(blk, &freeMemHead);
     }
     return 0;
