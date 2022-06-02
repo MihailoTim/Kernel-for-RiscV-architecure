@@ -3,9 +3,7 @@
 //
 
 #include "../h/syscall_c.h"
-#include "../lib/console.h"
 #include "../lib/hw.h"
-#include "../lib/mem.h"
 
 #ifdef __cplusplus
 extern "C" {

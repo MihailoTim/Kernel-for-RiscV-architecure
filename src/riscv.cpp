@@ -19,9 +19,9 @@ void RiscV::initialize() {
     Scheduler::initialize();
     TCB::initialize();
     ConsoleUtil::initialize();
-//    RiscV::enableInterrupts();
-    RiscV::enableHardwareInterrupts();
-//    RiscV::jumpToUserMode();
+    RiscV::enableInterrupts();
+//    RiscV::enableHardwareInterrupts();
+    RiscV::jumpToUserMode();
 }
 
 //get previous privilege and previous interrupt status
@@ -305,6 +305,7 @@ void RiscV::executeSemOpenSyscall() {
 
     //create new Semaphore Control Block and write it into ihandle if not null
     SCB *scb = new SCB(iinit);
+
     uint64 status = 0;
 
     if(scb == nullptr){
@@ -449,7 +450,6 @@ void RiscV::putcWrapper(void* arg)
         if(status & 1UL<<5){
 
             //get character from output buffer with possible block if nothing in buffer
-//                char volatile c = ConsoleUtil::putcUtilSyscall();
                 char volatile c = ConsoleUtil::putcUtilSyscall();
                 uint64 data = CONSOLE_RX_DATA;
                 asm("mv a0, %[data]" : : [data] "r"(data));
@@ -468,7 +468,6 @@ void RiscV::putcWrapper(void* arg)
 void RiscV::executePutcUtilSyscall() {
     char c = ConsoleUtil::getOutput();
     asm("mv a0, %[c]" : : [c] "r" ((uint64)(c)) );
-
 }
 
 void RiscV::jumpToUserMode() {
@@ -478,5 +477,5 @@ void RiscV::jumpToUserMode() {
 }
 
 void RiscV::finalize() {
-    RiscV::disableInterrupts();
+
 }

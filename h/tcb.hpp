@@ -21,6 +21,8 @@ class TCB {
 
     enum Status{RUNNING, READY, FINISHED, BLOCKED};
 
+    enum Mode{USER, SUPERVISOR};
+
     TCB();
 
     TCB(Body body, void* args, uint64* stack, uint64 timeSlice);
@@ -45,6 +47,7 @@ class TCB {
 
     Context context;
     Status status;
+    Mode mode;
 
     Body body;
     void *args;

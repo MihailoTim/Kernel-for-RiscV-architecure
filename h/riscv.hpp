@@ -189,13 +189,14 @@ inline void  RiscV::mc_sie(uint64 mask){
 }
 
 inline void RiscV::enableInterrupts() {
-    enableTimerInterrupts();
-    enableHardwareInterrupts();
+    RiscV::ms_sie(SIP_SSIE);
+    RiscV::ms_sie(SIP_SEIE);
+    RiscV::ms_sstatus(SSTATUS_SIE);
 }
 
 inline void RiscV::disableInterrupts() {
-    enableTimerInterrupts();
-    enableHardwareInterrupts();
+    disableTimerInterrupts();
+    disableHardwareInterrupts();
 }
 
 inline void RiscV::enableHardwareInterrupts() {
@@ -209,6 +210,7 @@ inline void RiscV::disableHardwareInterrupts(){
 }
 
 inline void RiscV::enableTimerInterrupts() {
+    RiscV::mc_sie(SIP_SEIE);
     RiscV::ms_sstatus(SSTATUS_SIE);
     RiscV::ms_sie(SIP_SSIE);
 }
