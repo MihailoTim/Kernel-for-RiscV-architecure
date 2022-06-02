@@ -54,6 +54,8 @@ class TCB {
     uint64 sleepTime = 0;
     uint64 wakeTime = 0;
 
+    uint64 sscratch;
+
     static TCB *running;
 
     static uint64 timeSliceCounter;

@@ -132,6 +132,7 @@ void WorkerD::workerBodyD(void* arg) {
 
 
 void Threads_CPP_API_test() {
+
     Thread* threads[4];
 
     threads[0] = new WorkerA();
