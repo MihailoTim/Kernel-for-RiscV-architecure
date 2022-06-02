@@ -26,26 +26,15 @@ System::System() {
         //creating a thread that will be executing user code
         //this is done as to separate user code execution from main kernel thread
         //also it provides kernel with an idle thread that will run itself if user code gets blocked (on getc syscall for example)
-//        thread_t mainThread;
-//        thread_create(&mainThread, userMainWrapper, nullptr);
 
-        uint64 *stack = (uint64*)MemoryAllocator::kmalloc(DEFAULT_STACK_SIZE);
-        TCB* mainThread = new TCB(userMainWrapper, nullptr, stack, DEFAULT_TIME_SLICE);
-        Scheduler::put(mainThread);
-
-        TCB::userAddr = (void*)mainThread;
-
-        RiscV::enableInterrupts();
+        thread_t userMainThread;
+        thread_create(&userMainThread, userMainWrapper, nullptr);
 
         //return control to user code until it reaches the end
         //exit only if user is finished and machine is ready to exit (in case there is something still left to print, wait for it to be done)
-        while (!RiscV::userMainFinished || !RiscV::canFinish()) {
-            //printString("dispatchuje se kernel main...\n");
+        while (!RiscV::userMainFinished) {
             thread_dispatch();
-            //printString("vratio se kernel main\n");
         }
-        printString("Zavrsio se kernel main\n");
-        Scheduler::showScheduler();
 
         //finalize the machine
         RiscV::finalize();

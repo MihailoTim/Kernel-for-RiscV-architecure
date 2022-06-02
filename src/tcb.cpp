@@ -69,6 +69,7 @@ void TCB::dispatch() {
     running = Scheduler::get();
     if(running) {
         running->status = Status::RUNNING;
+        RiscV::jumpToDesignatedPrivilegeMode();
         contextSwitch(&old->context, &running->context);
     }
 }

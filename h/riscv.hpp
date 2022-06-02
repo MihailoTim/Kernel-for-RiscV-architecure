@@ -87,7 +87,7 @@ class RiscV{
 
     static void mc_sie(uint64 mask);
 
-    static void jumpToUserMode();
+    static void jumpToDesignatedPrivilegeMode();
 
     static void popSppSpie();
 

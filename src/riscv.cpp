@@ -13,26 +13,19 @@ uint64 RiscV::globalTime = 0;
 bool RiscV::userMainFinished = false;
 
 //initailize each of the key components and switch to user mode for user code execution
-void RiscV::initialize() {
+void RiscV::initialize()
     RiscV::w_stvec((uint64) &RiscV::supervisorTrap);
     MemoryAllocator::initialize();
     Scheduler::initialize();
     TCB::initialize();
     ConsoleUtil::initialize();
     RiscV::enableInterrupts();
-//    RiscV::enableHardwareInterrupts();
-    RiscV::jumpToUserMode();
 }
 
 //get previous privilege and previous interrupt status
 void RiscV::popSppSpie() {
     asm("csrw sepc, ra");
     asm("sret");
-}
-
-//check whether anything is left to print on the screen
-bool RiscV::canFinish() {
-    return ConsoleUtil::pendingPutc == 0;
 }
 
 //handler function for traps
@@ -156,6 +149,7 @@ void RiscV::handleSupervisorTrap() {
         TCB::dispatch();
     }
 
+    RiscV::jumpToDesignatedPrivilegeMode();
 }
 
 void RiscV::executeMemAllocSyscall(){
@@ -470,12 +464,19 @@ void RiscV::executePutcUtilSyscall() {
     asm("mv a0, %[c]" : : [c] "r" ((uint64)(c)) );
 }
 
-void RiscV::jumpToUserMode() {
-    //sstatus is already set to enable interrupts, and its SPP bit is already 0
-    //by ecalling and then returning from trap we will simply enforce the previous privilege set in SPP bit
-    asm("ecall");
+void RiscV::jumpToDesignatedPrivilegeMode() {
+    if(TCB::running->mode == TCB::Mode::SUPERVISOR)
+        RiscV::ms_sstatus(RiscV::SSTATUS_SPP);
+    else
+        RiscV::mc_sstatus(RiscV::SSTATUS_SPP);
 }
 
 void RiscV::finalize() {
 
+    while(ConsoleUtil::outputHead != ConsoleUtil::outputTail);
+
+    RiscV::disableInterrupts();
+
+    while(Scheduler::readyHead != nullptr)
+        Scheduler::readyHead = Scheduler::readyHead->next;
 }

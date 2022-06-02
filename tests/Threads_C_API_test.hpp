@@ -92,6 +92,7 @@ void workerBodyD(void* arg) {
 
 
 void Threads_C_API_test() {
+    asm("csrs sstatus, 0x02");
     thread_t threads[4];
     thread_create(&threads[0], workerBodyA, nullptr);
     printString("ThreadA created\n");
