@@ -13,7 +13,7 @@ uint64 RiscV::globalTime = 0;
 bool RiscV::userMainFinished = false;
 
 //initailize each of the key components and switch to user mode for user code execution
-void RiscV::initialize()
+void RiscV::initialize(){
     RiscV::w_stvec((uint64) &RiscV::supervisorTrap);
     MemoryAllocator::initialize();
     Scheduler::initialize();
@@ -144,8 +144,7 @@ void RiscV::handleSupervisorTrap() {
     else if(scause == 0x02){
         TCB* old = TCB::running;
         old->status = TCB::Status::FINISHED;
-        ConsoleUtil::printString("Illegal instruction\n");
-        userMainFinished = true;
+        ConsoleUtil::printString("Illegal instruction\nExiting thread...\n");
         TCB::dispatch();
     }
 

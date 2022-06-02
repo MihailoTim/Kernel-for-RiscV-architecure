@@ -6,12 +6,9 @@
 #include "../h/riscv.hpp"
 #include "../h/syscall_c.h"
 #include "../tests/userMain.hpp"
-#include "../h/tcb.hpp"
+#include "../h/syscall_cpp.hpp"
 #include "../h/printing.hpp"
-#include "../h/consoleUtil.hpp"
 #include "../h/tcb.hpp"
-#include "../h/memoryAllocator.hpp"
-#include "../h/scheduler.hpp"
 
 bool System::initialized = false;
 
@@ -32,7 +29,7 @@ System::System() {
 
         //return control to user code until it reaches the end
         //exit only if user is finished and machine is ready to exit (in case there is something still left to print, wait for it to be done)
-        while (!RiscV::userMainFinished) {
+        while (((TCB *) userMainThread)->status != TCB::Status::FINISHED) {
             thread_dispatch();
         }
 
@@ -44,5 +41,4 @@ System::System() {
 //wrapper function for userMain as per POSIX threads
 void System::userMainWrapper(void *arg){
     userMain();
-    RiscV::userMainFinished = true;
 }
