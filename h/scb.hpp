@@ -8,36 +8,32 @@
 #include "tcb.hpp"
 //semaphore control block
 
-class SCB
-{
-public:
-    SCB(int val = 0);
+class SCB {
+
+    int val;
+
+    TCB *blockedHead, *blockedTail;
+
+    SCB(uint64 init);
+
     ~SCB();
 
-    uint64 wait();
-    uint64 signal();
+    void wait();
 
-    TCB* headBlocked;
-    TCB* tailBlocked;
-
-    void* operator new(size_t size);
-    void operator delete(void *p);
-
-    static const uint64 SEM_OPEN = 0x21;
-    static const uint64 SEM_CLOSE = 0x22;
-    static const uint64 SEM_WAIT = 0x23;
-    static const uint64 SEM_SIGNAL = 0x24;
-
-
-private:
-    int val, beginVal;
+    void signal();
 
     void block();
-    void unblock();
 
-    TCB* getFirstBlocked();
-    void removeFirstBlocked();
-    void addToBlocked(TCB* pcb);
+    void deblock();
+
+    void* operator new(size_t size);
+
+    void operator delete(void* addr);
+
+    friend class RiscV;
+
+    friend class ConsoleUtil;
+
 };
 
 

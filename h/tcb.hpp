@@ -8,6 +8,8 @@
 #include "../lib/hw.h"
 #include "./riscv.hpp"
 
+class SCB;
+
 class TCB {
     using Body = void(*)(void*);
 
@@ -53,6 +55,8 @@ class TCB {
 
     uint64 sleepTime = 0;
     uint64 wakeTime = 0;
+
+    SCB* semError = nullptr;
 
     uint64 a0Location;
 

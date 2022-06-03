@@ -8,87 +8,55 @@
 #include "../h/printing.hpp"
 #include "../h/consoleUtil.hpp"
 
-SCB::SCB(int val)
-{
-    this->val = this->beginVal = val;
-    headBlocked = tailBlocked = 0;
+SCB::SCB(uint64 init){
+    val = init;
+    blockedHead = nullptr;
+    blockedTail = nullptr;
 }
 
-uint64 SCB::wait() {
-    if(--val < 0)
-        block();
-
-    return 0;
-}
-
-uint64 SCB::signal() {
-    if(++val <= 0)
-        unblock();
-
-    return 0;
-}
-
-SCB::~SCB()
-{
-    while(getFirstBlocked() != 0)
-    {
-        TCB* pcb = getFirstBlocked();
-        removeFirstBlocked();
-        Scheduler::put(pcb);
+SCB::~SCB(){
+    TCB* iter = blockedHead;
+    while(iter !=nullptr) {
+        TCB* tmp = iter;
+        iter = iter->next;
+        tmp->next = 0;
+        tmp->semError = this;
+        Scheduler::put(tmp);
     }
 }
 
-void SCB::addToBlocked(TCB* pcb)
-{
-    pcb->next = 0;
-    if(headBlocked == 0)
-    {
-        headBlocked = tailBlocked = pcb;
-    }
-    else
-    {
-        tailBlocked->next = pcb;
-        tailBlocked = pcb;
-    }
-}
-
-void SCB::block()
-{
+void SCB::block() {
+    blockedTail = (!blockedHead ? blockedHead : blockedTail->next) = TCB::running;
+    TCB::running->next = nullptr;
     TCB::running->status = TCB::BLOCKED;
-    addToBlocked(TCB::running);
     TCB::dispatch();
 }
 
-TCB* SCB::getFirstBlocked()
-{
-    return headBlocked;
-}
-
-void SCB::removeFirstBlocked()
-{
-    if(headBlocked == 0)
-        return;
-    TCB* first = headBlocked;
-    headBlocked = headBlocked->next;
-    first->next = 0;
-    if(headBlocked == 0)
-        tailBlocked =0;
-}
-
-void SCB::unblock() {
-    TCB* fr = getFirstBlocked();
-    removeFirstBlocked();
-    if(fr != 0)
-    {
-        //Riscv::printString("Unblocked thread\n");
-        Scheduler::put(fr);
+void SCB::deblock(){
+    TCB* tcb = blockedHead;
+    blockedHead = blockedHead->next;
+    tcb->next = nullptr;
+    if(tcb) {
+        tcb->status = TCB::READY;
+        Scheduler::put(tcb);
     }
 }
-void *SCB::operator new(size_t size) {
-    return MemoryAllocator::kmalloc((size + MEM_BLOCK_SIZE-1)/MEM_BLOCK_SIZE);
+
+void SCB::wait() {
+    TCB::running->semError = nullptr;
+    if (--val < 0)
+        block();
 }
 
-void SCB::operator delete(void *p)
-{
-    MemoryAllocator::kfree(p);
+void SCB::signal(){
+    if(val++<0)
+        deblock();
+}
+
+void* SCB::operator new(size_t size){
+    return MemoryAllocator::kmalloc(size);
+}
+
+void SCB::operator delete(void *addr){
+    MemoryAllocator::kfree(addr);
 }

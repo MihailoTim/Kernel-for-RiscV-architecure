@@ -367,6 +367,11 @@ void RiscV::executeSemWaitSyscall() {
     else
         status = -1;
 
+    if(TCB::running->semError != nullptr)
+        status = -1;
+    else
+        status = 0;
+
     //return status
     asm("mv a0, %[status]" : : [status] "r" (status));
 

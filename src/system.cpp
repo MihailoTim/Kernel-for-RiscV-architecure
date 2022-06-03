@@ -40,8 +40,18 @@ System::System() {
 //wrapper function for userMain as per POSIX threads
 void System::userMainWrapper(void *arg){
 
-    for(int i=0;i<2000000;i++)
-        mem_alloc(1);
+//    for(int i=0;i<20000000;i++) {
+//        void* x = mem_alloc(1);
+//        if(x==nullptr){
+//            printString("alloc\n");
+//            break;
+//        }
+//        int status = mem_free(x);
+//        if(status == -1){
+//            printString("free\n");
+//            break;
+//        }
+//    }
 //    for(int i=0;;i++){
 //        void *x = mem_alloc(1);
 //        void *y = mem_alloc(1);
@@ -63,5 +73,5 @@ void System::userMainWrapper(void *arg){
 //        if(y);
 //    }
 
-//    userMain();
+    userMain();
 }
