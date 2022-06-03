@@ -4,7 +4,8 @@
 
 #include "../h/_semaphore.hpp"
 #include "../h/printing.hpp"
+#include "../h/scb.hpp"
 
 void _semaphore::operator delete(void *addr){
-//    printString("deleting sem_t\n");
+    sem_close((sem_t)addr);
 }

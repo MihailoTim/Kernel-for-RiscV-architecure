@@ -206,3 +206,26 @@ void MemoryAllocator::insertAndMerge(void *addr, BlockHeader **head) {   //inser
             }
     }
 }
+
+void MemoryAllocator::showMemory() {
+    BlockHeader *iter = allocMemHead;
+    printString("NOW SHOWING ALLOCATED MEMORY\n");
+    while(iter!=nullptr){
+        printInt((uint64)iter);
+        putc(' ');
+        printInt(iter->size);
+        putc('\n');
+        iter=iter->next;
+    }
+
+    printString("NOW SHOWING FREE MEMORY\n");
+    iter = freeMemHead;
+    while(iter!=nullptr){
+        printInt((uint64)iter);
+        putc(' ');
+        printInt(iter->size);
+        putc('\n');
+        iter=iter->next;
+    }
+    printString("================================================================\n");
+}

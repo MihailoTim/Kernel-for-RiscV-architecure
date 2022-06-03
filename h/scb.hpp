@@ -26,6 +26,8 @@ class SCB {
 
     void deblock();
 
+    static int semaphore_free(void *addr);
+
     void* operator new(size_t size);
 
     void operator delete(void* addr);
@@ -34,5 +36,8 @@ class SCB {
 
     friend class ConsoleUtil;
 
+    friend class _semaphore;
+
 };
+
 #endif //OS1_KERNEL_SCB_HPP

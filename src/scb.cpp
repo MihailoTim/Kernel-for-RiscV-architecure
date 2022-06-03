@@ -65,3 +65,16 @@ void* SCB::operator new(size_t size){
 void SCB::operator delete(void *addr){
     MemoryAllocator::kfree(addr);
 }
+
+int SCB::semaphore_free(void *addr) {
+    uint64 iptr = (uint64)addr;
+
+    asm("mv a1, %[iptr]" : : [iptr] "r" (iptr));  //put address in a1
+    asm("li a0, 0x52");  //put number of syscall in a0
+    asm("ecall");
+
+    uint64 status; //return status of mem_free
+
+    asm("mv %[status], a0" : [status] "=r" (status));
+    return status;
+}

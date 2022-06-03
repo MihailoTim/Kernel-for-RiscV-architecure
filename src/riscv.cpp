@@ -63,6 +63,8 @@ void RiscV::handleSupervisorTrap() {
             case 0x41 : executeGetcSyscall();break;
             case 0x42 : executePutcSyscall();break;
             case 0x43 : executePutcUtilSyscall();break;
+            case 0x51 : executeThreadFreeSyscall();break;
+            case 0x52 : executeSemaphoreFreeSyscall();break;
         }
 
         //write previously save sstatus and incremented sepc
@@ -539,4 +541,45 @@ void RiscV::saveA0toSscratch()
     asm("mv a1, %[a0]" : :  [a0] "r"(TCB::running->a0Location));
     asm("sd a0, 80(a1)");
     asm("mv a1,%[a1]"::  [a1]"r"(a1));
+}
+
+void RiscV::executeThreadFreeSyscall() {
+    uint64 iaddr, status;
+
+        //call internal allocator and free memory which iaddr points to
+    asm("mv %[iaddr], a1" : [iaddr] "=r"(iaddr));
+
+    TCB *thr = (TCB*)iaddr;
+
+    if(thr == nullptr)
+        status = -1;
+    else {
+        status = MemoryAllocator::kfree(thr->stack);
+        delete thr;
+    }
+
+    //return status
+    asm("mv a0, %[status]" : : [status] "r" (status));
+
+    RiscV::saveA0toSscratch();
+}
+
+void RiscV::executeSemaphoreFreeSyscall() {
+    uint64 iaddr, status;
+
+    //call internal allocator and free memory which iaddr points to
+    asm("mv %[iaddr], a1" : [iaddr] "=r"(iaddr));
+
+    SCB *scb = (SCB*)iaddr;
+
+    if(scb == nullptr){
+        status = -1;
+    }
+    else
+        delete scb;
+
+    //return status
+    asm("mv a0, %[status]" : : [status] "r" (status));
+
+    RiscV::saveA0toSscratch();
 }

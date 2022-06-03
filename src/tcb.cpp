@@ -90,3 +90,16 @@ void* TCB::operator new(size_t size){
 void TCB::operator delete(void *addr){
     MemoryAllocator::kfree(addr);
 }
+
+int TCB::thread_free(void *addr) {
+    uint64 iptr = (uint64)addr;
+
+    asm("mv a1, %[iptr]" : : [iptr] "r" (iptr));  //put address in a1
+    asm("li a0, 0x51");  //put number of syscall in a0
+    asm("ecall");
+
+    uint64 status;
+
+    asm("mv %[status], a0" : [status] "=r" (status));
+    return status;
+}

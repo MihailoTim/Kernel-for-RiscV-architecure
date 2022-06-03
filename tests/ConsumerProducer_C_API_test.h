@@ -138,8 +138,6 @@ void producerConsumer_C_API() {
 
     sem_close(waitForAll);
 
-    delete waitForAll;
-
     delete buffer;
 
 }

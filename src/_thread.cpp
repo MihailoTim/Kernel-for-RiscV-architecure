@@ -4,8 +4,9 @@
 
 #include "../h/_thread.hpp"
 #include "../h/printing.hpp"
+#include "../h/tcb.hpp"
 
 void _thread::operator delete(void *addr){
-//    printString("deleting thread_t\n");
+    TCB::thread_free(addr);
 }
 

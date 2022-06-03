@@ -6,6 +6,9 @@
 #define OS1_KERNEL_SYSTEM_HPP
 
 
+#include "memoryAllocator.hpp"
+
+
 class System {
 
     static void userMainWrapper(void* arg);
@@ -15,6 +18,5 @@ class System {
 public:
     System();
 };
-
 
 #endif //OS1_KERNEL_SYSTEM_HPP

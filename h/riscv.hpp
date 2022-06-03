@@ -52,6 +52,10 @@ class RiscV{
 
     static void executePutcUtilSyscall();
 
+    static void executeThreadFreeSyscall();
+
+    static void executeSemaphoreFreeSyscall();
+
     static void putcWrapper(void *arg);
 
     static uint64 r_scause();

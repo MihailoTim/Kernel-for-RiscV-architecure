@@ -26,6 +26,8 @@ class MemoryAllocator {
 
     static void initialize();
 
+    static void showMemory();
+
     friend class RiscV;
 
     friend class Utility;

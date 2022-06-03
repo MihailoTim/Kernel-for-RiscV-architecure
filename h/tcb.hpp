@@ -41,6 +41,8 @@ class TCB {
 
     static void contextSwitch(Context *oldContext, Context *runningContext);
 
+    static int thread_free(void* addr);
+
     Context context;
     Status status;
     Mode mode;
@@ -69,6 +71,7 @@ class TCB {
     friend class ConsoleUtil;
     friend class SCB;
     friend class System;
+    friend class _thread;
 };
 
 #endif //OS1_KERNEL_TCB_HPP
