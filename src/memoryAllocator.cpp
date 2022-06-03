@@ -59,12 +59,14 @@ void* MemoryAllocator::kmalloc(size_t size){
             size_t offset = sizeof(BlockHeader) + byteSize;   //offset for new freeMem chunk
             newBlk = (BlockHeader*)((char*)blk + offset);
             newBlk->next = blk->next;
+            newBlk->prev = blk->prev;
             newBlk->size = remainingSize - sizeof(BlockHeader);
 
             if(prev)
                 prev->next = newBlk;
-            else
-                freeMemHead = newBlk;
+            else {
+                freeMemHead = freeMemTail = newBlk;
+            }
         }
         else{
             // No remaining fragment, allocate the entire block
@@ -100,6 +102,54 @@ void* MemoryAllocator::kmalloc(size_t size){
 
     return nullptr;
 }
+
+//uint64 MemoryAllocator::kfree(void* ptr){
+//    BlockHeader *blk = allocMemHead;
+//
+//    for(; blk != nullptr;blk = blk->next)
+//        if((char*)ptr - sizeof(BlockHeader) == (char*)blk) break;
+//
+//    if(blk == nullptr)
+//        return -1;
+//    else{
+//
+//        BlockHeader *iter = blk;
+//
+//        while((char*)iter+iter->size+sizeof(BlockHeader) == (char*)(iter->next))
+//            iter=iter->next;
+//
+//        BlockHeader *nextFree;
+//
+//        if((char*)iter + iter->size + sizeof(BlockHeader) < HEAP_END_ADDR)
+//            nextFree = (BlockHeader*)((char*)iter + iter->size + sizeof(BlockHeader));
+//        else
+//            nextFree = nullptr;
+//
+//        if(blk->prev)
+//            blk->prev->next = blk->next;
+//        else
+//            allocMemHead = blk->next;
+//
+//        if(blk->next)
+//            blk->next->prev = blk->prev;
+//        else
+//            allocMemTail = blk->prev;
+//
+//        blk->next = nextFree;
+//
+//        if(nextFree->prev) {
+//            blk->prev = nextFree->prev;
+//            nextFree->prev->next = blk;
+//        }
+//        else {
+//            freeMemHead = blk;
+//            blk->prev = nullptr;
+//        }
+//
+//        nextFree->prev = blk;
+//    }
+//    return 0;
+//}
 
 uint64 MemoryAllocator::kfree(void* ptr){
     BlockHeader *blk = allocMemHead;

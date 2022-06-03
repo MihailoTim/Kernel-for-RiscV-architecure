@@ -39,8 +39,7 @@ System::System() {
 
 //wrapper function for userMain as per POSIX threads
 void System::userMainWrapper(void *arg){
-
-//    for(int i=0;i<20000000;i++) {
+//    for(int i=0;i<2000000;i++) {
 //        void* x = mem_alloc(1);
 //        if(x==nullptr){
 //            printString("alloc\n");
@@ -52,7 +51,7 @@ void System::userMainWrapper(void *arg){
 //            break;
 //        }
 //    }
-//    for(int i=0;;i++){
+//    for(int i=0;i<100000;i++){
 //        void *x = mem_alloc(1);
 //        void *y = mem_alloc(1);
 //        if(x == nullptr){
