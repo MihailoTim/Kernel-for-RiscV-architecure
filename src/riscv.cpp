@@ -186,7 +186,6 @@ void RiscV::executeMemFreeSyscall() {
 
 
     if(MemoryAllocator::initialized) {
-
         //call internal allocator and free memory which iaddr points to
         asm("mv %[iaddr], a1" : [iaddr] "=r"(iaddr));
         status = MemoryAllocator::kfree((void *) iaddr);;

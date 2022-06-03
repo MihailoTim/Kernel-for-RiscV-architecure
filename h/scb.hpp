@@ -35,6 +35,4 @@ class SCB {
     friend class ConsoleUtil;
 
 };
-
-
 #endif //OS1_KERNEL_SCB_HPP

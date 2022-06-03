@@ -33,7 +33,7 @@ void* MemoryAllocator::kmalloc(size_t size){
     if(size<=0 || freeMemHead == nullptr)
         return nullptr;
 
-    size_t byteSize = size<<MEM_BLOCK_OFFS; //size of requested chunk in bytes   //NOTE: argument of kmalloc is number of blocks requested
+    size_t byteSize = size * MEM_BLOCK_SIZE; //size of requested chunk in bytes   //NOTE: argument of kmalloc is number of blocks requested
 
     BlockHeader* blk = freeMemHead, *prev = nullptr;
 

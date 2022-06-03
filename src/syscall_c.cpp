@@ -4,11 +4,6 @@
 
 #include "../h/syscall_c.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
 //syscall_c.c contains definitions of all implemented syscalls accessible to user
 //syscall parameters (if has any) are put into registers a1-a7
 //syscall ID is put into a0
@@ -16,7 +11,7 @@ extern "C" {
 //return value for syscall is returned by a0 register
 
 void *mem_alloc(size_t size){
-    size_t sz = (size + MEM_BLOCK_SIZE -1) >> MEM_BLOCK_OFFS;
+    size_t sz = (size + MEM_BLOCK_SIZE -1) / MEM_BLOCK_SIZE;
 
     asm("mv a1, %[sz]" : : [sz] "r" (sz));  //put number of blocks required in a1
     asm("li a0, 0x01");  //put number of syscall in a0
@@ -228,7 +223,3 @@ void putc(char c){
     asm("ecall");
 }
 
-
-#ifdef __cplusplus
-}
-#endif

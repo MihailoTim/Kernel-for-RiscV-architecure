@@ -71,5 +71,4 @@ class TCB {
     friend class System;
 };
 
-
 #endif //OS1_KERNEL_TCB_HPP

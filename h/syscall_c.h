@@ -6,27 +6,21 @@
 #define SYSCALL_C_H
 
 #include "../lib/hw.h"
+#include "../h/_thread.hpp"
+#include "../h/_semaphore.hpp"
 
-#define MEM_BLOCK_OFFS 6
-
-typedef uint64* thread_t;
-typedef uint64* sem_t;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 void *mem_alloc(size_t size);
 
-int mem_free(void* ptr);
+int mem_free(void *ptr);
 
-int thread_create(thread_t* handle, void(*start_routine)(void*), void *arg);
+int thread_create(thread_t *handle, void(*start_routine)(void *), void *arg);
 
 int thread_exit();
 
 void thread_dispatch();
 
-int thread_attach_body(thread_t* handle, void(*start_routine)(void*), void *arg);
+int thread_attach_body(thread_t *handle, void(*start_routine)(void *), void *arg);
 
 int thread_start(thread_t handle);
 
@@ -43,9 +37,5 @@ int time_sleep(time_t time);
 char getc();
 
 void putc(char c);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif //TM200047_SYSCALL_C_H
