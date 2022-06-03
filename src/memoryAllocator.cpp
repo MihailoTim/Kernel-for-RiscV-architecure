@@ -4,19 +4,24 @@
 #include "../h/memoryAllocator.hpp"
 #include "../h/utility.hpp"
 #include "../h/printing.hpp"
-#include "../h/consoleUtil.hpp"
 
 MemoryAllocator::BlockHeader* MemoryAllocator::freeMemHead = nullptr;
 
 MemoryAllocator::BlockHeader* MemoryAllocator::allocMemHead = nullptr;
 
+MemoryAllocator::BlockHeader* MemoryAllocator::freeMemTail = nullptr;
+
+MemoryAllocator::BlockHeader* MemoryAllocator::allocMemTail = nullptr;
+
 bool MemoryAllocator::initialized = false;
 
 
 void MemoryAllocator::initialize() {
-    freeMemHead = (BlockHeader*)HEAP_START_ADDR;
+    freeMemHead = freeMemTail = (BlockHeader*)HEAP_START_ADDR;
 
-    allocMemHead = nullptr;
+    freeMemHead->prev = freeMemHead->next = freeMemTail->prev = freeMemTail->next = nullptr;
+
+    allocMemHead = allocMemTail = nullptr;
 
     freeMemHead->size = (char*)HEAP_END_ADDR - (char*)HEAP_START_ADDR - sizeof(BlockHeader);
 
@@ -26,27 +31,34 @@ void MemoryAllocator::initialize() {
 }
 
 void* MemoryAllocator::kmalloc(size_t size){
-    if(size<=0 || freeMemHead == nullptr) {
+    if(size<=0 || freeMemHead == nullptr)
         return nullptr;
-    }
 
     size_t byteSize = size<<MEM_BLOCK_OFFS; //size of requested chunk in bytes   //NOTE: argument of kmalloc is number of blocks requested
 
     BlockHeader* blk = freeMemHead, *prev = nullptr;
 
     for(; blk!=nullptr; prev = blk, blk = blk->next) {
-        if (blk->size > byteSize + sizeof(BlockHeader))
+        if (blk->size >= byteSize + sizeof(BlockHeader))
             break;            //iterate through the list and find the first fitting block of free memory
     }
 
     if(blk != nullptr){
+        BlockHeader* newBlk;
+        BlockHeader *nextAllocated;
+
+        if((char*)blk + blk->size + sizeof(BlockHeader) <HEAP_END_ADDR)
+            nextAllocated = (BlockHeader*)((char*)blk + blk->size + sizeof(BlockHeader));
+        else
+            nextAllocated = nullptr;
+
         size_t remainingSize = blk->size - byteSize;
 
         if(remainingSize >= sizeof(BlockHeader) + MEM_BLOCK_SIZE){    //check whether a large enough fragment will remain
 
             blk->size = byteSize;
             size_t offset = sizeof(BlockHeader) + byteSize;   //offset for new freeMem chunk
-            BlockHeader* newBlk = (BlockHeader*)((char*)blk + offset);
+            newBlk = (BlockHeader*)((char*)blk + offset);
             newBlk->next = blk->next;
             newBlk->size = remainingSize - sizeof(BlockHeader);
 
@@ -61,8 +73,28 @@ void* MemoryAllocator::kmalloc(size_t size){
             else freeMemHead = blk->next;
         }
 
-        //insert the blk chunk in list of allocated memory
-        insertAndMerge(blk, &allocMemHead);
+        if(allocMemHead == nullptr){
+            allocMemHead = allocMemTail = blk;
+        }
+        else{
+
+            blk->next = nextAllocated;
+
+            if(nextAllocated){
+                blk->prev = nextAllocated->prev;
+                blk->prev->next = blk;
+                if(nextAllocated->prev)
+                    nextAllocated->prev = blk;
+                else
+                    allocMemHead = blk;
+            }
+            else{
+                allocMemTail->next = blk;
+                blk->prev = allocMemTail;
+                blk->next = nullptr;
+                allocMemTail = blk;
+            }
+        }
 
         return (char*)blk + sizeof(BlockHeader);    //return address of start of the data block, not start of the header
     }
@@ -79,14 +111,16 @@ uint64 MemoryAllocator::kfree(void* ptr){
     if(blk == nullptr)
         return -1;
     else{
+        if(blk == allocMemTail)
+            allocMemTail = blk->prev;
+        if(blk == allocMemHead)
+            allocMemHead = blk->next;
+
         if(blk->next)
             blk->next->prev = blk->prev;
         if(blk->prev)
             blk->prev->next = blk->next;
-        else
-            allocMemHead = blk->next;
 
-        //insert blk chunk in list of free memory and try to merge with an already existing block
         insertAndMerge(blk, &freeMemHead);
     }
     return 0;

@@ -39,5 +39,60 @@ System::System() {
 
 //wrapper function for userMain as per POSIX threads
 void System::userMainWrapper(void *arg){
-    userMain();
+
+        printString("stressTesting\n");
+        constexpr int num = 100;
+        void* addrs[num];
+        for(int i = 0; i < num;i++)
+        {
+            addrs[i] = mem_alloc(1);
+            if(addrs[i] == 0)
+            {
+                printString("not OK\n");
+                return;
+            }
+
+        }
+        int sz = 300;
+        while(sz > 0)
+        {
+            for(int i = 0 ; i < num;i+=2)
+            {
+                int retval = mem_free(addrs[i]);
+                if(retval != 0)
+                {
+                    printString("not OK\n");
+                    return;
+                }
+                addrs[i] = mem_alloc(sz/2);
+                if(addrs[i] == 0)
+                {
+                    printString("not Ok\n");
+                    return;
+                }
+
+            }
+
+            for(int i = 1 ; i < num;i+=2)
+            {
+                int retval = mem_free(addrs[i]);
+                if(retval != 0)
+                {
+                    printString("not OK\n");
+                    return;
+                }
+                addrs[i] = mem_alloc(sz);
+                if(addrs[i] == 0)
+                {
+                    printString("not Ok\n");
+                    return;
+                }
+
+            }
+            sz-=10;
+        }
+
+        printString("OK\n");
+    printString("OK\n");
+//    userMain();
 }

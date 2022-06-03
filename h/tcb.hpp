@@ -54,7 +54,7 @@ class TCB {
     uint64 sleepTime = 0;
     uint64 wakeTime = 0;
 
-    uint64 sscratch;
+    uint64 a0Location;
 
     static TCB *running;
 

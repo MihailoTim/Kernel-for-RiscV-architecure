@@ -34,7 +34,7 @@ void RiscV::handleSupervisorTrap() {
     //read scause
     uint64 volatile scause = RiscV::r_scause();
 
-    __asm__ volatile("csrr %0, sscratch":"=r"(TCB::running->sscratch));
+    asm("csrr %[sscratch], sscratch" : [sscratch] "=r" (TCB::running->a0Location));
 
     //interrupt from ecall (both user and supervisor mode)
     if(scause == 0x09 || scause == 0x08) {
@@ -164,7 +164,7 @@ void RiscV::executeMemAllocSyscall(){
 
     asm("mv a0, %[addr]" : : [addr] "r" (addr));
 
-    RiscV::w_a0_sscratch();
+    RiscV::saveA0toSscratch();
 }
 
 void RiscV::executeMemFreeSyscall() {
@@ -185,7 +185,7 @@ void RiscV::executeMemFreeSyscall() {
     //return status
     asm("mv a0, %[status]" : : [status] "r" (status));
 
-    RiscV::w_a0_sscratch();
+    RiscV::saveA0toSscratch();
 }
 
 void RiscV::executeThreadCreateSyscall(){
@@ -215,7 +215,7 @@ void RiscV::executeThreadCreateSyscall(){
     //return status
     asm("mv a0, %[status]" : : [status] "r" (status));
 
-    RiscV::w_a0_sscratch();
+    RiscV::saveA0toSscratch();
 }
 
 void RiscV::executeThreadAttachBodySyscall(){
@@ -244,7 +244,7 @@ void RiscV::executeThreadAttachBodySyscall(){
 
     asm("mv a0, %[status]" : : [status] "r" (status));
 
-    RiscV::w_a0_sscratch();
+    RiscV::saveA0toSscratch();
 }
 
 void RiscV::executeThreadStartSyscall(){
@@ -271,7 +271,7 @@ void RiscV::executeThreadStartSyscall(){
     //return status
     asm("mv a0, %[status]" : : [status] "r" (status));
 
-    RiscV::w_a0_sscratch();
+    RiscV::saveA0toSscratch();
 }
 
 void RiscV::executeThreadExitSyscall() {
@@ -291,7 +291,7 @@ void RiscV::executeThreadExitSyscall() {
 
     asm("mv a0, %[status]" : : [status] "r" (status));
 
-    RiscV::w_a0_sscratch();
+    RiscV::saveA0toSscratch();
 }
 
 void RiscV::executeThreadDispatchSyscall(){
@@ -325,7 +325,7 @@ void RiscV::executeSemOpenSyscall() {
     //return status
     asm("mv a0, %[status]" : : [status] "r" (status));
 
-    RiscV::w_a0_sscratch();
+    RiscV::saveA0toSscratch();
 
 }
 
@@ -349,7 +349,7 @@ void RiscV::executeSemCloseSyscall() {
     //return status
     asm("mv a0, %[status]" : : [status] "r" (status));
 
-    RiscV::w_a0_sscratch();
+    RiscV::saveA0toSscratch();
 }
 
 void RiscV::executeSemWaitSyscall() {
@@ -370,7 +370,7 @@ void RiscV::executeSemWaitSyscall() {
     //return status
     asm("mv a0, %[status]" : : [status] "r" (status));
 
-    RiscV::w_a0_sscratch();
+    RiscV::saveA0toSscratch();
 
 }
 
@@ -393,7 +393,7 @@ void RiscV::executeSemSignalSyscall() {
     //return status
     asm("mv a0, %[status]" : : [status] "r" (status));
 
-    RiscV::w_a0_sscratch();
+    RiscV::saveA0toSscratch();
 }
 
 void RiscV::executeTimeSleepSyscall() {
@@ -420,7 +420,7 @@ void RiscV::executeTimeSleepSyscall() {
     //return status
     asm("mv a0, %[status]" : : [status] "r" (status));
 
-    RiscV::w_a0_sscratch();
+    RiscV::saveA0toSscratch();
 }
 
 void RiscV::executeGetcSyscall() {
@@ -443,7 +443,7 @@ void RiscV::executeGetcSyscall() {
     //return character
     asm("mv a0, %[c]" : : [c] "r" (c));
 
-    RiscV::w_a0_sscratch();
+    RiscV::saveA0toSscratch();
 }
 
 void RiscV::executePutcSyscall() {
@@ -495,7 +495,7 @@ void RiscV::executePutcUtilSyscall() {
     char c = ConsoleUtil::getOutput();
     asm("mv a0, %[c]" : : [c] "r" ((uint64)(c)) );
 
-    RiscV::w_a0_sscratch();
+    RiscV::saveA0toSscratch();
 }
 
 void RiscV::jumpToDesignatedPrivilegeMode() {
@@ -516,11 +516,11 @@ void RiscV::finalize() {
 }
 
 
-void RiscV::w_a0_sscratch()
+void RiscV::saveA0toSscratch()
 {
-    uint64 a1Temp;
-    __asm__ volatile("mv %0, a1":"=r"(a1Temp));
-    __asm__ volatile("mv a1, %0"::"r"(TCB::running->sscratch));
-    __asm__ volatile("sd a0, 80(a1)");
-    __asm__ volatile("mv a1,%0"::"r"(a1Temp));
+    uint64 a1;
+    asm("mv %[a1], a1": [a1] "=r"(a1));
+    asm("mv a1, %[a0]" : :  [a0] "r"(TCB::running->a0Location));
+    asm("sd a0, 80(a1)");
+    asm("mv a1,%[a1]"::  [a1]"r"(a1));
 }

@@ -13,8 +13,8 @@ class MemoryAllocator {
         BlockHeader *prev, *next;  //pointers to previous and next block
     };
 
-    static BlockHeader* freeMemHead;    //head of free memory list
-    static BlockHeader* allocMemHead;   //head of allocated memory list
+    static BlockHeader* freeMemHead, *freeMemTail;    //head of free memory list
+    static BlockHeader* allocMemHead, *allocMemTail;   //head of allocated memory list
 
     static bool initialized;
 
