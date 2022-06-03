@@ -40,59 +40,28 @@ System::System() {
 //wrapper function for userMain as per POSIX threads
 void System::userMainWrapper(void *arg){
 
-        printString("stressTesting\n");
-        constexpr int num = 100;
-        void* addrs[num];
-        for(int i = 0; i < num;i++)
-        {
-            addrs[i] = mem_alloc(1);
-            if(addrs[i] == 0)
-            {
-                printString("not OK\n");
-                return;
-            }
+    for(int i=0;i<2000000;i++)
+        mem_alloc(1);
+//    for(int i=0;;i++){
+//        void *x = mem_alloc(1);
+//        void *y = mem_alloc(1);
+//        if(x == nullptr){
+//            printString("alloc\n");
+//            printInt(i);
+//            break;
+//        }
+//        int status = mem_free(x);
+//        if(status == -1){
+//            printString("free\n");
+//            printInt(i);
+//            break;
+//        }
+//        if(i%10000==0){
+//            printInt(i);
+//            putc('\n');
+//        }
+//        if(y);
+//    }
 
-        }
-        int sz = 300;
-        while(sz > 0)
-        {
-            for(int i = 0 ; i < num;i+=2)
-            {
-                int retval = mem_free(addrs[i]);
-                if(retval != 0)
-                {
-                    printString("not OK\n");
-                    return;
-                }
-                addrs[i] = mem_alloc(sz/2);
-                if(addrs[i] == 0)
-                {
-                    printString("not Ok\n");
-                    return;
-                }
-
-            }
-
-            for(int i = 1 ; i < num;i+=2)
-            {
-                int retval = mem_free(addrs[i]);
-                if(retval != 0)
-                {
-                    printString("not OK\n");
-                    return;
-                }
-                addrs[i] = mem_alloc(sz);
-                if(addrs[i] == 0)
-                {
-                    printString("not Ok\n");
-                    return;
-                }
-
-            }
-            sz-=10;
-        }
-
-        printString("OK\n");
-    printString("OK\n");
 //    userMain();
 }
