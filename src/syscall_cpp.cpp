@@ -66,7 +66,7 @@ int Thread::start() {
 }
 
 Thread::~Thread() {
-    delete (uint64*)myHandle;
+    delete myHandle;
 }
 
 PeriodicThread::PeriodicThread(time_t period) : Thread(&PeriodicThread::wrapper, new Args((void*)this, period)){}
