@@ -3,7 +3,6 @@
 //
 
 #include "../h/syscall_c.h"
-#include "../lib/hw.h"
 
 #ifdef __cplusplus
 extern "C" {

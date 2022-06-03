@@ -3,7 +3,6 @@
 //
 
 #include "../h/syscall_cpp.hpp"
-#include "../lib/hw.h"
 
 //CPP API for Threads, Semaphores, and others that rely on C API layer
 

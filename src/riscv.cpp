@@ -10,7 +10,6 @@
 #include "../h/consoleUtil.hpp"
 
 uint64 RiscV::globalTime = 0;
-bool RiscV::userMainFinished = false;
 
 //initailize each of the key components and switch to user mode for user code execution
 void RiscV::initialize(){
@@ -147,6 +146,19 @@ void RiscV::handleSupervisorTrap() {
         TCB* old = TCB::running;
         old->status = TCB::Status::FINISHED;
         ConsoleUtil::printString("Illegal instruction\nExiting thread...\n");
+        TCB::dispatch();
+    }
+
+    else{
+        printString("Error: \n");
+        printString("scause: ");
+        printInt(scause);
+        printString("sepc: ");
+        uint64 volatile sepc = RiscV::r_sepc();
+        printInt(sepc);
+        TCB* old = TCB::running;
+        old->status = TCB::Status::FINISHED;
+        ConsoleUtil::printString("Exiting thread...\n");
         TCB::dispatch();
     }
 

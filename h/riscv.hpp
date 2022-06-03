@@ -7,7 +7,6 @@
 #include "../lib/hw.h"
 
 class RiscV{
-    static bool userMainFinished;
 
     static uint64 globalTime;
 
@@ -55,10 +54,6 @@ class RiscV{
 
     static void putcWrapper(void *arg);
 
-    static void pushRegisters();
-
-    static void popRegisters();
-
     static uint64 r_scause();
 
     static void w_scause(uint64 scause);
@@ -96,8 +91,6 @@ class RiscV{
     static void supervisorTrap();      //supervisorTrap defined in /src/supervisorTrap.S
 
     static void handleSupervisorTrap();
-
-    static bool canFinish();
 
     static void enableInterrupts();
 

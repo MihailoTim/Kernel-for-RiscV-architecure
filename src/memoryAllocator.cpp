@@ -2,7 +2,6 @@
 // Created by os on 5/15/22.
 //
 #include "../h/memoryAllocator.hpp"
-#include "../h/utility.hpp"
 #include "../h/printing.hpp"
 
 MemoryAllocator::BlockHeader* MemoryAllocator::freeMemHead = nullptr;
