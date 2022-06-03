@@ -39,5 +39,5 @@ System::System() {
 
 //wrapper function for userMain as per POSIX threads
 void System::userMainWrapper(void *arg){
-    userMain();
+//    userMain();
 }

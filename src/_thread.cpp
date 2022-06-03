@@ -6,6 +6,6 @@
 #include "../h/printing.hpp"
 
 void _thread::operator delete(void *addr){
-    printString("deleting thread_t\n");
+//    printString("deleting thread_t\n");
 }
 

@@ -22,7 +22,7 @@ void TCB::initialize() {
 
     TCB* putcThread = new TCB(RiscV::putcWrapper, nullptr, putcStack, DEFAULT_TIME_SLICE);
 
-    putcThread->mode = Mode::SUPERVISOR;
+//    putcThread->mode = Mode::SUPERVISOR;
 
     Scheduler::put(putcThread);
 }

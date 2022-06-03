@@ -6,5 +6,5 @@
 #include "../h/printing.hpp"
 
 void _semaphore::operator delete(void *addr){
-    printString("deleting sem_t\n");
+//    printString("deleting sem_t\n");
 }

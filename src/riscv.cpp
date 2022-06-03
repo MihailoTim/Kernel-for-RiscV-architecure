@@ -18,8 +18,7 @@ void RiscV::initialize(){
     Scheduler::initialize();
     TCB::initialize();
     ConsoleUtil::initialize();
-//    RiscV::enableInterrupts();
-    RiscV::enableHardwareInterrupts();
+    RiscV::enableInterrupts();
 }
 
 //get previous privilege and previous interrupt status
@@ -503,8 +502,8 @@ void RiscV::putcWrapper(void* arg)
             if(ConsoleUtil::pendingPutc>0)
                 ConsoleUtil::pendingPutc--;
         }
-
-        thread_dispatch();
+        else
+            thread_dispatch();
     }
 }
 

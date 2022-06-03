@@ -8,6 +8,11 @@
 #include "../h/printing.hpp"
 #include "../h/consoleUtil.hpp"
 
+#include "../h/scb.hpp"
+#include "../h/memoryAllocator.hpp"
+#include "../h/riscv.hpp"
+#include "../h/scheduler.hpp"
+
 SCB::SCB(uint64 init){
     val = init;
     blockedHead = nullptr;
