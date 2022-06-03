@@ -10,6 +10,8 @@ class RiscV{
 
     static uint64 globalTime;
 
+    static bool userMainFinished;
+
     enum BitMaskSstatus{
         SSTATUS_SIE = (1<<1),
         SSTATUS_SPIE = (1<<5),
@@ -113,8 +115,6 @@ class RiscV{
     static void finalize();
 
     friend class TCB;
-
-    friend class Utility;
 
     friend class System;
 

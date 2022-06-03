@@ -64,6 +64,8 @@ class TCB {
 
     static TCB *running;
 
+    static TCB *putcThread;
+
     static uint64 timeSliceCounter;
 
     friend class Scheduler;

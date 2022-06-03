@@ -6,6 +6,8 @@
 #define OS1_KERNEL__THREAD_HPP
 
 class _thread {
+    _thread(){}
+    _thread(_thread &t){}
 public:
     void operator delete(void *addr);
 };

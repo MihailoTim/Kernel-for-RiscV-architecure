@@ -7,10 +7,11 @@
 
 
 class _semaphore {
+    _semaphore(){}
+    _semaphore(_semaphore &s){}
 public:
     void operator delete(void *addr);
 };
-
 typedef _semaphore *sem_t;
 
 #endif //OS1_KERNEL__SEMAPHORE_HPP

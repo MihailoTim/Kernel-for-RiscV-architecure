@@ -9,6 +9,8 @@
 
 TCB* TCB::running = nullptr;
 
+TCB* TCB::putcThread = nullptr;
+
 uint64 TCB::timeSliceCounter = 0;
 
 
@@ -20,9 +22,9 @@ void TCB::initialize() {
 
     uint64 *putcStack = (uint64*)MemoryAllocator::kmalloc((DEFAULT_STACK_SIZE+MEM_BLOCK_SIZE-1)/MEM_BLOCK_SIZE);
 
-    TCB* putcThread = new TCB(RiscV::putcWrapper, nullptr, putcStack, DEFAULT_TIME_SLICE);
+    putcThread = new TCB(RiscV::putcWrapper, nullptr, putcStack, DEFAULT_TIME_SLICE);
 
-//    putcThread->mode = Mode::SUPERVISOR;
+    putcThread->mode = Mode::SUPERVISOR;
 
     Scheduler::put(putcThread);
 }

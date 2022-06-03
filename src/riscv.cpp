@@ -10,6 +10,7 @@
 #include "../h/consoleUtil.hpp"
 
 uint64 RiscV::globalTime = 0;
+bool RiscV::userMainFinished = false;
 
 //initailize each of the key components and switch to user mode for user code execution
 void RiscV::initialize(){
@@ -19,6 +20,7 @@ void RiscV::initialize(){
     TCB::initialize();
     ConsoleUtil::initialize();
     RiscV::enableInterrupts();
+//    RiscV::enableHardwareInterrupts();
 }
 
 //get previous privilege and previous interrupt status
@@ -444,7 +446,8 @@ void RiscV::executeTimeSleepSyscall() {
 void RiscV::executeGetcSyscall() {
 
     //register a pending getc call
-    ConsoleUtil::pendingGetc++;
+    if(!userMainFinished)
+        ConsoleUtil::pendingGetc++;
 
     //get character from input buffer
     char c = ConsoleUtil::getInput();
@@ -467,7 +470,8 @@ void RiscV::executeGetcSyscall() {
 void RiscV::executePutcSyscall() {
 
     //register a pending putc call
-    ConsoleUtil::pendingPutc++;
+    if(!userMainFinished)
+        ConsoleUtil::pendingPutc++;
 
     char c;
 
@@ -524,13 +528,20 @@ void RiscV::jumpToDesignatedPrivilegeMode() {
 }
 
 void RiscV::finalize() {
+    userMainFinished = true;
 
-    while(ConsoleUtil::outputHead != ConsoleUtil::outputTail);
+    ConsoleUtil::pendingPutc = 0;
+    ConsoleUtil::pendingGetc = 0;
 
     RiscV::disableInterrupts();
 
     while(Scheduler::readyHead != nullptr)
         Scheduler::readyHead = Scheduler::readyHead->next;
+
+    Scheduler::put(TCB::putcThread);
+
+    while(ConsoleUtil::outputHead != ConsoleUtil::outputTail)
+        thread_dispatch();
 }
 
 
