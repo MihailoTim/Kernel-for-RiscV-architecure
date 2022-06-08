@@ -6,6 +6,7 @@
 #define OS1_KERNEL_RISCV_HPP
 #include "../lib/hw.h"
 
+
 class RiscV{
 
     static uint64 globalTime;
@@ -58,6 +59,8 @@ class RiscV{
 
     static void executeSemaphoreFreeSyscall();
 
+    static void executeForkSyscall();
+
     static void putcWrapper(void *arg);
 
     static uint64 r_scause();
@@ -93,6 +96,8 @@ class RiscV{
     static void jumpToDesignatedPrivilegeMode();
 
     static void popSppSpie();
+
+    static void getPC();
 
     static void supervisorTrap();      //supervisorTrap defined in /src/supervisorTrap.S
 

@@ -8,6 +8,7 @@
 #include "../tests/userMain.hpp"
 #include "../h/printing.hpp"
 #include "../h/tcb.hpp"
+#include "../h/scheduler.hpp"
 
 bool System::initialized = false;
 
@@ -39,5 +40,15 @@ System::System() {
 
 //wrapper function for userMain as per POSIX threads
 void System::userMainWrapper(void *arg){
-    userMain();
+    int ret = fork();
+
+    if(ret == 0){
+        printString("dete\n");
+    }
+    else {
+        printString("otac\n");
+        thread_dispatch();
+    }
+//    MemoryAllocator::showMemory();
+//    userMain();
 }

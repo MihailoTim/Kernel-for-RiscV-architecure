@@ -223,3 +223,15 @@ void putc(char c){
     asm("ecall");
 }
 
+
+int fork(){
+    asm("li a0, 0x61");
+
+    asm("ecall");
+
+    uint64 status;
+
+    asm("mv %[status], a0" : [status] "=r" (status));
+
+    return status;
+}

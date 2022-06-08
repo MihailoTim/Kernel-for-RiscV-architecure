@@ -229,3 +229,14 @@ void MemoryAllocator::showMemory() {
     }
     printString("================================================================\n");
 }
+
+
+void* MemoryAllocator::memcpy(void *src, void *dst, uint64 len) {
+    char *csrc = (char*)src;
+    char *cdst = (char*)dst;
+
+    for(uint64 i=0;i<len;i++)
+        cdst[i] = csrc[i];
+
+    return dst;
+}

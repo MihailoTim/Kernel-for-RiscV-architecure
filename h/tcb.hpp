@@ -39,6 +39,10 @@ class TCB {
 
     static void initialize();
 
+    static uint64 currentSP;
+
+    static uint64 currentPC;
+
     static void contextSwitch(Context *oldContext, Context *runningContext);
 
     static int thread_free(void* addr);
@@ -52,6 +56,10 @@ class TCB {
     uint64 *stack;
 
     uint64 timeSlice;
+
+    uint64 sepc;
+
+    uint64 sstatus;
 
     TCB* next;
 

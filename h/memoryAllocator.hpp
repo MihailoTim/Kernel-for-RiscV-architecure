@@ -28,6 +28,8 @@ class MemoryAllocator {
 
     static void showMemory();
 
+    static void* memcpy(void *src, void* dst, uint64 len);
+
     friend class RiscV;
 
     friend class Utility;

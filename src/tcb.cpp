@@ -6,10 +6,15 @@
 #include "../h/memoryAllocator.hpp"
 #include "../h/scheduler.hpp"
 #include "../h/syscall_c.h"
+#include "../h/printing.hpp"
 
 TCB* TCB::running = nullptr;
 
 TCB* TCB::putcThread = nullptr;
+
+uint64 TCB::currentPC = 0;
+
+uint64 TCB::currentSP = 0;
 
 uint64 TCB::timeSliceCounter = 0;
 

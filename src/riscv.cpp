@@ -44,6 +44,8 @@ void RiscV::handleSupervisorTrap() {
         //sepc should be increased by 4, since this is an ecall trap
         uint64 volatile sstatus = RiscV::r_sstatus();
         uint64 volatile sepc = RiscV::r_sepc()+4;
+        TCB::running->sepc = sepc;
+        TCB::running->sstatus = sstatus;
 
         //get the syscall ID from a0
         uint64 syscallID;
@@ -67,11 +69,15 @@ void RiscV::handleSupervisorTrap() {
             case 0x43 : executePutcUtilSyscall();break;
             case 0x51 : executeThreadFreeSyscall();break;
             case 0x52 : executeSemaphoreFreeSyscall();break;
+            case 0x61 : asm("mv %[sp], sp" : [sp] "=r"(TCB::currentSP));
+                        RiscV::getPC();
+                        executeForkSyscall();
+                        break;
         }
 
         //write previously save sstatus and incremented sepc
-        RiscV::w_sstatus(sstatus);
-        RiscV::w_sepc(sepc);
+        RiscV::w_sstatus(TCB::running->sstatus);
+        RiscV::w_sepc(TCB::running->sepc);
     }
 
     //timer interrupt (in this system's implementation, timer tick is manifested as software interrupt)
@@ -149,17 +155,23 @@ void RiscV::handleSupervisorTrap() {
     else if(scause == 0x02){
         TCB* old = TCB::running;
         old->status = TCB::Status::FINISHED;
+        ConsoleUtil::printString("sepc: ");
+        uint64 sepc = RiscV::r_sepc();
+        ConsoleUtil::printInt(sepc,16);
+        ConsoleUtil::printString("\n");
         ConsoleUtil::printString("Illegal instruction\nExiting thread...\n");
         TCB::dispatch();
     }
 
     else{
-        printString("Error: \n");
-        printString("scause: ");
-        printInt(scause);
-        printString("sepc: ");
-        uint64 volatile sepc = RiscV::r_sepc();
-        printInt(sepc);
+        ConsoleUtil::printString("Error: \n");
+        ConsoleUtil::printString("scause: ");
+        uint64  scause = RiscV::r_scause();
+        ConsoleUtil::printInt(scause);
+        ConsoleUtil::printString("sepc: ");
+        uint64 sepc = RiscV::r_sepc();
+        ConsoleUtil::printInt(sepc,16);
+        ConsoleUtil::printString("\n");
         TCB* old = TCB::running;
         old->status = TCB::Status::FINISHED;
         ConsoleUtil::printString("Exiting thread...\n");
@@ -521,10 +533,10 @@ void RiscV::executePutcUtilSyscall() {
 }
 
 void RiscV::jumpToDesignatedPrivilegeMode() {
-    if(TCB::running->mode == TCB::Mode::SUPERVISOR)
-        RiscV::ms_sstatus(RiscV::SSTATUS_SPP);
-    else
-        RiscV::mc_sstatus(RiscV::SSTATUS_SPP);
+//    if(TCB::running->mode == TCB::Mode::SUPERVISOR)
+//        RiscV::ms_sstatus(RiscV::SSTATUS_SPP);
+//    else
+//        RiscV::mc_sstatus(RiscV::SSTATUS_SPP);
 }
 
 void RiscV::finalize() {
@@ -593,4 +605,68 @@ void RiscV::executeSemaphoreFreeSyscall() {
     asm("mv a0, %[status]" : : [status] "r" (status));
 
     RiscV::saveA0toSscratch();
+}
+
+void RiscV::executeForkSyscall() {
+
+    uint64 *stack = (uint64*)MemoryAllocator::kmalloc((DEFAULT_STACK_SIZE+MEM_BLOCK_SIZE-1)/MEM_BLOCK_SIZE);
+
+    MemoryAllocator::memcpy((void*)TCB::running->stack,(void*)stack,DEFAULT_STACK_SIZE);
+
+    TCB *forked = new TCB(nullptr, nullptr, stack, DEFAULT_TIME_SLICE);
+
+    uint64 status = 0;
+
+    if(forked) {
+
+        forked->context.ra = TCB::currentPC;
+
+        forked->context.sp = (uint64)((char*)stack + TCB::currentSP - (char*)TCB::running->stack);
+
+        uint64 registerStartSP = (uint64)((char*)TCB::running->a0Location - (char*)TCB::running->stack + (char*)stack);
+
+        forked->a0Location = registerStartSP;
+
+        uint64 a1,a0;
+
+        asm("mv %[a1], a1": [a1] "=r"(a1));
+
+        asm("mv %[a0], a0": [a0] "=r"(a0));
+
+        asm("mv a0,%[a0]"::  [a0]"r"(registerStartSP));
+
+        asm("mv a1, %[a0]" : :  [a0] "r"(registerStartSP));
+
+        asm("sd a0, 16(a1)");
+
+        asm("li a0, 0");
+
+        asm("sd a0, 80(a1)");
+
+        asm("mv a1,%[a1]"::  [a1]"r"(a1));
+
+        asm("mv a0,%[a0]"::  [a0]"r"(a0));
+
+        forked->sepc = TCB::running->sepc;
+
+        forked->sstatus = TCB::running->sstatus;
+
+        Scheduler::put(forked);
+
+        status = (uint64)forked;
+    }else
+        status = -1;
+
+    asm("mv a0, %[status]" : : [status] "r" (status));
+
+    RiscV::saveA0toSscratch();
+
+}
+
+void RiscV::getPC(){
+    uint64 ra;
+
+    asm("mv %[ra], ra" : [ra] "=r"(ra));
+
+    TCB::currentPC = ra + 8;
 }

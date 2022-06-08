@@ -38,4 +38,6 @@ char getc();
 
 void putc(char c);
 
+int fork();
+
 #endif //TM200047_SYSCALL_C_H
