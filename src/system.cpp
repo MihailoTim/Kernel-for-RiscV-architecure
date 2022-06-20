@@ -40,15 +40,15 @@ System::System() {
 
 //wrapper function for userMain as per POSIX threads
 void System::userMainWrapper(void *arg){
-    int ret = fork();
-
-    if(ret == 0){
-        printString("dete\n");
-    }
-    else {
-        printString("otac\n");
-        thread_dispatch();
-    }
+//    int ret = fork();
+//
+//    if(ret == 0){
+//        printString("dete\n");
+//    }
+//    else {
+//        printString("otac\n");
+//        thread_dispatch();
+//    }
 //    MemoryAllocator::showMemory();
-//    userMain();
+    userMain();
 }

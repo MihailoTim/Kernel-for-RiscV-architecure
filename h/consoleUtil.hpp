@@ -8,6 +8,8 @@
 #include "../lib/hw.h"
 #include "scb.hpp"
 
+//Console class for utility functions
+
 class ConsoleUtil {
     static uint64 pendingGetc;
     static uint64 pendingPutc;
@@ -15,9 +17,11 @@ class ConsoleUtil {
     static SCB* outputSem;
     static SCB* inputSem;
 
+    //Buffer size should be dynamically allocated, for now leaving it as is
     static const uint64 bufferSize = 8192;
     static char inputBuffer[bufferSize];
     static char outputBuffer[bufferSize];
+
     static uint64 inputHead, inputTail, outputHead, outputTail;
 
     static void putInput(char c);

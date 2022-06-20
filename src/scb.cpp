@@ -8,10 +8,6 @@
 #include "../h/printing.hpp"
 #include "../h/consoleUtil.hpp"
 
-#include "../h/scb.hpp"
-#include "../h/memoryAllocator.hpp"
-#include "../h/riscv.hpp"
-#include "../h/scheduler.hpp"
 
 SCB::SCB(uint64 init){
     val = init;
@@ -19,6 +15,8 @@ SCB::SCB(uint64 init){
     blockedTail = nullptr;
 }
 
+//if there are any threads that are still blocked on semaphore when it is being deleted
+//free those threads and set their semError field to point to this semaphore
 SCB::~SCB(){
     TCB* iter = blockedHead;
     while(iter !=nullptr) {
@@ -30,6 +28,7 @@ SCB::~SCB(){
     }
 }
 
+//block a thread by putting running thread at the end of blocked queue
 void SCB::block() {
     blockedTail = (!blockedHead ? blockedHead : blockedTail->next) = TCB::running;
     TCB::running->next = nullptr;
@@ -37,6 +36,7 @@ void SCB::block() {
     TCB::dispatch();
 }
 
+//unblock a thread by fetching first from the blocked queue and putting it in scheduler
 void SCB::deblock(){
     TCB* tcb = blockedHead;
     blockedHead = blockedHead->next;
@@ -58,14 +58,17 @@ void SCB::signal(){
         deblock();
 }
 
+//overload operator new, to not use system call for every kernel object that is being allocated
 void* SCB::operator new(size_t size){
     return MemoryAllocator::kmalloc(size);
 }
 
+//overload operator delete, to not use system call for every kernel object that is being deallocated
 void SCB::operator delete(void *addr){
     MemoryAllocator::kfree(addr);
 }
 
+//syscall to free space that is taken up by semaphore
 int SCB::semaphore_free(void *addr) {
     uint64 iptr = (uint64)addr;
 

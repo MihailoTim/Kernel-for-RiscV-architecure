@@ -5,6 +5,8 @@
 #include "../h/syscall_cpp.hpp"
 
 //CPP API for Threads, Semaphores, and others that rely on C API layer
+//CPP API is implemented in this way, as the task was to not change given interface or add any non-static members or functions to any class in CPP layer
+//Solution is to add only one static wrapper function and then add syscalls where needed to manipulate with handles in similar fashion as with additional members
 
 struct Args{
     void* pt;

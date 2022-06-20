@@ -14,7 +14,9 @@ MemoryAllocator::BlockHeader* MemoryAllocator::allocMemTail = nullptr;
 
 bool MemoryAllocator::initialized = false;
 
-
+//initialize MemoryAllocator class
+//forbid multiple initializations
+//initial size of free memory is freeMemHead->size
 void MemoryAllocator::initialize() {
     freeMemHead = freeMemTail = (BlockHeader*)HEAP_START_ADDR;
 

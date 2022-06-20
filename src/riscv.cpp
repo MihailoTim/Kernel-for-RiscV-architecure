@@ -69,6 +69,9 @@ void RiscV::handleSupervisorTrap() {
             case 0x43 : executePutcUtilSyscall();break;
             case 0x51 : executeThreadFreeSyscall();break;
             case 0x52 : executeSemaphoreFreeSyscall();break;
+            //in this case we need to save SP and PC at this point so that newly created thread
+            //can return to this point and exit trap routine regularly
+            //note that getPC() returns PC incremented by 8 to skip executeForkSyscall
             case 0x61 : asm("mv %[sp], sp" : [sp] "=r"(TCB::currentSP));
                         RiscV::getPC();
                         executeForkSyscall();
@@ -163,6 +166,7 @@ void RiscV::handleSupervisorTrap() {
         TCB::dispatch();
     }
 
+    //some other kind of error, for more information check out RiscV handbook
     else{
         ConsoleUtil::printString("Error: \n");
         ConsoleUtil::printString("scause: ");
@@ -525,6 +529,8 @@ void RiscV::putcWrapper(void* arg)
     }
 }
 
+//utility syscall to get character from output buffer
+//syscall is needed because we don't want to fiddle with kernel structures from anywhere but the trap routine
 void RiscV::executePutcUtilSyscall() {
     char c = ConsoleUtil::getOutput();
     asm("mv a0, %[c]" : : [c] "r" ((uint64)(c)) );
@@ -532,13 +538,16 @@ void RiscV::executePutcUtilSyscall() {
     RiscV::saveA0toSscratch();
 }
 
+//return to privilege that was given at creation
 void RiscV::jumpToDesignatedPrivilegeMode() {
-//    if(TCB::running->mode == TCB::Mode::SUPERVISOR)
-//        RiscV::ms_sstatus(RiscV::SSTATUS_SPP);
-//    else
-//        RiscV::mc_sstatus(RiscV::SSTATUS_SPP);
+    if(TCB::running->mode == TCB::Mode::SUPERVISOR)
+        RiscV::ms_sstatus(RiscV::SSTATUS_SPP);
+    else
+        RiscV::mc_sstatus(RiscV::SSTATUS_SPP);
 }
 
+
+//clear out the scheduler and let console finish remaining outputs if there are any
 void RiscV::finalize() {
     userMainFinished = true;
 
@@ -556,7 +565,7 @@ void RiscV::finalize() {
         thread_dispatch();
 }
 
-
+//write value in a0 to a memory location where a0 is store on stack for currently running thread
 void RiscV::saveA0toSscratch()
 {
     uint64 a1;
@@ -566,10 +575,10 @@ void RiscV::saveA0toSscratch()
     asm("mv a1,%[a1]"::  [a1]"r"(a1));
 }
 
+//syscall to free the space that is allocated for thread
 void RiscV::executeThreadFreeSyscall() {
     uint64 iaddr, status;
 
-        //call internal allocator and free memory which iaddr points to
     asm("mv %[iaddr], a1" : [iaddr] "=r"(iaddr));
 
     TCB *thr = (TCB*)iaddr;
@@ -587,6 +596,7 @@ void RiscV::executeThreadFreeSyscall() {
     RiscV::saveA0toSscratch();
 }
 
+//syscall to free the space that is allocated for semaphore
 void RiscV::executeSemaphoreFreeSyscall() {
     uint64 iaddr, status;
 
@@ -607,28 +617,35 @@ void RiscV::executeSemaphoreFreeSyscall() {
     RiscV::saveA0toSscratch();
 }
 
+//fork syscall
 void RiscV::executeForkSyscall() {
 
+    //create new stack and copy stack from currently running stack into the new one
     uint64 *stack = (uint64*)MemoryAllocator::kmalloc((DEFAULT_STACK_SIZE+MEM_BLOCK_SIZE-1)/MEM_BLOCK_SIZE);
 
     MemoryAllocator::memcpy((void*)TCB::running->stack,(void*)stack,DEFAULT_STACK_SIZE);
 
+    //create new TCB for new thread
     TCB *forked = new TCB(nullptr, nullptr, stack, DEFAULT_TIME_SLICE);
 
     uint64 status = 0;
 
     if(forked) {
 
+        //set return address where forked thread should return
         forked->context.ra = TCB::currentPC;
 
+        //set SP value where forked thread's stack starts
         forked->context.sp = (uint64)((char*)stack + TCB::currentSP - (char*)TCB::running->stack);
 
+        //get memory location of where registers are stored from previous context switch
         uint64 registerStartSP = (uint64)((char*)TCB::running->a0Location - (char*)TCB::running->stack + (char*)stack);
 
         forked->a0Location = registerStartSP;
 
         uint64 a1,a0;
 
+        //write address of stored registers in SP of forked thread so that it can return regularly
         asm("mv %[a1], a1": [a1] "=r"(a1));
 
         asm("mv %[a0], a0": [a0] "=r"(a0));
@@ -639,6 +656,7 @@ void RiscV::executeForkSyscall() {
 
         asm("sd a0, 16(a1)");
 
+        //write 0 in a0 register of forked thread because fork should return 0 in context of child, and thread ID othrewise
         asm("li a0, 0");
 
         asm("sd a0, 80(a1)");
@@ -651,8 +669,10 @@ void RiscV::executeForkSyscall() {
 
         forked->sstatus = TCB::running->sstatus;
 
+        //put forked in scheduler
         Scheduler::put(forked);
 
+        //return address of forked as thread ID
         status = (uint64)forked;
     }else
         status = -1;

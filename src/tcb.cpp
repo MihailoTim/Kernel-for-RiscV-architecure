@@ -25,8 +25,10 @@ void TCB::initialize() {
 
     TCB::running->mode = Mode::SUPERVISOR;
 
+    //stack for thread that will be running console output
     uint64 *putcStack = (uint64*)MemoryAllocator::kmalloc((DEFAULT_STACK_SIZE+MEM_BLOCK_SIZE-1)/MEM_BLOCK_SIZE);
 
+    //console output thread
     putcThread = new TCB(RiscV::putcWrapper, nullptr, putcStack, DEFAULT_TIME_SLICE);
 
     putcThread->mode = Mode::SUPERVISOR;
@@ -49,9 +51,11 @@ TCB::TCB(Body body, void* args, uint64* stack, uint64 timeSlice){
 
     this->next = nullptr;
 
+    //initial context for thread
     this->context = {(body == nullptr) ? 0 : (uint64)((char*)stack + DEFAULT_STACK_SIZE),
                      (uint64)&wrapper };
 
+    //by default run it in user mode
     this->mode = Mode::USER;
 }
 
@@ -64,7 +68,7 @@ TCB::~TCB(){
     free();
 }
 
-//if currently running thread is not finished, asleep or blocked put it in scheduler
+//if currently running thread is not finished, asleep or blocked, put it in scheduler
 //get new thread from scheduler and switch context
 void TCB::dispatch() {
     TCB* old = running;
@@ -74,6 +78,7 @@ void TCB::dispatch() {
     }
 
     running = Scheduler::get();
+
     if(running) {
         running->status = Status::RUNNING;
         RiscV::jumpToDesignatedPrivilegeMode();
@@ -90,19 +95,22 @@ void TCB::wrapper(void *args) {
     thread_exit();
 }
 
+//overload operator new, to not use system call for every kernel object that is being allocated
 void* TCB::operator new(size_t size){
     return MemoryAllocator::kmalloc(size);
 }
 
+//overload operator delete, to not use system call for every kernel object that is being deallocated
 void TCB::operator delete(void *addr){
     MemoryAllocator::kfree(addr);
 }
 
+//internal syscall to free space allocated to a thread
 int TCB::thread_free(void *addr) {
     uint64 iptr = (uint64)addr;
 
-    asm("mv a1, %[iptr]" : : [iptr] "r" (iptr));  //put address in a1
-    asm("li a0, 0x51");  //put number of syscall in a0
+    asm("mv a1, %[iptr]" : : [iptr] "r" (iptr));
+    asm("li a0, 0x51");
     asm("ecall");
 
     uint64 status;
