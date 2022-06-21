@@ -10,7 +10,7 @@ course, students were tasked with building a small but functional kernel, that s
 Scope of the project also includes implementing memory allocation, thread managment, semaphores and both synchronus and asynchronus context switch, as well
 as preemption on interrupt from keyboard or timer.
   
-Kernel is running a single user application that is statically linked and already loaded into operative memory. For the purpose of testing this user program 
+Kernel is running a single user application that is statically linked and preloaded into operative memory. For the purpose of testing this user program 
 is represented as userMain() function.
 
 <br/>
@@ -41,7 +41,7 @@ Implementation of this kernel is layered into multiple levels of abstraction:
 | ---------------- |----------------------------------------------------------------------------------| -----|
 | 0x01             |  <p><pre> void* mem_alloc (size_t size); </pre></p> | Allocates at least _size_ bytes, rounded up and aligned to blocks size of MEM_BLOCK_SIZE. Return pointer to allocated memory or _null_ if failed|
 | 0x02             |  <p><pre> int mem_free (void*);  </pre></p> | Frees memory previously allocated by _mem_alloc_. Returns 0 if successful, negative value otherwise. Argument must be pointer previously allocated by _mem_alloc_, otherwise an error code is returned. |
-| 0x11             |  <p><pre> int thread_create ( thread_t* handle, void(*start_routine)(void*), void* arg ); </pre></p>| Creates a thread with bode _start_routine_ and body argument _arg_. If successful writes address of created thread in \*handle and return 0. Othrewise, return negative value and _null_ is written into \*handle  |  
+| 0x11             |  <p><pre> int thread_create ( thread_t* handle,<br/>                     void(*start_routine)(void*),<br/>                     void* arg ); </pre></p>| Creates a thread with bode _start_routine_ and body argument _arg_. If successful writes address of created thread in \*handle and return 0. Othrewise, return negative value and _null_ is written into \*handle  |  
 | 0x12             |  <p><pre> int thread_exit ();  </pre></p> | Exits currently running thread. If not successful return negative value |
 | 0x13             |  <p><pre> void thread_dispatch (); </pre></p> | Executes synchronus context switch and possibly gives processor time to another thread |
 | 0x21             |  <p><pre> int sem_open ( sem_t* handle, unsigned init );  </pre></p> | Creates a semaphore with initial value _init_. If successful writes address of semaphore into \*handle and returns 0. Othrewise, return negative value and _null_ is written into \*handle  |
