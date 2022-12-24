@@ -8,6 +8,7 @@
 #include "../h/scheduler.hpp"
 #include "../h/printing.hpp"
 #include "../h/consoleUtil.hpp"
+#include "../h/buddy.hpp"
 
 uint64 RiscV::globalTime = 0;
 bool RiscV::userMainFinished = false;
@@ -19,6 +20,7 @@ void RiscV::initialize(){
     Scheduler::initialize();
     TCB::initialize();
     ConsoleUtil::initialize();
+    Buddy::initialize();
     RiscV::enableInterrupts();
 //    RiscV::enableHardwareInterrupts();
 }

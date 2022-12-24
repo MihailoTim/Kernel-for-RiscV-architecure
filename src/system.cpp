@@ -9,6 +9,8 @@
 #include "../h/printing.hpp"
 #include "../h/tcb.hpp"
 #include "../h/scheduler.hpp"
+#include "../h/consoleUtil.hpp"
+#include "../h/buddy.hpp"
 
 bool System::initialized = false;
 
@@ -19,6 +21,24 @@ System::System() {
 
         //initialize the machine
         RiscV::initialize();
+
+        Buddy::printList();
+
+        void* alloc11 = Buddy::alloc(11);
+        void* alloc1 = Buddy::alloc(1);
+
+        Buddy::printList();
+
+
+        ConsoleUtil::printInt((uint64)alloc1);
+        ConsoleUtil::printString("\n");
+        Buddy::free(alloc1, 1);
+        Buddy::free(alloc11, 11);
+
+
+        Buddy::printList();
+
+//        ConsoleUtil::printInt((uint64)Buddy::BUDDY_START_ADDR, 10);
 
         //creating a thread that will be executing user code
         //this is done as to separate user code execution from main kernel thread
@@ -50,5 +70,5 @@ void System::userMainWrapper(void *arg){
 //        thread_dispatch();
 //    }
 //    MemoryAllocator::showMemory();
-    userMain();
+//    userMain();
 }

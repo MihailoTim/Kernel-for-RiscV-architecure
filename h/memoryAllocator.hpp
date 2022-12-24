@@ -6,6 +6,8 @@
 #define OS1_KERNEL_MEMORYALLOCATOR_HPP
 
 #include "../lib/hw.h"
+#include "../h/constants.hpp"
+
 
 class MemoryAllocator {
     struct BlockHeader{

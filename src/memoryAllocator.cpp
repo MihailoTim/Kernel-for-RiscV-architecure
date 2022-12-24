@@ -3,6 +3,7 @@
 //
 #include "../h/memoryAllocator.hpp"
 #include "../h/printing.hpp"
+#include "../h/buddy.hpp"
 
 MemoryAllocator::BlockHeader* MemoryAllocator::freeMemHead = nullptr;
 
@@ -18,7 +19,7 @@ bool MemoryAllocator::initialized = false;
 //forbid multiple initializations
 //initial size of free memory is freeMemHead->size
 void MemoryAllocator::initialize() {
-    freeMemHead = freeMemTail = (BlockHeader*)HEAP_START_ADDR;
+    freeMemHead = freeMemTail = (BlockHeader*)FREE_MEMORY_START_CONST;
 
     freeMemHead->prev = freeMemHead->next = freeMemTail->prev = freeMemTail->next = nullptr;
 

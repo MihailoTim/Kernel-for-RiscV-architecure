@@ -102,7 +102,8 @@ void ConsoleUtil::printInt(int xx, int base, int sgn)
         buf[i++] = '-';
 
     while(--i >= 0)
-        putc(buf[i]);
+        ConsoleUtil::putOutput(buf[i]);
+
 }
 
 char ConsoleUtil::putcUtilSyscall()
