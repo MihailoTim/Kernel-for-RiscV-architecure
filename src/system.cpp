@@ -22,23 +22,59 @@ System::System() {
         //initialize the machine
         RiscV::initialize();
 
-        Buddy::printList();
 
-        void* alloc11 = Buddy::alloc(11);
-        void* alloc1 = Buddy::alloc(1);
+        bool error = false;
 
-        Buddy::printList();
+        void *mem[2048];
+        for(int i=0;i<2048;i++){
+            mem[i] = Buddy::alloc(0);
+            if(!mem[i]){
+                error = true;
+                break;
+            }
+        }
+
+        if(error)
+            ConsoleUtil::printString("ERROR\n");
+        else
+            ConsoleUtil::printString("ALL OK\n");
+
+        error = false;
+
+        for(int i=1;i<2048;i++){
+            if((uint64)mem[i] - (uint64)mem[i-1] != 4096) {
+                error = true;
+                break;
+            }
+        }
+
+        if(error)
+            ConsoleUtil::printString("ERROR\n");
+        else
+            ConsoleUtil::printString("ALL OK\n");
+
+        error = false;
+
+        for(int i=0;i<2048;i++){
+            Buddy::free(mem[i],0);
+        }
+
+        if(!Buddy::canAllocate(12))
+            ConsoleUtil::printString("ERROR\n");
+        else
+            ConsoleUtil::printString("ALL OK\n");
 
 
-        ConsoleUtil::printInt((uint64)alloc1);
-        ConsoleUtil::printString("\n");
-        Buddy::free(alloc1, 1);
-        Buddy::free(alloc11, 11);
+        Buddy::alloc(11);
+        Buddy::alloc(11);
 
+        void *check = Buddy::alloc(0);
 
-        Buddy::printList();
+        if(check != nullptr)
+            ConsoleUtil::printString("ERROR\n");
+        else
+            ConsoleUtil::printString("ALL OK\n");
 
-//        ConsoleUtil::printInt((uint64)Buddy::BUDDY_START_ADDR, 10);
 
         //creating a thread that will be executing user code
         //this is done as to separate user code execution from main kernel thread
@@ -70,5 +106,5 @@ void System::userMainWrapper(void *arg){
 //        thread_dispatch();
 //    }
 //    MemoryAllocator::showMemory();
-//    userMain();
+    userMain();
 }

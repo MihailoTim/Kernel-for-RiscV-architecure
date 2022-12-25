@@ -22,6 +22,10 @@ public:
 
     static void printList();
 
+    static inline bool canAllocate(uint64 size){
+        return head[size] != nullptr;
+    };
+
 private:
     static void* BUDDY_META_DATA_ADDR;
     static void* BUDDY_START_ADDR;

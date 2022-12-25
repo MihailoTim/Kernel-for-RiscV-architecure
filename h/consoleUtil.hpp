@@ -8,6 +8,7 @@
 #include "../lib/hw.h"
 #include "scb.hpp"
 
+
 //Console class for utility functions
 
 class ConsoleUtil {
