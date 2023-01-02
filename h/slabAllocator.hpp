@@ -17,15 +17,23 @@ public:
 
     static Cache* createCache(const char* name, size_t size, void (*ctor)(void*), void (*dtor)(void*));
 
+    static void deleteCache(Cache* &cache);
+
     static bool allocateSlab(Cache *cache);
+
+    static int shrinkCache(Cache* cache);
 
     static void* allocateSlot(Slab* slab);
 
     static void* allocateObject(Cache *cache);
 
+    static void* allocateBuffer(size_t size);
+
     static void freeSlot(Slab* slab, uint64 index);
 
-    static void freeObject(Cache* cache, void* addr);
+    static bool freeObject(Cache* cache,const void* addr);
+
+    static void freeBuffer(const void* addr);
 
     static void printSlab(Slab *slab);
 
@@ -52,7 +60,7 @@ private:
         return nullptr;
     }
 
-    static inline bool freeFromList(Slab* head, void* addr){
+    static inline bool freeFromList(Slab* head,const void* addr){
         while(head){
             uint64 upperBound = SlabAllocator::getUpperBound(head);
             uint64 lowerBound = SlabAllocator::getLowerBound(head);
@@ -66,6 +74,14 @@ private:
         return false;
     }
 
+    static inline void deleteList(Slab* &head){
+        while(head){
+            Buddy::free(head, head->parent->slabSize);
+            head = head->next;
+        }
+    }
+
+    static const char* names[13];
 };
 
 #endif //KERNEL_FOR_RISCV_ARCHITECURE_SLAN_HPP

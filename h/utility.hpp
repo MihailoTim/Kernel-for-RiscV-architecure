@@ -23,4 +23,9 @@
 #define BLOCK_SIZE 4096
 #define BLOCK_SIZE_BITS 12
 
+extern const char *numbers[13];
+
+char* strcpy(const char* src, char* dst);
+char* strcat(char* dst, const char* src);
+
 #endif //KERNEL_FOR_RISCV_ARCHITECURE_UTILITY_HPP

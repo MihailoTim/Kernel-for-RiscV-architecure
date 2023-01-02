@@ -5,6 +5,7 @@
 
 Cache* SlabAllocator::cache = nullptr;
 Cache* SlabAllocator::sizeN[BUCKET_SIZE] = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
+const char* SlabAllocator::names[13] = {"Buffer Cache No. 0", "Buffer Cache No. 1", "Buffer Cache No. 2", "Buffer Cache No. 3", "Buffer Cache No. 4", "Buffer Cache No. 5", "Buffer Cache No. 6", "Buffer Cache No. 7", "Buffer Cache No. 8", "Buffer Cache No. 9", "Buffer Cache No. 10", "Buffer Cache No. 11", "Buffer Cache No. 12"};
 void* SlabAllocator::startAddr = nullptr;
 uint64 SlabAllocator::blocksResponsibleFor = 0;
 
@@ -20,6 +21,11 @@ void SlabAllocator::initialize(void* space, uint64 blockNum) {
     cache->fullHead = nullptr;
     cache->objectSize = sizeof(Cache);
     cache->slabSize = DEFAULT_SLAB_SIZE;
+    strcpy("Main Cache", cache->name);
+    for(int i=0;i<BUCKET_SIZE;i++){
+        sizeN[i] = SlabAllocator::createCache(names[i], 2<<i, nullptr, nullptr);
+        printCache(sizeN[i]);
+    }
 }
 
 bool SlabAllocator::allocateSlab(Cache *cache) {
@@ -60,13 +66,22 @@ void* SlabAllocator::allocateObject(Cache *cache) {
     ret = SlabAllocator::allocateFromList(cache->emptyHead);
     if(ret)
         return ret;
-
     if(!SlabAllocator::allocateSlab(cache))
         return nullptr;
 
     ret = SlabAllocator::allocateSlot(cache->emptyHead);
 
     return ret;
+}
+
+void* SlabAllocator::allocateBuffer(size_t size) {
+    uint64 level = Buddy::getDeg(Buddy::ceil(size));
+    if(level < CACHE_LOWER_BOUND || level > CACHE_UPPER_BOUND)
+        return nullptr;
+    else
+        level -= CACHE_LOWER_BOUND;
+    SlabAllocator::allocateObject(sizeN[level]);
+return nullptr;
 }
 
 void SlabAllocator::freeSlot(Slab *slab, uint64 index) {
@@ -86,18 +101,50 @@ void SlabAllocator::freeSlot(Slab *slab, uint64 index) {
     }
 }
 
-void SlabAllocator::freeObject(Cache* cache, void *addr) {
+bool SlabAllocator::freeObject(Cache* cache, const void *addr) {
 
     bool deleted = SlabAllocator::freeFromList(cache->partialHead, addr);
     if(deleted)
-        return;
+        return deleted;
 
     deleted = SlabAllocator::freeFromList(cache->fullHead, addr);
 
+    return deleted;
+}
+
+void SlabAllocator::freeBuffer(const void *addr) {
+    for(int i=0;i<BUCKET_SIZE;i++)
+        if(SlabAllocator::freeObject(sizeN[i], addr))
+            return;
 }
 
 Cache* SlabAllocator::createCache(const char *name, size_t size, void (*ctor)(void *), void (*dtor)(void *)) {
-    return nullptr;
+    Cache* ret = (Cache*)SlabAllocator::allocateObject(SlabAllocator::cache);
+    ret->ctor = ctor;
+    ret->dtor = dtor;
+    ret->emptyHead = ret->partialHead = ret->fullHead = nullptr;
+    ret->objectSize = size;
+    ret->slabSize = DEFAULT_SLAB_SIZE;
+    strcpy(name, ret->name);
+    return ret;
+}
+
+void SlabAllocator::deleteCache(Cache* &cache) {
+    deleteList(cache->fullHead);
+    deleteList(cache->partialHead);
+    deleteList(cache->emptyHead);
+    SlabAllocator::freeObject(SlabAllocator::cache, cache);
+    cache = nullptr;
+}
+
+int SlabAllocator::shrinkCache(Cache *cache) {
+    int ret = 0;
+    while(cache->emptyHead){
+        Buddy::free(cache->emptyHead, cache->slabSize);
+        ret += cache->emptyHead->totalNumOfSlots;
+        cache->emptyHead = cache->emptyHead->next;
+    }
+    return ret;
 }
 
 void SlabAllocator::printSlab(Slab *slab) {
@@ -114,6 +161,9 @@ void SlabAllocator::printSlab(Slab *slab) {
 }
 
 void SlabAllocator::printCache(Cache *cache) {
+    ConsoleUtil::printString("Cache name: ");
+    ConsoleUtil::printString(cache->name);
+    ConsoleUtil::printString("\n");
     ConsoleUtil::print("HEAP_START_ADDR: ", (uint64)HEAP_START_ADDR, "\n");
     ConsoleUtil::print("Cache address: ", (uint64)cache, "\n");
     ConsoleUtil::print("Empty head: ", (uint64)cache->emptyHead, "\n");

@@ -20,7 +20,6 @@ void RiscV::initialize(){
     Scheduler::initialize();
     TCB::initialize();
     ConsoleUtil::initialize();
-    SlabAllocator::initialize(BUDDY_START_ADDR_CONST, 4096);
     RiscV::enableInterrupts();
 //    RiscV::enableHardwareInterrupts();
 }

@@ -8,6 +8,8 @@
 #include "../lib/hw.h"
 #include "../h/utility.hpp"
 
+class SlabAllocator;
+
 class Buddy{
 public:
     static void initialize(void* addr, uint64 block_num);
@@ -56,6 +58,8 @@ private:
 
     static void insert(void* addr, uint64 size);
     static void compress(uint64 size);
+
+    friend class SlabAllocator;
 };
 
 #endif //KERNEL_FOR_RISCV_ARCHITECURE_BUDDYALLOCATOR_HPP

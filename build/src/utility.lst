@@ -1,0 +1,261 @@
+GAS LISTING /tmp/ccv2tiOB.s 			page 1
+
+
+   1              		.file	"utility.cpp"
+   2              		.option pic
+   3              		.option norelax
+   4              		.text
+   5              	.Ltext0:
+   6              		.align	2
+   7              		.globl	_Z6strcpyPKcPc
+   9              	_Z6strcpyPKcPc:
+  10              	.LFB0:
+  11              		.file 1 "src/utility.cpp"
+   1:src/utility.cpp **** //
+   2:src/utility.cpp **** // Created by os on 1/2/23.
+   3:src/utility.cpp **** //
+   4:src/utility.cpp **** #include "../h/utility.hpp"
+   5:src/utility.cpp **** 
+   6:src/utility.cpp **** char* strcpy(const char* src, char* dst){
+  12              		.loc 1 6 41
+  13              		.cfi_startproc
+  14              	.LVL0:
+  15 0000 130101FF 		addi	sp,sp,-16
+  16              		.cfi_def_cfa_offset 16
+  17 0004 23348100 		sd	s0,8(sp)
+  18              		.cfi_offset 8, -8
+  19 0008 13040101 		addi	s0,sp,16
+  20              		.cfi_def_cfa 8, 0
+  21 000c 93070500 		mv	a5,a0
+  22 0010 13850500 		mv	a0,a1
+  23              	.LVL1:
+  24              	.L3:
+   7:src/utility.cpp ****     while(*src != '\0')
+  25              		.loc 1 7 5
+  26              		.loc 1 7 16
+  27              		.loc 1 7 11 is_stmt 0
+  28 0014 03C70700 		lbu	a4,0(a5)
+  29              		.loc 1 7 16
+  30 0018 630A0700 		beqz	a4,.L2
+   8:src/utility.cpp ****         *dst++ = *src++;
+  31              		.loc 1 8 9 is_stmt 1
+  32              		.loc 1 8 22 is_stmt 0
+  33 001c 93871700 		addi	a5,a5,1
+  34              	.LVL2:
+  35              		.loc 1 8 16
+  36 0020 2300E500 		sb	a4,0(a0)
+  37              		.loc 1 8 13
+  38 0024 13051500 		addi	a0,a0,1
+  39              	.LVL3:
+   7:src/utility.cpp ****     while(*src != '\0')
+  40              		.loc 1 7 5
+  41 0028 6FF0DFFE 		j	.L3
+  42              	.L2:
+   9:src/utility.cpp ****     *dst = *src;
+  43              		.loc 1 9 5 is_stmt 1
+  44              		.loc 1 9 10 is_stmt 0
+  45 002c 2300E500 		sb	a4,0(a0)
+  10:src/utility.cpp ****     return dst;
+  46              		.loc 1 10 5 is_stmt 1
+  11:src/utility.cpp **** }
+GAS LISTING /tmp/ccv2tiOB.s 			page 2
+
+
+  47              		.loc 1 11 1 is_stmt 0
+  48 0030 03348100 		ld	s0,8(sp)
+  49              		.cfi_restore 8
+  50              		.cfi_def_cfa 2, 16
+  51 0034 13010101 		addi	sp,sp,16
+  52              		.cfi_def_cfa_offset 0
+  53 0038 67800000 		jr	ra
+  54              		.cfi_endproc
+  55              	.LFE0:
+  57              		.align	2
+  58              		.globl	_Z6strcatPcPKc
+  60              	_Z6strcatPcPKc:
+  61              	.LFB1:
+  12:src/utility.cpp **** 
+  13:src/utility.cpp **** char* strcat(char* dst, const char* src){
+  62              		.loc 1 13 41 is_stmt 1
+  63              		.cfi_startproc
+  64              	.LVL4:
+  65 003c 130101FE 		addi	sp,sp,-32
+  66              		.cfi_def_cfa_offset 32
+  67 0040 233C1100 		sd	ra,24(sp)
+  68 0044 23388100 		sd	s0,16(sp)
+  69 0048 23349100 		sd	s1,8(sp)
+  70              		.cfi_offset 1, -8
+  71              		.cfi_offset 8, -16
+  72              		.cfi_offset 9, -24
+  73 004c 13040102 		addi	s0,sp,32
+  74              		.cfi_def_cfa 8, 0
+  75 0050 93040500 		mv	s1,a0
+  76 0054 13850500 		mv	a0,a1
+  77              	.LVL5:
+  14:src/utility.cpp ****     char *dest = dst;
+  78              		.loc 1 14 5
+  79              		.loc 1 14 11 is_stmt 0
+  80 0058 93850400 		mv	a1,s1
+  81              	.LVL6:
+  82              	.L7:
+  15:src/utility.cpp ****     while(*dest != '\0')
+  83              		.loc 1 15 5 is_stmt 1
+  84              		.loc 1 15 17
+  85              		.loc 1 15 11 is_stmt 0
+  86 005c 83C70500 		lbu	a5,0(a1)
+  87              		.loc 1 15 17
+  88 0060 63860700 		beqz	a5,.L6
+  16:src/utility.cpp ****         dest++;
+  89              		.loc 1 16 9 is_stmt 1
+  90              		.loc 1 16 13 is_stmt 0
+  91 0064 93851500 		addi	a1,a1,1
+  92              	.LVL7:
+  15:src/utility.cpp ****     while(*dest != '\0')
+  93              		.loc 1 15 5
+  94 0068 6FF05FFF 		j	.L7
+  95              	.L6:
+  17:src/utility.cpp ****     strcpy(src, dest);
+  96              		.loc 1 17 5 is_stmt 1
+  97              		.loc 1 17 11 is_stmt 0
+  98 006c 97000000 		call	_Z6strcpyPKcPc
+GAS LISTING /tmp/ccv2tiOB.s 			page 3
+
+
+  98      E7800000 
+  99              	.LVL8:
+  18:src/utility.cpp ****     return dst;
+ 100              		.loc 1 18 5 is_stmt 1
+  19:src/utility.cpp **** }
+ 101              		.loc 1 19 1 is_stmt 0
+ 102 0074 13850400 		mv	a0,s1
+ 103 0078 83308101 		ld	ra,24(sp)
+ 104              		.cfi_restore 1
+ 105 007c 03340101 		ld	s0,16(sp)
+ 106              		.cfi_restore 8
+ 107              		.cfi_def_cfa 2, 32
+ 108 0080 83348100 		ld	s1,8(sp)
+ 109              		.cfi_restore 9
+ 110              	.LVL9:
+ 111 0084 13010102 		addi	sp,sp,32
+ 112              		.cfi_def_cfa_offset 0
+ 113 0088 67800000 		jr	ra
+ 114              		.cfi_endproc
+ 115              	.LFE1:
+ 117              	.Letext0:
+ 118              		.file 2 "src/../h/../lib/hw.h"
+ 119              		.file 3 "src/../h/utility.hpp"
+GAS LISTING /tmp/ccv2tiOB.s 			page 4
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 utility.cpp
+     /tmp/ccv2tiOB.s:9      .text:0000000000000000 _Z6strcpyPKcPc
+     /tmp/ccv2tiOB.s:13     .text:0000000000000000 .L0 
+     /tmp/ccv2tiOB.s:15     .text:0000000000000000 .L0 
+     /tmp/ccv2tiOB.s:16     .text:0000000000000004 .L0 
+     /tmp/ccv2tiOB.s:18     .text:0000000000000008 .L0 
+     /tmp/ccv2tiOB.s:20     .text:000000000000000c .L0 
+     /tmp/ccv2tiOB.s:26     .text:0000000000000014 .L0 
+     /tmp/ccv2tiOB.s:27     .text:0000000000000014 .L0 
+     /tmp/ccv2tiOB.s:28     .text:0000000000000014 .L0 
+     /tmp/ccv2tiOB.s:30     .text:0000000000000018 .L0 
+     /tmp/ccv2tiOB.s:32     .text:000000000000001c .L0 
+     /tmp/ccv2tiOB.s:33     .text:000000000000001c .L0 
+     /tmp/ccv2tiOB.s:36     .text:0000000000000020 .L0 
+     /tmp/ccv2tiOB.s:38     .text:0000000000000024 .L0 
+     /tmp/ccv2tiOB.s:41     .text:0000000000000028 .L0 
+     /tmp/ccv2tiOB.s:44     .text:000000000000002c .L0 
+     /tmp/ccv2tiOB.s:45     .text:000000000000002c .L0 
+     /tmp/ccv2tiOB.s:47     .text:0000000000000030 .L0 
+     /tmp/ccv2tiOB.s:48     .text:0000000000000030 .L0 
+     /tmp/ccv2tiOB.s:49     .text:0000000000000034 .L0 
+     /tmp/ccv2tiOB.s:50     .text:0000000000000034 .L0 
+     /tmp/ccv2tiOB.s:52     .text:0000000000000038 .L0 
+     /tmp/ccv2tiOB.s:54     .text:000000000000003c .L0 
+     /tmp/ccv2tiOB.s:60     .text:000000000000003c _Z6strcatPcPKc
+     /tmp/ccv2tiOB.s:63     .text:000000000000003c .L0 
+     /tmp/ccv2tiOB.s:65     .text:000000000000003c .L0 
+     /tmp/ccv2tiOB.s:66     .text:0000000000000040 .L0 
+     /tmp/ccv2tiOB.s:70     .text:000000000000004c .L0 
+     /tmp/ccv2tiOB.s:71     .text:000000000000004c .L0 
+     /tmp/ccv2tiOB.s:72     .text:000000000000004c .L0 
+     /tmp/ccv2tiOB.s:74     .text:0000000000000050 .L0 
+     /tmp/ccv2tiOB.s:79     .text:0000000000000058 .L0 
+     /tmp/ccv2tiOB.s:80     .text:0000000000000058 .L0 
+     /tmp/ccv2tiOB.s:84     .text:000000000000005c .L0 
+     /tmp/ccv2tiOB.s:85     .text:000000000000005c .L0 
+     /tmp/ccv2tiOB.s:86     .text:000000000000005c .L0 
+     /tmp/ccv2tiOB.s:88     .text:0000000000000060 .L0 
+     /tmp/ccv2tiOB.s:90     .text:0000000000000064 .L0 
+     /tmp/ccv2tiOB.s:91     .text:0000000000000064 .L0 
+     /tmp/ccv2tiOB.s:94     .text:0000000000000068 .L0 
+     /tmp/ccv2tiOB.s:97     .text:000000000000006c .L0 
+     /tmp/ccv2tiOB.s:98     .text:000000000000006c .L0 
+     /tmp/ccv2tiOB.s:101    .text:0000000000000074 .L0 
+     /tmp/ccv2tiOB.s:102    .text:0000000000000074 .L0 
+     /tmp/ccv2tiOB.s:104    .text:000000000000007c .L0 
+     /tmp/ccv2tiOB.s:106    .text:0000000000000080 .L0 
+     /tmp/ccv2tiOB.s:107    .text:0000000000000080 .L0 
+     /tmp/ccv2tiOB.s:109    .text:0000000000000084 .L0 
+     /tmp/ccv2tiOB.s:112    .text:0000000000000088 .L0 
+     /tmp/ccv2tiOB.s:114    .text:000000000000008c .L0 
+     /tmp/ccv2tiOB.s:120    .text:000000000000008c .L0 
+     /tmp/ccv2tiOB.s:42     .text:000000000000002c .L2
+     /tmp/ccv2tiOB.s:24     .text:0000000000000014 .L3
+     /tmp/ccv2tiOB.s:95     .text:000000000000006c .L6
+     /tmp/ccv2tiOB.s:82     .text:000000000000005c .L7
+GAS LISTING /tmp/ccv2tiOB.s 			page 5
+
+
+     /tmp/ccv2tiOB.s:332    .debug_abbrev:0000000000000000 .Ldebug_abbrev0
+     /tmp/ccv2tiOB.s:705    .debug_str:0000000000000142 .LASF20
+     /tmp/ccv2tiOB.s:669    .debug_str:0000000000000019 .LASF21
+     /tmp/ccv2tiOB.s:699    .debug_str:00000000000000eb .LASF22
+     /tmp/ccv2tiOB.s:5      .text:0000000000000000 .Ltext0
+     /tmp/ccv2tiOB.s:117    .text:000000000000008c .Letext0
+     /tmp/ccv2tiOB.s:661    .debug_line:0000000000000000 .Ldebug_line0
+     /tmp/ccv2tiOB.s:665    .debug_str:0000000000000007 .LASF0
+     /tmp/ccv2tiOB.s:703    .debug_str:000000000000012f .LASF1
+     /tmp/ccv2tiOB.s:689    .debug_str:000000000000009d .LASF2
+     /tmp/ccv2tiOB.s:685    .debug_str:000000000000008a .LASF4
+     /tmp/ccv2tiOB.s:681    .debug_str:0000000000000065 .LASF3
+     /tmp/ccv2tiOB.s:675    .debug_str:0000000000000046 .LASF5
+     /tmp/ccv2tiOB.s:683    .debug_str:0000000000000077 .LASF6
+     /tmp/ccv2tiOB.s:701    .debug_str:000000000000011c .LASF7
+     /tmp/ccv2tiOB.s:709    .debug_str:0000000000000215 .LASF8
+     /tmp/ccv2tiOB.s:671    .debug_str:0000000000000029 .LASF9
+     /tmp/ccv2tiOB.s:673    .debug_str:0000000000000037 .LASF10
+     /tmp/ccv2tiOB.s:707    .debug_str:0000000000000206 .LASF11
+     /tmp/ccv2tiOB.s:677    .debug_str:000000000000004d .LASF12
+     /tmp/ccv2tiOB.s:713    .debug_str:000000000000022c .LASF13
+     /tmp/ccv2tiOB.s:687    .debug_str:0000000000000091 .LASF14
+     /tmp/ccv2tiOB.s:697    .debug_str:00000000000000d5 .LASF15
+     /tmp/ccv2tiOB.s:693    .debug_str:00000000000000b0 .LASF16
+     /tmp/ccv2tiOB.s:691    .debug_str:00000000000000ab .LASF17
+     /tmp/ccv2tiOB.s:679    .debug_str:000000000000005d .LASF18
+     /tmp/ccv2tiOB.s:711    .debug_str:0000000000000225 .LASF23
+     /tmp/ccv2tiOB.s:695    .debug_str:00000000000000c6 .LASF24
+     /tmp/ccv2tiOB.s:61     .text:000000000000003c .LFB1
+     /tmp/ccv2tiOB.s:115    .text:000000000000008c .LFE1
+     /tmp/ccv2tiOB.s:572    .debug_loc:0000000000000000 .LLST2
+     /tmp/ccv2tiOB.s:587    .debug_loc:0000000000000049 .LLST3
+     /tmp/ccv2tiOB.s:667    .debug_str:0000000000000014 .LASF19
+     /tmp/ccv2tiOB.s:605    .debug_loc:0000000000000095 .LLST4
+     /tmp/ccv2tiOB.s:99     .text:0000000000000074 .LVL8
+     /tmp/ccv2tiOB.s:663    .debug_str:0000000000000000 .LASF25
+     /tmp/ccv2tiOB.s:715    .debug_str:000000000000023c .LASF26
+     /tmp/ccv2tiOB.s:10     .text:0000000000000000 .LFB0
+     /tmp/ccv2tiOB.s:55     .text:000000000000003c .LFE0
+     /tmp/ccv2tiOB.s:616    .debug_loc:00000000000000cb .LLST0
+     /tmp/ccv2tiOB.s:627    .debug_loc:0000000000000101 .LLST1
+     /tmp/ccv2tiOB.s:64     .text:000000000000003c .LVL4
+     /tmp/ccv2tiOB.s:77     .text:0000000000000058 .LVL5
+     /tmp/ccv2tiOB.s:110    .text:0000000000000084 .LVL9
+     /tmp/ccv2tiOB.s:81     .text:000000000000005c .LVL6
+     /tmp/ccv2tiOB.s:14     .text:0000000000000000 .LVL0
+     /tmp/ccv2tiOB.s:23     .text:0000000000000014 .LVL1
+     /tmp/ccv2tiOB.s:34     .text:0000000000000020 .LVL2
+     /tmp/ccv2tiOB.s:39     .text:0000000000000028 .LVL3
+     /tmp/ccv2tiOB.s:121    .debug_info:0000000000000000 .Ldebug_info0
+
+NO UNDEFINED SYMBOLS

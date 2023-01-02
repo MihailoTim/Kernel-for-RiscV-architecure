@@ -11,6 +11,7 @@
 #include "../h/scheduler.hpp"
 #include "../h/consoleUtil.hpp"
 #include "../h/slabAllocator.hpp"
+#include "../h/slab.hpp"
 
 bool System::initialized = false;
 
@@ -22,29 +23,9 @@ System::System() {
         //initialize the machine
         RiscV::initialize();
 
-        Cache *cache = SlabAllocator::cache;
+        kmem_init((void*)HEAP_START_ADDR, 4096);
 
-        void* alloc[100];
-
-        SlabAllocator::allocateObject(cache);
-
-        for(int i = 0; i < 67; i++)
-            alloc[i] = SlabAllocator::allocateObject(cache);
-
-        SlabAllocator::printSlab(cache->fullHead);
-
-        void* all1 = SlabAllocator::allocateObject(cache);
-
-        void* all2 = SlabAllocator::allocateObject(cache);
-
-
-        SlabAllocator::freeObject(cache, all1);
-        SlabAllocator::freeObject(cache, all2);
-
-        for(int i=0; i<67;i++)
-            SlabAllocator::freeObject(cache, alloc[i]);
-
-        SlabAllocator::printCache(cache);
+        SlabAllocator::allocateBuffer(100);
 
         //creating a thread that will be executing user code
         //this is done as to separate user code execution from main kernel thread

@@ -8,7 +8,8 @@ build/src/system.o: src/system.cpp src/../h/system.hpp \
  src/../h/tcb.hpp src/../h/slabAllocator.hpp \
  src/../h/../h/buddyAllocator.hpp src/../h/../h/../h/utility.hpp \
  src/../h/../h/consoleUtil.hpp src/../h/../h/cache_t.hpp \
- src/../h/../h/../h/slab_t.hpp
+ src/../h/../h/../h/slab_t.hpp src/../h/slab.hpp \
+ src/../h/../h/slabAllocator.hpp
 
 src/../h/system.hpp:
 
@@ -57,3 +58,7 @@ src/../h/../h/consoleUtil.hpp:
 src/../h/../h/cache_t.hpp:
 
 src/../h/../h/../h/slab_t.hpp:
+
+src/../h/slab.hpp:
+
+src/../h/../h/slabAllocator.hpp:
