@@ -32,7 +32,6 @@ void* Buddy::alloc(uint64 size) {
             break;
         }
     }
-
     return blk;
 }
 
@@ -43,35 +42,33 @@ void Buddy::free(void *addr, uint64 size) {
 }
 
 void Buddy::insert(void *addr, uint64 size) {
-//    ConsoleUtil::printString("INSERT: ");
-//    ConsoleUtil::printInt(size);
-//    ConsoleUtil::printString("\n");
     if(!head[size]){
         head[size] = tail[size] = (Block*)addr;
         head[size]->next = tail[size]->next = nullptr;
         return;
     }
-    else
-        if((uint64)addr < (uint64)head[size]){
-            Bucket* newHead = (Bucket*)addr;
+    else {
+        if ((uint64) addr < (uint64) head[size]) {
+            Bucket *newHead = (Bucket *) addr;
             newHead->next = head[size];
             head[size] = newHead;
             compress(size);
             return;
-        }
-        else{
-            Block* prev = nullptr, *iter = head[size];
-            while(iter != nullptr){
-                if((uint64)addr < (uint64)iter) {
+        } else {
+            Block *prev = nullptr, *iter = head[size];
+            while (iter != nullptr) {
+                if ((uint64) addr < (uint64) iter) {
                     Block *newBlock = (Block *) addr;
                     newBlock->next = iter;
                     prev->next = newBlock;
                     compress(size);
                     return;
-                }
-                else
+                } else {
+                    prev = iter;
                     iter = iter->next;
+                }
             }
+        }
     }
     tail[size]->next = (Block*)addr;
     tail[size] = tail[size]->next;
@@ -79,19 +76,14 @@ void Buddy::insert(void *addr, uint64 size) {
 }
 
 void Buddy::compress(uint64 size) {
-//    ConsoleUtil::printString("COMPRESS: ");
-//    ConsoleUtil::printInt(size);
-//    ConsoleUtil::printString("\n");
-//    ConsoleUtil::printString("BEFORE COMPRESSION: \n");
-//    printList();
     if(size == BUCKET_SIZE-1)
         return;
     Block *curr = head[size];
     Block *prev = nullptr;
     while(curr && curr->next != nullptr){
-        uint64 blkNoCurr = ((uint64)(curr) - (uint64)BUDDY_START_ADDR) >> BUDDY_BLOCK_BITS;
-        uint64 blkNoNext = ((uint64)(curr->next) - (uint64)BUDDY_START_ADDR) >> BUDDY_BLOCK_BITS;
-        uint64 pair = (blkNoCurr % (1<<size) == 0) ? blkNoCurr + (1<<size) : blkNoCurr - (1<<size);
+        uint64 blkNoCurr = ((uint64)(curr) - (uint64)Buddy::BUDDY_START_ADDR) >> (BUDDY_BLOCK_BITS+size);
+        uint64 blkNoNext = ((uint64)(curr->next) - (uint64)Buddy::BUDDY_START_ADDR) >> (BUDDY_BLOCK_BITS+size);
+        uint64 pair = (blkNoCurr % 2 == 0) ? blkNoCurr + 1 : blkNoCurr - 1;
         Block *blk = curr;
         if(blkNoNext == pair){
             if(prev){
@@ -99,12 +91,12 @@ void Buddy::compress(uint64 size) {
             }
             else{
                 head[size] = curr->next->next;
+                if(!head[size])
+                    tail[size] = nullptr;
             }
         }
         else
             prev = curr;
-//        ConsoleUtil::printString("BEFORE INSERTION: \n");
-//        printList();
         if(blkNoNext == pair){
             blk->next = nullptr;
             insert(blk, size+1);

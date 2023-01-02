@@ -22,9 +22,9 @@ void SlabAllocator::initialize(void* space, uint64 blockNum) {
     cache->objectSize = sizeof(Cache);
     cache->slabSize = DEFAULT_SLAB_SIZE;
     strcpy("Main Cache", cache->name);
+
     for(int i=0;i<BUCKET_SIZE;i++){
         sizeN[i] = SlabAllocator::createCache(names[i], 2<<i, nullptr, nullptr);
-        printCache(sizeN[i]);
     }
 }
 
@@ -34,11 +34,12 @@ bool SlabAllocator::allocateSlab(Cache *cache) {
         return false;
     SlabAllocator::insertIntoList(cache->emptyHead, slab);
     slab->totalNumOfSlots = slab->numOfFreeSlots = ((cache->slabSize << BLOCK_SIZE_BITS) - sizeof(Slab)) / cache->objectSize;
-    slab->objectOffset = (void*)((uint64)slab + sizeof(Slab) + (slab->totalNumOfSlots>>3) + 1);
-    slab->allocated = (bool*)((uint64)slab + sizeof(Slab));
+    slab->objectOffset = (void*)((uint64)slab + sizeof(Slab));
+//    slab->allocated = (bool*)((uint64)slab + sizeof(Slab));
     slab->parent = cache;
     for(uint64 i=0;i<slab->totalNumOfSlots;i++)
         slab->allocated[i] = false;
+
     return true;
 }
 
@@ -61,11 +62,13 @@ void* SlabAllocator::allocateSlot(Slab *slab) {
 
 void* SlabAllocator::allocateObject(Cache *cache) {
     void* ret = SlabAllocator::allocateFromList(cache->partialHead);
-    if(ret)
+    if(ret){
         return ret;
+    }
     ret = SlabAllocator::allocateFromList(cache->emptyHead);
-    if(ret)
+    if(ret){
         return ret;
+    }
     if(!SlabAllocator::allocateSlab(cache))
         return nullptr;
 
@@ -103,11 +106,11 @@ void SlabAllocator::freeSlot(Slab *slab, uint64 index) {
 
 bool SlabAllocator::freeObject(Cache* cache, const void *addr) {
 
-    bool deleted = SlabAllocator::freeFromList(cache->partialHead, addr);
+    bool deleted = SlabAllocator::freeFromList(cache->fullHead, addr);
     if(deleted)
         return deleted;
 
-    deleted = SlabAllocator::freeFromList(cache->fullHead, addr);
+    deleted = SlabAllocator::freeFromList(cache->partialHead, addr);
 
     return deleted;
 }
@@ -148,16 +151,19 @@ int SlabAllocator::shrinkCache(Cache *cache) {
 }
 
 void SlabAllocator::printSlab(Slab *slab) {
-    ConsoleUtil::print("Slab address:", (uint64)slab, "\n");
-    ConsoleUtil::print("Number of slots:", (uint64)slab->totalNumOfSlots, "\n");
-    ConsoleUtil::print("Slab object size:", (uint64)sizeof(Slab), "\n");
-    ConsoleUtil::print("Object offset:", (uint64)slab->objectOffset, "\n");
-    ConsoleUtil::print("Slab allocated array address:", (uint64)slab->allocated, "\n");
-    ConsoleUtil::printString("Allocated status array:\n");
-    for(uint64 i=0;i<slab->totalNumOfSlots;i++){
-        ConsoleUtil::print("", (uint8)slab->allocated[i], " ");
+    if(slab) {
+        ConsoleUtil::print("Slab address:", (uint64) slab, "\n");
+        ConsoleUtil::print("Number of slots:", (uint64) slab->totalNumOfSlots, "\n");
+        ConsoleUtil::print("Number of free slots:", (uint64) slab->numOfFreeSlots, "\n");
+        ConsoleUtil::print("Slab object size:", (uint64) sizeof(Slab), "\n");
+        ConsoleUtil::print("Object offset:", (uint64) slab->objectOffset, "\n");
+        ConsoleUtil::print("Slab allocated array address:", (uint64) slab->allocated, "\n");
+        ConsoleUtil::printString("Allocated status array:\n");
+        for (uint64 i = 0; i < slab->totalNumOfSlots; i++) {
+            ConsoleUtil::print("", slab->allocated[i] == true ? 1 : 0, " ");
+        }
+        ConsoleUtil::printString("\n");
     }
-    ConsoleUtil::printString("\n");
 }
 
 void SlabAllocator::printCache(Cache *cache) {
@@ -166,6 +172,8 @@ void SlabAllocator::printCache(Cache *cache) {
     ConsoleUtil::printString("\n");
     ConsoleUtil::print("HEAP_START_ADDR: ", (uint64)HEAP_START_ADDR, "\n");
     ConsoleUtil::print("Cache address: ", (uint64)cache, "\n");
+    ConsoleUtil::print("Cache slab size: ", (uint64)cache->slabSize, "\n");
+    ConsoleUtil::print("Cache object size: ", (uint64)cache->objectSize, "\n");
     ConsoleUtil::print("Empty head: ", (uint64)cache->emptyHead, "\n");
 
     Slab* iter = cache->emptyHead;

@@ -15,6 +15,10 @@
 
 bool System::initialized = false;
 
+struct Test{
+    uint64 a,b,c,d,e,f;
+};
+
 System::System() {
     //check whether system is already running to prevent user malicious access
     if (!initialized) {
@@ -23,9 +27,27 @@ System::System() {
         //initialize the machine
         RiscV::initialize();
 
-        kmem_init((void*)HEAP_START_ADDR, 4096);
+        kmem_init(BUDDY_START_ADDR_CONST, 4096);
 
-        SlabAllocator::allocateBuffer(100);
+        kmem_cache_t* cache1 = kmem_cache_create("Cache 1", sizeof(Test), nullptr, nullptr);
+
+        const int size = 200;
+
+        void* mem[size];
+
+        for(int i = 0; i<size; i++)
+            mem[i] = kmem_cache_alloc(cache1);
+
+        for(int i=0;i<size;i++)
+            kmem_cache_free(cache1, mem[i]);
+
+
+        kmem_cache_destroy(cache1);
+
+        for(int i=0; i<BUCKET_SIZE;i++)
+            SlabAllocator::deleteCache(SlabAllocator::sizeN[i]);
+
+        Buddy::printList();
 
         //creating a thread that will be executing user code
         //this is done as to separate user code execution from main kernel thread

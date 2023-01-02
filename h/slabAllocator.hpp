@@ -65,7 +65,7 @@ private:
             uint64 upperBound = SlabAllocator::getUpperBound(head);
             uint64 lowerBound = SlabAllocator::getLowerBound(head);
             if((uint64)addr < upperBound && (uint64)addr >= lowerBound){
-                uint64 index = ((uint64)addr - lowerBound) / cache->objectSize;
+                uint64 index = ((uint64)addr - lowerBound) / head->parent->objectSize;
                 freeSlot(head, index);
                 return true;
             }
@@ -76,7 +76,8 @@ private:
 
     static inline void deleteList(Slab* &head){
         while(head){
-            Buddy::free(head, head->parent->slabSize);
+            Slab* tmp = head;
+            Buddy::free(tmp, head->parent->slabSize);
             head = head->next;
         }
     }
