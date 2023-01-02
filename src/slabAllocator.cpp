@@ -3,8 +3,8 @@
 //
 #include "../h/slabAllocator.hpp"
 
-SlabAllocator::Cache* SlabAllocator::cache = nullptr;
-SlabAllocator::Cache* SlabAllocator::sizeN[BUCKET_SIZE] = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
+Cache* SlabAllocator::cache = nullptr;
+Cache* SlabAllocator::sizeN[BUCKET_SIZE] = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
 void* SlabAllocator::startAddr = nullptr;
 uint64 SlabAllocator::blocksResponsibleFor = 0;
 
@@ -26,11 +26,10 @@ void SlabAllocator::initialize(void* space, uint64 blockNum) {
 void SlabAllocator::allocateSlab(Cache *cache) {
     Slab* slab = (Slab*)Buddy::alloc(cache->slabSize);
     SlabAllocator::insertIntoList(&cache->emptyHead, slab);
-    slab->objectSize = cache->objectSize;
-    slab->owner = reinterpret_cast<SlabAllocator::Cache*>(cache);
     slab->totalNumOfSlots = slab->numOfFreeSlots = ((cache->slabSize << BLOCK_SIZE_BITS) - sizeof(Slab)) / cache->objectSize;
     slab->objectOffset = (void*)((uint64)slab + sizeof(Slab) + (slab->totalNumOfSlots>>3) + 1);
     slab->allocated = (bool*)((uint64)slab + sizeof(Slab));
+    slab->parent = cache;
     for(uint64 i=0;i<slab->totalNumOfSlots;i++)
         slab->allocated[i] = false;
 }
@@ -40,13 +39,13 @@ void* SlabAllocator::allocateSlot(Slab *slab) {
         if(!slab->allocated[i]){
             slab->allocated[i] = true;
             slab->numOfFreeSlots--;
-            return (void*)((uint64)slab->objectOffset + i*slab->objectSize);
+            return (void*)((uint64)slab->objectOffset + i*slab->parent->objectSize);
         }
     }
     return nullptr;
 }
 
-SlabAllocator::Cache* SlabAllocator::createCache(const char *name, size_t size, void (*ctor)(void *), void (*dtor)(void *)) {
+Cache* SlabAllocator::createCache(const char *name, size_t size, void (*ctor)(void *), void (*dtor)(void *)) {
     return nullptr;
 }
 

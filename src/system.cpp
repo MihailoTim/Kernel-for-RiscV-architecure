@@ -22,9 +22,9 @@ System::System() {
         //initialize the machine
         RiscV::initialize();
 
-        SlabAllocator::Cache *cache = SlabAllocator::cache;
+        Cache *cache = SlabAllocator::cache;
         SlabAllocator::printCache(cache);
-        SlabAllocator::Slab *slab = cache->emptyHead;
+        Slab *slab = cache->emptyHead;
         SlabAllocator::printSlab(SlabAllocator::cache->emptyHead);
 
         void* all1 = SlabAllocator::allocateSlot(slab);

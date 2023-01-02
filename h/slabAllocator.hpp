@@ -8,33 +8,10 @@
 #include "../h/utility.hpp"
 #include "../h/buddyAllocator.hpp"
 #include "../h/consoleUtil.hpp"
+#include "../h/cache_t.hpp"
 
 class SlabAllocator{
 public:
-    typedef class Slab{
-    public:
-        inline bool isFull(){return numOfFreeSlots == 0;}
-        inline bool isEmpty(){return numOfFreeSlots == totalNumOfSlots;}
-        Slab *prev, *next;
-        uint64 numOfFreeSlots;
-        uint64 totalNumOfSlots;
-        uint64 objectSize;
-        bool *allocated;
-        void* objectOffset;
-    }kmem_slab_t;
-
-    typedef class Cache{
-    public:
-        char name[CACHE_MAX_NAME_LENGTH];
-        uint64 objectSize;
-        uint64 slabSize;
-        void (*ctor)(void*);
-        void (*dtor)(void*);
-
-        Slab *emptyHead;
-        Slab *partialHead;
-        Slab* fullHead;
-    } kmem_cache_t;
 
     static void initialize(void* space, uint64 blockNum);
 
