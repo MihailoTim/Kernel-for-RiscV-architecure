@@ -23,20 +23,28 @@ System::System() {
         RiscV::initialize();
 
         Cache *cache = SlabAllocator::cache;
+
+        void* alloc[100];
+
+        SlabAllocator::allocateObject(cache);
+
+        for(int i = 0; i < 67; i++)
+            alloc[i] = SlabAllocator::allocateObject(cache);
+
+        SlabAllocator::printSlab(cache->fullHead);
+
+        void* all1 = SlabAllocator::allocateObject(cache);
+
+        void* all2 = SlabAllocator::allocateObject(cache);
+
+
+        SlabAllocator::freeObject(cache, all1);
+        SlabAllocator::freeObject(cache, all2);
+
+        for(int i=0; i<67;i++)
+            SlabAllocator::freeObject(cache, alloc[i]);
+
         SlabAllocator::printCache(cache);
-        Slab *slab = cache->emptyHead;
-        SlabAllocator::printSlab(SlabAllocator::cache->emptyHead);
-
-        void* all1 = SlabAllocator::allocateSlot(slab);
-        void* all2 = SlabAllocator::allocateSlot(slab);
-
-        SlabAllocator::printSlab(slab);
-
-        ConsoleUtil::print("",(uint64)all1,"\n");
-        ConsoleUtil::print("",(uint64)all2,"\n");
-
-        all1 = all2;
-        all2 = all1;
 
         //creating a thread that will be executing user code
         //this is done as to separate user code execution from main kernel thread
