@@ -6,7 +6,7 @@
 #define OS1_KERNEL_MEMORYALLOCATOR_HPP
 
 #include "../lib/hw.h"
-#include "../h/constants.hpp"
+#include "../h/utility.hpp"
 
 
 class MemoryAllocator {

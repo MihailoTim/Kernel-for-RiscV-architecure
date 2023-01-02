@@ -44,6 +44,7 @@ class ConsoleUtil {
 public:
     static void printInt(int xx, int base=10, int sgn=0);
     static void printString(const char *string);
+    static void print(const char *string, int xx, const char *sep);
 };
 
 

@@ -1,4 +1,4 @@
-#include "../h/buddy.hpp"
+#include "../h/buddyAllocator.hpp"
 #include "../h/consoleUtil.hpp"
 
 void* Buddy::BUDDY_START_ADDR = BUDDY_START_ADDR_CONST;
@@ -7,12 +7,12 @@ uint64 Buddy::BLOCKS_AVAILABLE = BUDDY_NUMBER_OF_BLOCKS;
 Buddy::Bucket* Buddy::head[BUCKET_SIZE] = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
 Buddy::Bucket* Buddy::tail[BUCKET_SIZE] = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
 
-void Buddy::initialize(){
-    Buddy::BUDDY_START_ADDR = BUDDY_START_ADDR_CONST;
+void Buddy::initialize(void* addr, uint64 block_num){
+    Buddy::BUDDY_START_ADDR = addr;
     Buddy::BUDDY_META_DATA_ADDR = BUDDY_META_ADDR_CONST;
-    Buddy::BLOCKS_AVAILABLE = BUDDY_NUMBER_OF_BLOCKS;
-    head[BUCKET_SIZE-1] = tail[BUCKET_SIZE-1] = (Block*)BUDDY_START_ADDR;
-    head[BUCKET_SIZE-1]->next = tail[BUCKET_SIZE-1]->next = nullptr;
+    Buddy::BLOCKS_AVAILABLE = block_num;
+    head[getDeg(block_num)] = tail[getDeg(block_num)] = (Block*)BUDDY_START_ADDR;
+    head[getDeg(block_num)]->next = tail[getDeg(block_num)]->next = nullptr;
 }
 
 void* Buddy::alloc(uint64 size) {

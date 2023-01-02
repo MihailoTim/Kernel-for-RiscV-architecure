@@ -8,7 +8,7 @@
 #include "../h/scheduler.hpp"
 #include "../h/printing.hpp"
 #include "../h/consoleUtil.hpp"
-#include "../h/buddy.hpp"
+#include "../h/slabAllocator.hpp"
 
 uint64 RiscV::globalTime = 0;
 bool RiscV::userMainFinished = false;
@@ -20,7 +20,7 @@ void RiscV::initialize(){
     Scheduler::initialize();
     TCB::initialize();
     ConsoleUtil::initialize();
-    Buddy::initialize();
+    SlabAllocator::initialize(BUDDY_START_ADDR_CONST, 4096);
     RiscV::enableInterrupts();
 //    RiscV::enableHardwareInterrupts();
 }

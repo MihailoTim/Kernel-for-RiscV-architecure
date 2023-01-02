@@ -3,7 +3,7 @@
 //
 #include "../h/memoryAllocator.hpp"
 #include "../h/printing.hpp"
-#include "../h/buddy.hpp"
+#include "../h/buddyAllocator.hpp"
 
 MemoryAllocator::BlockHeader* MemoryAllocator::freeMemHead = nullptr;
 

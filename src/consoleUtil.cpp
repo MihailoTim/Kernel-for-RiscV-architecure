@@ -106,6 +106,12 @@ void ConsoleUtil::printInt(int xx, int base, int sgn)
 
 }
 
+void ConsoleUtil::print(const char *string, int xx, const char *sep) {
+    ConsoleUtil::printString(string);
+    ConsoleUtil::printInt(xx);
+    ConsoleUtil::printString(sep);
+}
+
 char ConsoleUtil::putcUtilSyscall()
 {
     asm("li a0, 0x43");

@@ -10,7 +10,7 @@
 #include "../h/tcb.hpp"
 #include "../h/scheduler.hpp"
 #include "../h/consoleUtil.hpp"
-#include "../h/buddy.hpp"
+#include "../h/slabAllocator.hpp"
 
 bool System::initialized = false;
 
@@ -22,59 +22,21 @@ System::System() {
         //initialize the machine
         RiscV::initialize();
 
+        SlabAllocator::Cache *cache = SlabAllocator::cache;
+        SlabAllocator::printCache(cache);
+        SlabAllocator::Slab *slab = cache->emptyHead;
+        SlabAllocator::printSlab(SlabAllocator::cache->emptyHead);
 
-        bool error = false;
+        void* all1 = SlabAllocator::allocateSlot(slab);
+        void* all2 = SlabAllocator::allocateSlot(slab);
 
-        void *mem[2048];
-        for(int i=0;i<2048;i++){
-            mem[i] = Buddy::alloc(0);
-            if(!mem[i]){
-                error = true;
-                break;
-            }
-        }
+        SlabAllocator::printSlab(slab);
 
-        if(error)
-            ConsoleUtil::printString("ERROR\n");
-        else
-            ConsoleUtil::printString("ALL OK\n");
+        ConsoleUtil::print("",(uint64)all1,"\n");
+        ConsoleUtil::print("",(uint64)all2,"\n");
 
-        error = false;
-
-        for(int i=1;i<2048;i++){
-            if((uint64)mem[i] - (uint64)mem[i-1] != 4096) {
-                error = true;
-                break;
-            }
-        }
-
-        if(error)
-            ConsoleUtil::printString("ERROR\n");
-        else
-            ConsoleUtil::printString("ALL OK\n");
-
-        error = false;
-
-        for(int i=0;i<2048;i++){
-            Buddy::free(mem[i],0);
-        }
-
-        if(!Buddy::canAllocate(12))
-            ConsoleUtil::printString("ERROR\n");
-        else
-            ConsoleUtil::printString("ALL OK\n");
-
-
-        Buddy::alloc(11);
-        Buddy::alloc(11);
-
-        void *check = Buddy::alloc(0);
-
-        if(check != nullptr)
-            ConsoleUtil::printString("ERROR\n");
-        else
-            ConsoleUtil::printString("ALL OK\n");
-
+        all1 = all2;
+        all2 = all1;
 
         //creating a thread that will be executing user code
         //this is done as to separate user code execution from main kernel thread

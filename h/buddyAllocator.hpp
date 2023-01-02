@@ -2,15 +2,15 @@
 // Created by os on 12/24/22.
 //
 
-#ifndef KERNEL_FOR_RISCV_ARCHITECURE_BUDDY_HPP
-#define KERNEL_FOR_RISCV_ARCHITECURE_BUDDY_HPP
+#ifndef KERNEL_FOR_RISCV_ARCHITECURE_BUDDYALLOCATOR_HPP
+#define KERNEL_FOR_RISCV_ARCHITECURE_BUDDYALLOCATOR_HPP
 
 #include "../lib/hw.h"
-#include "../h/constants.hpp"
+#include "../h/utility.hpp"
 
 class Buddy{
 public:
-    static void initialize();
+    static void initialize(void* addr, uint64 block_num);
 
     static void* alloc(uint64 num);
 
@@ -43,10 +43,19 @@ private:
         return ++num;
     }
 
+    static inline uint64 getDeg(uint64 num){
+        uint64 deg = 0;
+        while(num>1){
+            num/=2;
+            deg++;
+        }
+        return deg;
+    }
+
     static void split(Block* block, int currentBucket, int startBucket);
 
     static void insert(void* addr, uint64 size);
     static void compress(uint64 size);
 };
 
-#endif //KERNEL_FOR_RISCV_ARCHITECURE_BUDDY_HPP
+#endif //KERNEL_FOR_RISCV_ARCHITECURE_BUDDYALLOCATOR_HPP
