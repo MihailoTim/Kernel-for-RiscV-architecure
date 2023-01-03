@@ -9,6 +9,7 @@
 #include "../h/printing.hpp"
 #include "../h/consoleUtil.hpp"
 #include "../h/slabAllocator.hpp"
+#include "../h/slab.hpp"
 
 uint64 RiscV::globalTime = 0;
 bool RiscV::userMainFinished = false;
@@ -16,6 +17,7 @@ bool RiscV::userMainFinished = false;
 //initailize each of the key components and switch to user mode for user code execution
 void RiscV::initialize(){
     RiscV::w_stvec((uint64) &RiscV::supervisorTrap);
+    kmem_init(BUDDY_START_ADDR_CONST, 4096);
     MemoryAllocator::initialize();
     Scheduler::initialize();
     TCB::initialize();

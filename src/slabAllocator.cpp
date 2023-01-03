@@ -34,19 +34,25 @@ bool SlabAllocator::allocateSlab(Cache *cache) {
         return false;
     SlabAllocator::insertIntoList(cache->emptyHead, slab);
     slab->totalNumOfSlots = slab->numOfFreeSlots = ((cache->slabSize << BLOCK_SIZE_BITS) - sizeof(Slab)) / cache->objectSize;
-    slab->objectOffset = (void*)((uint64)slab + sizeof(Slab));
-//    slab->allocated = (bool*)((uint64)slab + sizeof(Slab));
+    slab->objectOffset = (void*)((uint64)slab + sizeof(Slab) + slab->totalNumOfSlots/8 + 1);
+    slab->allocated = (char*)((uint64)slab + sizeof(Slab));
     slab->parent = cache;
-    for(uint64 i=0;i<slab->totalNumOfSlots;i++)
-        slab->allocated[i] = false;
+    for(uint64 i=0;i<slab->totalNumOfSlots/8 + 1;i++)
+        slab->allocated[i] = 0;
+
+    if(cache->ctor)
+        for(uint64 i=0;i<slab->totalNumOfSlots;i++) {
+            ConsoleUtil::print("",((uint64)slab->objectOffset + i*slab->parent->objectSize), "\n");
+            cache->ctor((void*)((uint64)slab->objectOffset + i*slab->parent->objectSize));
+        }
 
     return true;
 }
 
 void* SlabAllocator::allocateSlot(Slab *slab) {
     for(uint64 i=0; i<slab->totalNumOfSlots; i++){
-        if(!slab->allocated[i]){
-            slab->allocated[i] = true;
+        if(!(slab->allocated[i/8] & (1<<(7 - i%8)))){
+            slab->allocated[i/8] |= (1<<(7 - i%8));
             Slab* &headFrom = slab->isEmpty() ? slab->parent->emptyHead : slab->parent->partialHead;
             slab->numOfFreeSlots--;
             Slab* &headTo = slab->isFull() ? slab->parent->fullHead : slab->parent->partialHead;
@@ -88,8 +94,8 @@ return nullptr;
 }
 
 void SlabAllocator::freeSlot(Slab *slab, uint64 index) {
-    if(slab->allocated[index]) {
-        slab->allocated[index] = false;
+    if(slab->allocated[index/8] & (1<<(7 - index%8))) {
+        slab->allocated[index/8] &= ~(1<<(7 - index%8));
         Slab *&headFrom = slab->isFull() ? slab->parent->fullHead : slab->parent->partialHead;
         slab->numOfFreeSlots++;
         Slab *&headTo = slab->isEmpty() ? slab->parent->emptyHead : slab->parent->partialHead;
@@ -105,6 +111,10 @@ void SlabAllocator::freeSlot(Slab *slab, uint64 index) {
 }
 
 bool SlabAllocator::freeObject(Cache* cache, const void *addr) {
+    if(cache->dtor)
+        cache->dtor((void*)addr);
+    if(cache->ctor)
+        cache->ctor((void*)addr);
 
     bool deleted = SlabAllocator::freeFromList(cache->fullHead, addr);
     if(deleted)
@@ -159,8 +169,8 @@ void SlabAllocator::printSlab(Slab *slab) {
         ConsoleUtil::print("Object offset:", (uint64) slab->objectOffset, "\n");
         ConsoleUtil::print("Slab allocated array address:", (uint64) slab->allocated, "\n");
         ConsoleUtil::printString("Allocated status array:\n");
-        for (uint64 i = 0; i < slab->totalNumOfSlots; i++) {
-            ConsoleUtil::print("", slab->allocated[i] == true ? 1 : 0, " ");
+        for (uint64 i = 0; i < slab->totalNumOfSlots/8 + 1; i++) {
+            ConsoleUtil::print("", slab->allocated[i], " ");
         }
         ConsoleUtil::printString("\n");
     }

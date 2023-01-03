@@ -6,7 +6,8 @@ build/src/riscv.o: src/riscv.cpp src/../h/riscv.hpp src/../h/../lib/hw.h \
  src/../h/tcb.hpp src/../h/slabAllocator.hpp \
  src/../h/../h/buddyAllocator.hpp src/../h/../h/../h/utility.hpp \
  src/../h/../h/consoleUtil.hpp src/../h/../h/cache_t.hpp \
- src/../h/../h/../h/slab_t.hpp
+ src/../h/../h/../h/slab_t.hpp src/../h/slab.hpp \
+ src/../h/../h/slabAllocator.hpp
 
 src/../h/riscv.hpp:
 
@@ -49,3 +50,7 @@ src/../h/../h/consoleUtil.hpp:
 src/../h/../h/cache_t.hpp:
 
 src/../h/../h/../h/slab_t.hpp:
+
+src/../h/slab.hpp:
+
+src/../h/../h/slabAllocator.hpp:

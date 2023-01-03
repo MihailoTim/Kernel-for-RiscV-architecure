@@ -21,6 +21,7 @@ uint64 TCB::timeSliceCounter = 0;
 
 //create a thread for kernel main and a separate thread for console output execution
 void TCB::initialize() {
+
     TCB::running = new TCB(nullptr, nullptr, nullptr, DEFAULT_TIME_SLICE);
 
     TCB::running->mode = Mode::SUPERVISOR;
@@ -117,4 +118,8 @@ int TCB::thread_free(void *addr) {
 
     asm("mv %[status], a0" : [status] "=r" (status));
     return status;
+}
+
+void* TCB::ctor(void* tcb){
+    return nullptr;
 }

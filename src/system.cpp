@@ -27,8 +27,6 @@ System::System() {
         //initialize the machine
         RiscV::initialize();
 
-        kmem_init(BUDDY_START_ADDR_CONST, 4096);
-
         kmem_cache_t* cache1 = kmem_cache_create("Cache 1", sizeof(Test), nullptr, nullptr);
 
         const int size = 200;
@@ -38,11 +36,14 @@ System::System() {
         for(int i = 0; i<size; i++)
             mem[i] = kmem_cache_alloc(cache1);
 
+        kmem_cache_info(cache1);
+
         for(int i=0;i<size;i++)
             kmem_cache_free(cache1, mem[i]);
 
 
         kmem_cache_destroy(cache1);
+
 
         for(int i=0; i<BUCKET_SIZE;i++)
             SlabAllocator::deleteCache(SlabAllocator::sizeN[i]);
