@@ -31,6 +31,10 @@ class SCB {
 
     static void initialize();
 
+    static void ctor(void*);
+
+    static void dtor(void*);
+
     void* operator new(size_t size);
 
     void operator delete(void* addr);

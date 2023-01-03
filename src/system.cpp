@@ -9,15 +9,19 @@
 #include "../h/printing.hpp"
 #include "../h/tcb.hpp"
 #include "../h/scheduler.hpp"
-#include "../h/consoleUtil.hpp"
-#include "../h/slabAllocator.hpp"
-#include "../h/slab.hpp"
 
 bool System::initialized = false;
 
 struct Test{
     uint64 a,b,c,d,e,f;
 };
+
+void ctor(void* tst){
+    ((Test*)tst)->a = 17;
+    ((Test*)tst)->b = 32;
+    ((Test*)tst)->c = 13;
+
+}
 
 System::System() {
     //check whether system is already running to prevent user malicious access
@@ -26,6 +30,14 @@ System::System() {
 
         //initialize the machine
         RiscV::initialize();
+
+        kmem_cache_t* cache = kmem_cache_create("Custom cache", sizeof(Test), ctor,nullptr);
+
+        Test* tst = (Test*)kmem_cache_alloc(cache);
+
+        ConsoleUtil::print("", tst->a,"\n");
+        ConsoleUtil::print("", tst->b,"\n");
+        ConsoleUtil::print("", tst->c,"\n");
 
         //creating a thread that will be executing user code
         //this is done as to separate user code execution from main kernel thread
@@ -57,5 +69,5 @@ void System::userMainWrapper(void *arg){
 //        thread_dispatch();
 //    }
 //    MemoryAllocator::showMemory();
-    userMain();
+//    userMain();
 }

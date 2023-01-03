@@ -11,13 +11,11 @@
 kmem_cache_t* SCB::scbCache = nullptr;
 
 void SCB::initialize() {
-    SCB::scbCache = kmem_cache_create("SCB Cache", sizeof(SCB), nullptr, nullptr);
+    SCB::scbCache = kmem_cache_create("SCB Cache", sizeof(SCB), SCB::ctor, SCB::dtor);
 }
 
 SCB::SCB(uint64 init){
     val = init;
-    blockedHead = nullptr;
-    blockedTail = nullptr;
 }
 
 //if there are any threads that are still blocked on semaphore when it is being deleted
@@ -85,4 +83,14 @@ int SCB::semaphore_free(void *addr) {
 
     asm("mv %[status], a0" : [status] "=r" (status));
     return status;
+}
+
+void SCB::ctor(void* scb){
+    ((SCB*)scb)->blockedHead = nullptr;
+    ((SCB*)scb)->blockedTail = nullptr;
+}
+
+void SCB::dtor(void* scb){
+    ((SCB*)scb)->blockedHead = nullptr;
+    ((SCB*)scb)->blockedTail = nullptr;
 }

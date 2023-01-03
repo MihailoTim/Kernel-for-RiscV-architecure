@@ -40,11 +40,11 @@ bool SlabAllocator::allocateSlab(Cache *cache) {
     for(uint64 i=0;i<slab->totalNumOfSlots/8 + 1;i++)
         slab->allocated[i] = 0;
 
-    if(cache->ctor)
-        for(uint64 i=0;i<slab->totalNumOfSlots;i++) {
-            cache->ctor((void*)((uint64)slab->objectOffset + i*slab->parent->objectSize));
+    if(cache->ctor) {
+        for (uint64 i = 0; i < slab->totalNumOfSlots; i++) {
+            cache->ctor((void *) ((uint64) slab->objectOffset + i * slab->parent->objectSize));
         }
-
+    }
     return true;
 }
 

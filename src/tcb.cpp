@@ -25,7 +25,7 @@ kmem_cache_t* TCB::tcbCache = nullptr;
 //create a thread for kernel main and a separate thread for console output execution
 void TCB::initialize() {
 
-    TCB::tcbCache = kmem_cache_create("TCB Cache", sizeof(TCB), nullptr, nullptr);
+    TCB::tcbCache = kmem_cache_create("TCB Cache", sizeof(TCB), TCB::ctor, TCB::dtor);
 
     TCB::running = new TCB(nullptr, nullptr, nullptr, DEFAULT_TIME_SLICE);
 
@@ -52,16 +52,9 @@ TCB::TCB(Body body, void* args, uint64* stack, uint64 timeSlice){
 
     this->stack = (body == nullptr) ? nullptr : stack;
 
-    this->status = Status::READY;
-
-    this->next = nullptr;
-
     //initial context for thread
     this->context = {(body == nullptr) ? 0 : (uint64)((char*)stack + DEFAULT_STACK_SIZE),
                      (uint64)&wrapper };
-
-    //by default run it in user mode
-    this->mode = Mode::USER;
 }
 
 //deallocate memory for thread stack
@@ -124,6 +117,18 @@ int TCB::thread_free(void *addr) {
     return status;
 }
 
-void* TCB::ctor(void* tcb){
-    return nullptr;
+void TCB::ctor(void* tcb){
+    ((TCB*)tcb)->status = Status::READY;
+
+    ((TCB*)tcb)->next = nullptr;
+
+    ((TCB*)tcb)->mode = Mode::USER;
+}
+
+void TCB::dtor(void* tcb){
+    ((TCB*)tcb)->status = Status::READY;
+
+    ((TCB*)tcb)->next = nullptr;
+
+    ((TCB*)tcb)->mode = Mode::USER;
 }

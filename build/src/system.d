@@ -10,8 +10,7 @@ build/src/system.o: src/system.cpp src/../h/system.hpp \
  src/../h/../h/../h/../h/consoleUtil.hpp \
  src/../h/../h/../h/../h/cache_t.hpp \
  src/../h/../h/../h/../h/../h/slab_t.hpp src/../h/scheduler.hpp \
- src/../h/../h/tcb.hpp src/../h/consoleUtil.hpp \
- src/../h/slabAllocator.hpp src/../h/slab.hpp
+ src/../h/../h/tcb.hpp
 
 src/../h/system.hpp:
 
@@ -56,9 +55,3 @@ src/../h/../h/../h/../h/../h/slab_t.hpp:
 src/../h/scheduler.hpp:
 
 src/../h/../h/tcb.hpp:
-
-src/../h/consoleUtil.hpp:
-
-src/../h/slabAllocator.hpp:
-
-src/../h/slab.hpp:

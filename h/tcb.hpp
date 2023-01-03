@@ -39,7 +39,9 @@ class TCB {
 
     static void initialize();
 
-    static void* ctor(void*);
+    static void ctor(void*);
+
+    static void dtor(void*);
 
     static uint64 currentSP;
 

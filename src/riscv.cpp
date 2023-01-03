@@ -7,9 +7,6 @@
 #include "../h/tcb.hpp"
 #include "../h/scheduler.hpp"
 #include "../h/printing.hpp"
-#include "../h/consoleUtil.hpp"
-#include "../h/slabAllocator.hpp"
-#include "../h/slab.hpp"
 #include "../h/scb.hpp"
 
 uint64 RiscV::globalTime = 0;
@@ -18,7 +15,7 @@ bool RiscV::userMainFinished = false;
 //initailize each of the key components and switch to user mode for user code execution
 void RiscV::initialize(){
     RiscV::w_stvec((uint64) &RiscV::supervisorTrap);
-    kmem_init(BUDDY_START_ADDR_CONST, 4096);
+    kmem_init(BUDDY_START_ADDR_CONST, 32);
     MemoryAllocator::initialize();
     Scheduler::initialize();
     TCB::initialize();
@@ -545,10 +542,12 @@ void RiscV::executePutcUtilSyscall() {
 
 //return to privilege that was given at creation
 void RiscV::jumpToDesignatedPrivilegeMode() {
-    if(TCB::running->mode == TCB::Mode::SUPERVISOR)
+    if(TCB::running->mode == TCB::Mode::SUPERVISOR) {
         RiscV::ms_sstatus(RiscV::SSTATUS_SPP);
-    else
+    }
+    else {
         RiscV::mc_sstatus(RiscV::SSTATUS_SPP);
+    }
 }
 
 
