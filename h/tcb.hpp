@@ -6,7 +6,7 @@
 #define OS1_KERNEL_TCB_HPP
 
 #include "../lib/hw.h"
-#include "./riscv.hpp"
+#include "../h/slab.hpp"
 
 class SCB;
 
@@ -77,6 +77,8 @@ class TCB {
     static TCB *putcThread;
 
     static uint64 timeSliceCounter;
+
+    static kmem_cache_t* tcbCache;
 
     friend class Scheduler;
     friend class RiscV;

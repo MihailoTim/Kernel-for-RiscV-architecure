@@ -10,6 +10,7 @@
 #include "../h/consoleUtil.hpp"
 #include "../h/slabAllocator.hpp"
 #include "../h/slab.hpp"
+#include "../h/scb.hpp"
 
 uint64 RiscV::globalTime = 0;
 bool RiscV::userMainFinished = false;
@@ -21,6 +22,7 @@ void RiscV::initialize(){
     MemoryAllocator::initialize();
     Scheduler::initialize();
     TCB::initialize();
+    SCB::initialize();
     ConsoleUtil::initialize();
     RiscV::enableInterrupts();
 //    RiscV::enableHardwareInterrupts();
@@ -589,7 +591,7 @@ void RiscV::executeThreadFreeSyscall() {
     if(thr == nullptr)
         status = -1;
     else {
-        status = MemoryAllocator::kfree(thr->stack);
+        kfree(thr->stack);
         delete thr;
     }
 
@@ -624,7 +626,7 @@ void RiscV::executeSemaphoreFreeSyscall() {
 void RiscV::executeForkSyscall() {
 
     //create new stack and copy stack from currently running stack into the new one
-    uint64 *stack = (uint64*)MemoryAllocator::kmalloc((DEFAULT_STACK_SIZE+MEM_BLOCK_SIZE-1)/MEM_BLOCK_SIZE);
+    uint64 *stack = (uint64*)kmalloc(DEFAULT_STACK_SIZE);
 
     MemoryAllocator::memcpy((void*)TCB::running->stack,(void*)stack,DEFAULT_STACK_SIZE);
 

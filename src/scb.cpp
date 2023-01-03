@@ -8,6 +8,11 @@
 #include "../h/printing.hpp"
 #include "../h/consoleUtil.hpp"
 
+kmem_cache_t* SCB::scbCache = nullptr;
+
+void SCB::initialize() {
+    SCB::scbCache = kmem_cache_create("SCB Cache", sizeof(SCB), nullptr, nullptr);
+}
 
 SCB::SCB(uint64 init){
     val = init;
@@ -60,12 +65,12 @@ void SCB::signal(){
 
 //overload operator new, to not use system call for every kernel object that is being allocated
 void* SCB::operator new(size_t size){
-    return MemoryAllocator::kmalloc(size);
+    return kmem_cache_alloc(SCB::scbCache);
 }
 
 //overload operator delete, to not use system call for every kernel object that is being deallocated
 void SCB::operator delete(void *addr){
-    MemoryAllocator::kfree(addr);
+    kmem_cache_free(SCB::scbCache, addr);
 }
 
 //syscall to free space that is taken up by semaphore

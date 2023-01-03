@@ -9,6 +9,7 @@
 //semaphore control block
 
 class SCB {
+    static kmem_cache_t* scbCache;
 
     int val;
 
@@ -27,6 +28,8 @@ class SCB {
     void deblock();
 
     static int semaphore_free(void *addr);
+
+    static void initialize();
 
     void* operator new(size_t size);
 

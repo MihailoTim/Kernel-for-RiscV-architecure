@@ -4,6 +4,7 @@
 
 #include "../h/consoleUtil.hpp"
 #include "../h/printing.hpp"
+#include "../h/scb.hpp"
 
 uint64 ConsoleUtil::inputHead = 0;
 uint64 ConsoleUtil::inputTail = 0;
@@ -16,12 +17,14 @@ uint64 ConsoleUtil::pendingPutc = 0;
 SCB* ConsoleUtil::outputSem = nullptr;
 SCB* ConsoleUtil::inputSem = nullptr;
 
-char ConsoleUtil::inputBuffer[bufferSize];
-char ConsoleUtil::outputBuffer[bufferSize];
+char* ConsoleUtil::inputBuffer = nullptr;
+char* ConsoleUtil::outputBuffer = nullptr;
 
 void ConsoleUtil::initialize() {
     inputSem = new SCB(0);
     outputSem = new SCB(0);
+    inputBuffer = (char*)kmalloc(ConsoleUtil::bufferSize);
+    outputBuffer = (char*)kmalloc(ConsoleUtil::bufferSize);
 }
 
 void ConsoleUtil::putInput(char c) {

@@ -27,29 +27,6 @@ System::System() {
         //initialize the machine
         RiscV::initialize();
 
-        kmem_cache_t* cache1 = kmem_cache_create("Cache 1", sizeof(Test), nullptr, nullptr);
-
-        const int size = 200;
-
-        void* mem[size];
-
-        for(int i = 0; i<size; i++)
-            mem[i] = kmem_cache_alloc(cache1);
-
-        kmem_cache_info(cache1);
-
-        for(int i=0;i<size;i++)
-            kmem_cache_free(cache1, mem[i]);
-
-
-        kmem_cache_destroy(cache1);
-
-
-        for(int i=0; i<BUCKET_SIZE;i++)
-            SlabAllocator::deleteCache(SlabAllocator::sizeN[i]);
-
-        Buddy::printList();
-
         //creating a thread that will be executing user code
         //this is done as to separate user code execution from main kernel thread
         //also it provides kernel with an idle thread that will run itself if user code gets blocked (on getc syscall for example)

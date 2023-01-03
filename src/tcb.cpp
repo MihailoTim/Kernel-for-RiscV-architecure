@@ -7,6 +7,7 @@
 #include "../h/scheduler.hpp"
 #include "../h/syscall_c.h"
 #include "../h/printing.hpp"
+#include "../h/riscv.hpp"
 
 TCB* TCB::running = nullptr;
 
@@ -18,16 +19,19 @@ uint64 TCB::currentSP = 0;
 
 uint64 TCB::timeSliceCounter = 0;
 
+kmem_cache_t* TCB::tcbCache = nullptr;
+
 
 //create a thread for kernel main and a separate thread for console output execution
 void TCB::initialize() {
 
+    TCB::tcbCache = kmem_cache_create("TCB Cache", sizeof(TCB), nullptr, nullptr);
+
     TCB::running = new TCB(nullptr, nullptr, nullptr, DEFAULT_TIME_SLICE);
 
     TCB::running->mode = Mode::SUPERVISOR;
-
     //stack for thread that will be running console output
-    uint64 *putcStack = (uint64*)MemoryAllocator::kmalloc((DEFAULT_STACK_SIZE+MEM_BLOCK_SIZE-1)/MEM_BLOCK_SIZE);
+    uint64 *putcStack = (uint64*)kmalloc(DEFAULT_STACK_SIZE);
 
     //console output thread
     putcThread = new TCB(RiscV::putcWrapper, nullptr, putcStack, DEFAULT_TIME_SLICE);
@@ -62,7 +66,7 @@ TCB::TCB(Body body, void* args, uint64* stack, uint64 timeSlice){
 
 //deallocate memory for thread stack
 void TCB::free(){
-    MemoryAllocator::kfree(stack);
+    kfree(stack);
 }
 
 TCB::~TCB(){
@@ -98,12 +102,12 @@ void TCB::wrapper(void *args) {
 
 //overload operator new, to not use system call for every kernel object that is being allocated
 void* TCB::operator new(size_t size){
-    return MemoryAllocator::kmalloc(size);
+    return kmem_cache_alloc(TCB::tcbCache);
 }
 
 //overload operator delete, to not use system call for every kernel object that is being deallocated
 void TCB::operator delete(void *addr){
-    MemoryAllocator::kfree(addr);
+    kmem_cache_free(TCB::tcbCache, addr);
 }
 
 //internal syscall to free space allocated to a thread

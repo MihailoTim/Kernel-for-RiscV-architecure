@@ -42,7 +42,6 @@ bool SlabAllocator::allocateSlab(Cache *cache) {
 
     if(cache->ctor)
         for(uint64 i=0;i<slab->totalNumOfSlots;i++) {
-            ConsoleUtil::print("",((uint64)slab->objectOffset + i*slab->parent->objectSize), "\n");
             cache->ctor((void*)((uint64)slab->objectOffset + i*slab->parent->objectSize));
         }
 
@@ -89,8 +88,7 @@ void* SlabAllocator::allocateBuffer(size_t size) {
         return nullptr;
     else
         level -= CACHE_LOWER_BOUND;
-    SlabAllocator::allocateObject(sizeN[level]);
-return nullptr;
+    return SlabAllocator::allocateObject(sizeN[level]);
 }
 
 void SlabAllocator::freeSlot(Slab *slab, uint64 index) {

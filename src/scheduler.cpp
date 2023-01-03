@@ -5,6 +5,7 @@
 #include "../h/scheduler.hpp"
 #include "../h/printing.hpp"
 #include "../h/consoleUtil.hpp"
+#include "../h/riscv.hpp"
 
 TCB* Scheduler::readyHead = nullptr;
 TCB* Scheduler::readyTail = nullptr;
