@@ -25,7 +25,7 @@ void MemoryAllocator::initialize() {
 
     allocMemHead = allocMemTail = nullptr;
 
-    freeMemHead->size = (char*)HEAP_END_ADDR - (char*)HEAP_START_ADDR - sizeof(BlockHeader);
+    freeMemHead->size = (char*)HEAP_END_ADDR - (char*)FREE_MEMORY_START_CONST - sizeof(BlockHeader);
 
     freeMemHead->next = nullptr;
 
@@ -33,7 +33,7 @@ void MemoryAllocator::initialize() {
 }
 
 void* MemoryAllocator::kmalloc(size_t size){
-    if(size<=0 || freeMemHead == nullptr)
+    if(size<=0 || freeMemHead == nullptr || freeMemHead->size < size)
         return nullptr;
 
     size_t byteSize = size * MEM_BLOCK_SIZE; //size of requested chunk in bytes   //NOTE: argument of kmalloc is number of blocks requested
@@ -49,7 +49,7 @@ void* MemoryAllocator::kmalloc(size_t size){
         BlockHeader* newBlk;
         BlockHeader *nextAllocated;
 
-        if((char*)blk + blk->size + sizeof(BlockHeader) <HEAP_END_ADDR)
+        if((char*)blk + blk->size + sizeof(BlockHeader) < HEAP_END_ADDR)
             nextAllocated = (BlockHeader*)((char*)blk + blk->size + sizeof(BlockHeader));
         else
             nextAllocated = nullptr;

@@ -43,8 +43,13 @@ int thread_create(thread_t* handle, void(*start_routine)(void*), void *arg){
     uint64 iarg = (uint64)arg;
     uint64 istack = 0;
 
-    if(start_routine)
+    if(start_routine) {
         istack = (uint64) mem_alloc(DEFAULT_STACK_SIZE);
+        if(istack == 0) {
+            *handle = nullptr;
+            return -1;
+        }
+    }
 
     asm("mv a7, %[istack]" : : [istack] "r" (istack));
     asm("mv a3, %[iarg]" : : [iarg] "r" (iarg));
@@ -85,8 +90,12 @@ int thread_attach_body(thread_t *handle, void(*start_routine)(void*), void *arg)
     uint64 iarg = (uint64)arg;
     uint64 istack = 0;
 
-    if(start_routine)
+    if(handle && start_routine) {
         istack = (uint64) mem_alloc(DEFAULT_STACK_SIZE);
+        if(istack == 0) {
+            return -1;
+        }
+    }
 
     asm("mv a7, %[istack]" : : [istack] "r" (istack));
     asm("mv a3, %[iarg]" : : [iarg] "r" (iarg));
@@ -105,6 +114,8 @@ int thread_attach_body(thread_t *handle, void(*start_routine)(void*), void *arg)
 
 int thread_start(thread_t handle){
     uint64 ihandle = (uint64)handle;
+    if(handle == nullptr)
+        return -1;
 
     asm("mv a1, %[ihandle]" : : [ihandle] "r" (ihandle));
     asm("li a0, 0x15");

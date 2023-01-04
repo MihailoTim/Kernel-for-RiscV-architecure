@@ -43,7 +43,9 @@ int Semaphore::signal() {
 }
 
 Thread::Thread(void (*body)(void*), void *arg) {
-    thread_attach_body(&myHandle, body, arg);
+    int status = thread_attach_body(&myHandle, body, arg);
+    if(status == -1)
+        myHandle = nullptr;
 }
 
 void Thread::wrapper(void *arg) {
@@ -52,7 +54,9 @@ void Thread::wrapper(void *arg) {
 }
 
 Thread::Thread() {
-    thread_attach_body(&myHandle, &Thread::wrapper, this);
+    int status = thread_attach_body(&myHandle, &Thread::wrapper, this);
+    if(status == -1)
+        myHandle = nullptr;
 }
 
 int Thread::sleep(time_t time) {

@@ -131,6 +131,8 @@ void SlabAllocator::freeBuffer(const void *addr) {
 
 Cache* SlabAllocator::createCache(const char *name, size_t size, void (*ctor)(void *), void (*dtor)(void *)) {
     Cache* ret = (Cache*)SlabAllocator::allocateObject(SlabAllocator::cache);
+    if(ret == nullptr)
+        return nullptr;
     ret->ctor = ctor;
     ret->dtor = dtor;
     ret->emptyHead = ret->partialHead = ret->fullHead = nullptr;
@@ -208,8 +210,6 @@ void SlabAllocator::printCache(Cache *cache) {
         iter = iter->next;
     }
     ConsoleUtil::printString("\n");
-
-    ConsoleUtil::print("Object size: ", (uint64)cache->objectSize, "\n");
 }
 
 void SlabAllocator::insertIntoList(Slab *&head, Slab *slab) {

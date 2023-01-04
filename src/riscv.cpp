@@ -15,7 +15,7 @@ bool RiscV::userMainFinished = false;
 //initailize each of the key components and switch to user mode for user code execution
 void RiscV::initialize(){
     RiscV::w_stvec((uint64) &RiscV::supervisorTrap);
-    kmem_init(BUDDY_START_ADDR_CONST, 32);
+    kmem_init(BUDDY_START_ADDR_CONST, 4096);
     MemoryAllocator::initialize();
     Scheduler::initialize();
     TCB::initialize();
