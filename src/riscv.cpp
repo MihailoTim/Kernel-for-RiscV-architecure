@@ -11,7 +11,40 @@
 
 uint64 RiscV::globalTime = 0;
 bool RiscV::userMainFinished = false;
+void* RiscV::PMT = nullptr;
 
+void* RiscV::getPMT(){
+    void* ret = Buddy::alloc(1);
+    uint64* arr = (uint64*)ret;
+    for(int i=0;i<512;i++)
+        arr[i] = 0;
+    return ret;
+}
+
+void RiscV::handlePageFault(uint64 addr, uint64 mask){
+    uint64 pmt2Entry = (addr >> 30) & (0x1ff);;
+    uint64 pmt1Entry = (addr >> 21) & (0x1ff);
+    uint64 pmt0Entry = (addr >> 12) & (0x1ff);
+    uint64 pmt2Desc = ((uint64*)PMT)[pmt2Entry];
+    void* pmt1 = nullptr;
+    if(pmt2Desc == 0){
+        pmt1 = RiscV::getPMT();
+        ((uint64*)PMT)[pmt2Entry] = (((uint64)pmt1 >> 12) << 10) | (uint64)1;
+    }
+    else
+        pmt1 = (void*)((pmt2Desc >> 10) << 12);
+    uint64 pmt1Desc = ((uint64*)pmt1)[pmt1Entry];
+    void* pmt0 = nullptr;
+    if(pmt1Desc == 0){
+        pmt0 = RiscV::getPMT();
+        ((uint64*)pmt1)[pmt1Entry] = (((uint64)pmt0 >> 12) << 10) | (uint64)1;
+    }
+    else
+        pmt0 = (void*)((pmt1Desc >> 10) << 12);
+    uint64 pmt0Desc = ((uint64*)pmt0)[pmt0Entry];
+    if(pmt0Desc == 0)
+        ((uint64*)pmt0)[pmt0Entry] = ((addr >> 12) << 10) | mask;
+}
 //initailize each of the key components and switch to user mode for user code execution
 void RiscV::initialize(){
     RiscV::w_stvec((uint64) &RiscV::supervisorTrap);
@@ -21,6 +54,35 @@ void RiscV::initialize(){
     TCB::initialize();
     SCB::initialize();
     ConsoleUtil::initialize();
+    RiscV::PMT = getPMT();
+    for(uint64 i=0x80000000;i<(uint64)HEAP_END_ADDR;i+=4096)
+        handlePageFault(i,0xf);
+//    for(int i=0;i<512;i++)
+//        if(((uint64*)PMT)[i] != 0){
+//            void* pmt1 =(void*)((((uint64*)PMT)[i]>>10)<<12);
+//            ConsoleUtil::print("pmt1: ",(uint64)pmt1, "\n",16);
+//            for(int i=0;i<512;i++)
+//                if(((uint64*)pmt1)[i] != 0){
+//                    void* pmt0 =(void*)((((uint64*)pmt1)[i]>>10)<<12);
+//                    for(int i=0;i<512;i++)
+//                        if(((uint64*)pmt0)[i] != 0){
+//                            ConsoleUtil::print("i: ",i," ",10);
+//                            ConsoleUtil::print("desc: ",((uint64*)pmt0)[i]>>10,"\n",16);
+//                        }
+//                }
+//        }
+
+    handlePageFault((uint64)CONSOLE_IRQ,0xf);
+    handlePageFault((uint64)CONSOLE_RX_STATUS_BIT,0xf);
+    handlePageFault((uint64)CONSOLE_TX_STATUS_BIT,0xf);
+    handlePageFault((uint64)CONSOLE_RX_DATA,0xf);
+    handlePageFault((uint64)CONSOLE_TX_DATA,0xf);
+    handlePageFault((uint64)CONSOLE_STATUS,0xf);
+    handlePageFault((uint64)0xc201004,0xf);
+
+    uint64 satp = ((uint64)1<<63) | ((uint64)(RiscV::PMT)>>12);
+    asm("csrw satp, %[satp]" : : [satp] "r" (satp));
+
     RiscV::enableInterrupts();
 //    RiscV::enableHardwareInterrupts();
 }

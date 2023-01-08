@@ -124,7 +124,7 @@ void Buddy::printList() {
         ConsoleUtil::printString(": ");
         Bucket *tmp = head[i];
         while(tmp != nullptr){
-            ConsoleUtil::printInt((uint64)tmp,10);
+            ConsoleUtil::printInt((uint64)tmp,16);
             ConsoleUtil::printString(" ");
             tmp = tmp->next;
         }

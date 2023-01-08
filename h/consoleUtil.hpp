@@ -19,7 +19,7 @@ class ConsoleUtil {
     static SCB* inputSem;
 
     //Buffer size should be dynamically allocated, for now leaving it as is
-    static const uint64 bufferSize = 8192;
+    static uint64 bufferSize;
     static char *inputBuffer;
     static char *outputBuffer;
 
@@ -44,7 +44,7 @@ class ConsoleUtil {
 public:
     static void printInt(int xx, int base=10, int sgn=0);
     static void printString(const char *string);
-    static void print(const char *string, int xx, const char *sep);
+    static void print(const char *string, int xx, const char *sep = "\n", int base = 16);
 };
 
 

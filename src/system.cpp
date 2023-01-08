@@ -41,9 +41,9 @@ System::System() {
 
         //return control to user code until it reaches the end
         //exit only if user is finished and machine is ready to exit (in case there is something still left to print, wait for it to be done)
-        while (( (TCB*)userMainThread)->status != TCB::Status::FINISHED) {
-            thread_dispatch();
-        }
+//        while (( (TCB*)userMainThread)->status != TCB::Status::FINISHED) {
+//            thread_dispatch();
+//        }
 
         //finalize the machine
         RiscV::finalize();
@@ -62,5 +62,5 @@ void System::userMainWrapper(void *arg){
 //        thread_dispatch();
 //    }
 //    MemoryAllocator::showMemory();
-    userMain();
+//    userMain();
 }

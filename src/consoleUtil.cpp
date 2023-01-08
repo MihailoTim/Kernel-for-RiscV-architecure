@@ -20,6 +20,8 @@ SCB* ConsoleUtil::inputSem = nullptr;
 char* ConsoleUtil::inputBuffer = nullptr;
 char* ConsoleUtil::outputBuffer = nullptr;
 
+uint64 ConsoleUtil::bufferSize = 2*8192;
+
 void ConsoleUtil::initialize() {
     inputSem = new SCB(0);
     outputSem = new SCB(0);
@@ -109,9 +111,9 @@ void ConsoleUtil::printInt(int xx, int base, int sgn)
 
 }
 
-void ConsoleUtil::print(const char *string, int xx, const char *sep) {
+void ConsoleUtil::print(const char *string, int xx, const char *sep, int base) {
     ConsoleUtil::printString(string);
-    ConsoleUtil::printInt(xx);
+    ConsoleUtil::printInt(xx, base);
     ConsoleUtil::printString(sep);
 }
 

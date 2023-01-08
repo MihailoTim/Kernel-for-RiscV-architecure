@@ -11,6 +11,8 @@ class RiscV{
 
     static uint64 globalTime;
 
+    static void* PMT;
+
     static bool userMainFinished;
 
     enum BitMaskSstatus{
@@ -115,9 +117,13 @@ class RiscV{
 
     static void disableTimerInterrupts();
 
+    static void handlePageFault(uint64 addr, uint64 mask);
+
     static void initialize();
 
     static void finalize();
+
+    static void* getPMT();
 
     friend class TCB;
 

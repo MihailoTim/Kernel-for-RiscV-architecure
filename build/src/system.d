@@ -11,8 +11,7 @@ build/src/system.o: src/system.cpp src/../h/system.hpp \
  src/../h/../h/../h/../h/cache_t.hpp \
  src/../h/../h/../h/../h/../h/slab_t.hpp src/../h/scheduler.hpp \
  src/../h/../h/tcb.hpp src/../tests/slabTest.hpp \
- src/../tests/../h/syscall_c.h src/../tests/../h/syscall_cpp.hpp \
- src/../tests/../h/../h/syscall_c.h
+ src/../tests/../h/slab.hpp
 
 src/../h/system.hpp:
 
@@ -58,8 +57,4 @@ src/../h/../h/tcb.hpp:
 
 src/../tests/slabTest.hpp:
 
-src/../tests/../h/syscall_c.h:
-
-src/../tests/../h/syscall_cpp.hpp:
-
-src/../tests/../h/../h/syscall_c.h:
+src/../tests/../h/slab.hpp:

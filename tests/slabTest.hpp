@@ -1,79 +1,107 @@
-#include "../h/syscall_c.h"
-#include "../h/syscall_cpp.hpp"
+#include "../h/slab.hpp"
 
+#define RUN_NUM (5)
+#define ITERATIONS (1000)
 
-struct thread_data {
+#define shared_size (7)
+#define MASK (0xA5)
+
+struct data_s {
     int id;
+    kmem_cache_t  *shared;
+    int iterations;
 };
-class ForkThread;
 
-void f(ForkThread *f){
+const char * const CACHE_NAMES[] = {"tc_0",
+                                    "tc_1",
+                                    "tc_2",
+                                    "tc_3",
+                                    "tc_4"};
 
+void memset(const void *data, int size, int value) {
+    for (int j = 0; j < size; j++) {
+        *(char *)data = value;
+    }
 }
 
-class ForkThread : public Thread {
-public:
-    ForkThread(long _id) noexcept : Thread(), id(_id), finished(false) {}
-    virtual void run() {
-        ConsoleUtil::print("Started thread id:", id, "\n");
+void construct(void *data) {
+    static int i = 1;
+    ConsoleUtil::print("", i++," Shared object constructed.\n");
+    memset(data, shared_size, MASK);
+}
 
-        ForkThread* thread = new ForkThread(id + 1);
-        ForkThread** threads = (ForkThread** ) mem_alloc(sizeof(ForkThread*) * id);
-
-        f(thread);
-
-        if (threads != nullptr) {
-            for (long i = 0; i < id; i++) {
-                threads[i] = new ForkThread(id);
-            }
-
-            if (thread != nullptr) {
-                if (thread->start() == 0) {
-
-                    for (int i = 0; i < 5000; i++) {
-                        for (int j = 0; j < 5000; j++) {
-
-                        }
-                        thread_dispatch();
-                    }
-
-                    while (!thread->isFinished()) {
-                        thread_dispatch();
-                    }
-                }
-                delete thread;
-            }
-
-            for (long i = 0; i < id; i++) {
-                delete threads[i];
-            }
-
-            mem_free(threads);
+int check(void *data, size_t size) {
+    int ret = 1;
+    for (uint64 i = 0; i < size; i++) {
+        if (((unsigned char *)data)[i] != MASK) {
+            ret = 0;
         }
-
-        ConsoleUtil::print("Finished thread id:", id,"\n");
-
-        finished = true;
     }
 
-    bool isFinished() const {
-        return finished;
-    }
+    return ret;
+}
 
-private:
-    long id;
-    bool finished;
+struct objects_s {
+    kmem_cache_t *cache;
+    void *data;
 };
 
+void work(void* pdata) {
+    struct data_s data = *(struct data_s*) pdata;
+    int size = 0;
+    int object_size = data.id + 1;
+    kmem_cache_t *cache = kmem_cache_create(CACHE_NAMES[data.id], object_size, 0, 0);
 
-void userMain() {
-    ForkThread thread(1);
+    struct objects_s *objs = (struct objects_s*)(kmalloc(sizeof(struct objects_s) * data.iterations));
 
-    thread.start();
-
-    while (!thread.isFinished()) {
-        thread_dispatch();
+    for (int i = 0; i < data.iterations; i++) {
+        if (i % 100 == 0) {
+            objs[size].data = kmem_cache_alloc(data.shared);
+            objs[size].cache = data.shared;
+            if (!check(objs[size].data, shared_size)) {
+                ConsoleUtil::printString("Value not correct!");
+            }
+        }
+        else {
+            objs[size].data = kmem_cache_alloc(cache);
+            objs[size].cache = cache;
+            memset(objs[size].data, object_size, MASK);
+        }
+        size++;
     }
 
-    ConsoleUtil::printString("User main finished\n");
+    kmem_cache_info(cache);
+    kmem_cache_info(data.shared);
+
+    for (int i = 0; i < size; i++) {
+        if (!check(objs[i].data, (cache == objs[i].cache) ? object_size : shared_size)) {
+            ConsoleUtil::printString("Value not correct!");
+        }
+        kmem_cache_free(objs[i].cache, objs[i].data);
+    }
+
+    kfree(objs);
+    kmem_cache_destroy(cache);
+}
+
+
+
+void runs(void(*work)(void*), struct data_s* data, int num) {
+    for (int i = 0; i < num; i++) {
+        struct data_s private_data;
+        private_data = *(struct data_s*) data;
+        private_data.id = i;
+        work(&private_data);
+    }
+}
+
+void userMain() {
+    kmem_cache_t *shared = kmem_cache_create("shared object", shared_size, construct, nullptr);
+
+    struct data_s data;
+    data.shared = shared;
+    data.iterations = ITERATIONS;
+    runs(work, &data, RUN_NUM);
+
+    kmem_cache_destroy(shared);
 }
