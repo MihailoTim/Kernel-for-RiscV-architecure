@@ -20,7 +20,7 @@ SCB* ConsoleUtil::inputSem = nullptr;
 char* ConsoleUtil::inputBuffer = nullptr;
 char* ConsoleUtil::outputBuffer = nullptr;
 
-uint64 ConsoleUtil::bufferSize = 2*8192;
+uint64 ConsoleUtil::bufferSize = 8192;
 
 void ConsoleUtil::initialize() {
     inputSem = new SCB(0);

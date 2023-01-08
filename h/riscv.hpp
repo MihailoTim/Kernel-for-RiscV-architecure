@@ -11,7 +11,8 @@ class RiscV{
 
     static uint64 globalTime;
 
-    static void* PMT;
+    static void* kPMT;
+    static void* uPMT;
 
     static bool userMainFinished;
 
@@ -117,7 +118,7 @@ class RiscV{
 
     static void disableTimerInterrupts();
 
-    static void handlePageFault(uint64 addr, uint64 mask);
+    static void handlePageFault(void* PMT,uint64 addr, uint64 mask);
 
     static void initialize();
 

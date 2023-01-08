@@ -11,7 +11,8 @@
 
 uint64 RiscV::globalTime = 0;
 bool RiscV::userMainFinished = false;
-void* RiscV::PMT = nullptr;
+void* RiscV::kPMT = nullptr;
+void* RiscV::uPMT = nullptr;
 
 void* RiscV::getPMT(){
     void* ret = Buddy::alloc(1);
@@ -21,7 +22,7 @@ void* RiscV::getPMT(){
     return ret;
 }
 
-void RiscV::handlePageFault(uint64 addr, uint64 mask){
+void RiscV::handlePageFault(void* PMT, uint64 addr, uint64 mask){
     uint64 pmt2Entry = (addr >> 30) & (0x1ff);;
     uint64 pmt1Entry = (addr >> 21) & (0x1ff);
     uint64 pmt0Entry = (addr >> 12) & (0x1ff);
@@ -54,33 +55,23 @@ void RiscV::initialize(){
     TCB::initialize();
     SCB::initialize();
     ConsoleUtil::initialize();
-    RiscV::PMT = getPMT();
-    for(uint64 i=0x80000000;i<(uint64)HEAP_END_ADDR;i+=4096)
-        handlePageFault(i,0xf);
-//    for(int i=0;i<512;i++)
-//        if(((uint64*)PMT)[i] != 0){
-//            void* pmt1 =(void*)((((uint64*)PMT)[i]>>10)<<12);
-//            ConsoleUtil::print("pmt1: ",(uint64)pmt1, "\n",16);
-//            for(int i=0;i<512;i++)
-//                if(((uint64*)pmt1)[i] != 0){
-//                    void* pmt0 =(void*)((((uint64*)pmt1)[i]>>10)<<12);
-//                    for(int i=0;i<512;i++)
-//                        if(((uint64*)pmt0)[i] != 0){
-//                            ConsoleUtil::print("i: ",i," ",10);
-//                            ConsoleUtil::print("desc: ",((uint64*)pmt0)[i]>>10,"\n",16);
-//                        }
-//                }
-//        }
+    RiscV::kPMT = RiscV::getPMT();
+    RiscV::uPMT = RiscV::getPMT();
+    for(uint64 i=0x80000000;i<(uint64)HEAP_END_ADDR;i+=4096) {
+        handlePageFault(kPMT,i, 0xf);
+        handlePageFault(uPMT,i, 0x1f);
+    }
 
-    handlePageFault((uint64)CONSOLE_IRQ,0xf);
-    handlePageFault((uint64)CONSOLE_RX_STATUS_BIT,0xf);
-    handlePageFault((uint64)CONSOLE_TX_STATUS_BIT,0xf);
-    handlePageFault((uint64)CONSOLE_RX_DATA,0xf);
-    handlePageFault((uint64)CONSOLE_TX_DATA,0xf);
-    handlePageFault((uint64)CONSOLE_STATUS,0xf);
-    handlePageFault((uint64)0xc201004,0xf);
+    handlePageFault(kPMT, (uint64)CONSOLE_RX_DATA,0xf);
+    handlePageFault(kPMT, (uint64)CONSOLE_TX_DATA,0xf);
+    handlePageFault(kPMT, (uint64)CONSOLE_STATUS,0xf);
+    handlePageFault(kPMT, (uint64)0xc201004,0xf);
+    handlePageFault(uPMT, (uint64)CONSOLE_RX_DATA,0x1f);
+    handlePageFault(uPMT, (uint64)CONSOLE_TX_DATA,0x1f);
+    handlePageFault(uPMT, (uint64)CONSOLE_STATUS,0x1f);
+    handlePageFault(uPMT, (uint64)0xc201004,0x1f);
 
-    uint64 satp = ((uint64)1<<63) | ((uint64)(RiscV::PMT)>>12);
+    uint64 satp = ((uint64)1<<63) | ((uint64)(RiscV::kPMT)>>12);
     asm("csrw satp, %[satp]" : : [satp] "r" (satp));
 
     RiscV::enableInterrupts();
@@ -605,9 +596,13 @@ void RiscV::executePutcUtilSyscall() {
 //return to privilege that was given at creation
 void RiscV::jumpToDesignatedPrivilegeMode() {
     if(TCB::running->mode == TCB::Mode::SUPERVISOR) {
+        uint64 satp = ((uint64)1<<63) | ((uint64)(RiscV::kPMT)>>12);
+        asm("csrw satp, %[satp]" : : [satp] "r" (satp));
         RiscV::ms_sstatus(RiscV::SSTATUS_SPP);
     }
     else {
+        uint64 satp = ((uint64)1<<63) | ((uint64)(RiscV::uPMT)>>12);
+        asm("csrw satp, %[satp]" : : [satp] "r" (satp));
         RiscV::mc_sstatus(RiscV::SSTATUS_SPP);
     }
 }

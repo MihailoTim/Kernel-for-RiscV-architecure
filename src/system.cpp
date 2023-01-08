@@ -5,11 +5,11 @@
 #include "../h/system.hpp"
 #include "../h/riscv.hpp"
 #include "../h/syscall_c.h"
-//#include "../tests/userMain.hpp"
+#include "../tests/userMain.hpp"
 #include "../h/printing.hpp"
 #include "../h/tcb.hpp"
 #include "../h/scheduler.hpp"
-#include "../tests/slabTest.hpp"
+//#include "../tests/testUser.hpp"
 
 bool System::initialized = false;
 
@@ -38,12 +38,12 @@ System::System() {
 
         thread_t userMainThread;
         thread_create(&userMainThread, userMainWrapper, nullptr);
-
-        //return control to user code until it reaches the end
-        //exit only if user is finished and machine is ready to exit (in case there is something still left to print, wait for it to be done)
-//        while (( (TCB*)userMainThread)->status != TCB::Status::FINISHED) {
-//            thread_dispatch();
-//        }
+//
+//        //return control to user code until it reaches the end
+//        //exit only if user is finished and machine is ready to exit (in case there is something still left to print, wait for it to be done)
+        while (( (TCB*)userMainThread)->status != TCB::Status::FINISHED) {
+            thread_dispatch();
+        }
 
         //finalize the machine
         RiscV::finalize();
