@@ -1,9 +1,9 @@
-#ifndef XV6_THREADS_CPP_API_TEST_HPP
-#define XV6_THREADS_CPP_API_TEST_HPP
+#ifndef XV6_THREADS_C_API_TEST_HPP
+#define XV6_THREADS_C_API_TEST_HPP
 
-#include "../h/syscall_cpp.hpp"
+#include "../../../h/syscall_c.h"
 
-#include "../h/printing.hpp"
+#include "../../../h/printing.hpp"
 
 bool finishedA = false;
 bool finishedB = false;
@@ -16,47 +16,7 @@ uint64 fibonacci(uint64 n) {
     return fibonacci(n - 1) + fibonacci(n - 2);
 }
 
-class WorkerA: public Thread {
-    void workerBodyA(void* arg);
-public:
-    WorkerA():Thread() {}
-
-    void run() override {
-        workerBodyA(nullptr);
-    }
-};
-
-class WorkerB: public Thread {
-    void workerBodyB(void* arg);
-public:
-    WorkerB():Thread() {}
-
-    void run() override {
-        workerBodyB(nullptr);
-    }
-};
-
-class WorkerC: public Thread {
-    void workerBodyC(void* arg);
-public:
-    WorkerC():Thread() {}
-
-    void run() override {
-        workerBodyC(nullptr);
-    }
-};
-
-class WorkerD: public Thread {
-    void workerBodyD(void* arg);
-public:
-    WorkerD():Thread() {}
-
-    void run() override {
-        workerBodyD(nullptr);
-    }
-};
-
-void WorkerA::workerBodyA(void *arg) {
+void workerBodyA(void* arg) {
     for (uint64 i = 0; i < 10; i++) {
         printString("A: i="); printInt(i); printString("\n");
         for (uint64 j = 0; j < 10000; j++) {
@@ -68,7 +28,7 @@ void WorkerA::workerBodyA(void *arg) {
     finishedA = true;
 }
 
-void WorkerB::workerBodyB(void *arg) {
+void workerBodyB(void* arg) {
     for (uint64 i = 0; i < 16; i++) {
         printString("B: i="); printInt(i); printString("\n");
         for (uint64 j = 0; j < 10000; j++) {
@@ -81,7 +41,7 @@ void WorkerB::workerBodyB(void *arg) {
     thread_dispatch();
 }
 
-void WorkerC::workerBodyC(void *arg) {
+void workerBodyC(void* arg) {
     uint8 i = 0;
     for (; i < 3; i++) {
         printString("C: i="); printInt(i); printString("\n");
@@ -103,12 +63,12 @@ void WorkerC::workerBodyC(void *arg) {
         printString("C: i="); printInt(i); printString("\n");
     }
 
-    printString("C finished!\n");
+    printString("A finished!\n");
     finishedC = true;
     thread_dispatch();
 }
 
-void WorkerD::workerBodyD(void* arg) {
+void workerBodyD(void* arg) {
     uint8 i = 10;
     for (; i < 13; i++) {
         printString("D: i="); printInt(i); printString("\n");
@@ -131,31 +91,25 @@ void WorkerD::workerBodyD(void* arg) {
 }
 
 
-void Threads_CPP_API_test() {
-
-    Thread* threads[4];
-
-    threads[0] = new WorkerA();
+void Threads_C_API_test() {
+    thread_t threads[4];
+    thread_create(&threads[0], workerBodyA, nullptr);
     printString("ThreadA created\n");
 
-    threads[1] = new WorkerB();
+    thread_create(&threads[1], workerBodyB, nullptr);
     printString("ThreadB created\n");
 
-    threads[2] = new WorkerC();
+    thread_create(&threads[2], workerBodyC, nullptr);
     printString("ThreadC created\n");
 
-    threads[3] = new WorkerD();
+    thread_create(&threads[3], workerBodyD, nullptr);
     printString("ThreadD created\n");
 
-    for(int i=0; i<4; i++) {
-        threads[i]->start();
-    }
-
     while (!(finishedA && finishedB && finishedC && finishedD)) {
-        Thread::dispatch();
+        thread_dispatch();
     }
 
-    for (auto thread: threads) { delete thread; }
+    for (auto &thread: threads) { delete thread; }
 }
 
-#endif //XV6_THREADS_CPP_API_TEST_HPP
+#endif //XV6_THREADS_C_API_TEST_HPP

@@ -14,10 +14,10 @@ uint64 RiscV::globalTime = 0;
 bool RiscV::userMainFinished = false;
 void* RiscV::kPMT = nullptr;
 void* RiscV::uPMT = nullptr;
-extern char *kernelTextStart;
-extern char *kernelDataStart;
 extern char *userTextStart;
-extern char *etext;
+extern char *userDataStart;
+extern char *userDataEnd;
+extern char *kernelTextEnd;
 
 void* RiscV::getPMT(){
     void* ret = Buddy::alloc(1);
@@ -48,8 +48,9 @@ void RiscV::handlePageFault(void* PMT, uint64 addr, uint64 mask){
     else
         pmt0 = (void*)((pmt1Desc >> 10) << 12);
     uint64 pmt0Desc = ((uint64*)pmt0)[pmt0Entry];
-    if(pmt0Desc == 0)
-        ((uint64*)pmt0)[pmt0Entry] = ((addr >> 12) << 10) | mask;
+    if(pmt0Desc == 0) {
+        ((uint64 *) pmt0)[pmt0Entry] = ((addr >> 12) << 10) | mask;
+    }
 }
 //initailize each of the key components and switch to user mode for user code execution
 void RiscV::initialize(){
@@ -61,36 +62,41 @@ void RiscV::initialize(){
     SCB::initialize();
     ConsoleUtil::initialize();
     RiscV::kPMT = RiscV::getPMT();
-    uint64 uTextStart = (uint64)(&userTextStart);
-    uint64 eText = (uint64)(&etext);
-    uint64 kTextStart = (uint64)(&kernelTextStart);
-    uint64 kDataStart = (uint64)(&kernelDataStart);
+    uint64 kTextEnd = ((uint64)(&kernelTextEnd));
+    uint64 uTextStart = ((uint64)(&userTextStart));
+    uint64 uDataStart = ((uint64)(&userDataStart));
+    uint64 uDataEnd = ((uint64)(&userDataEnd));
+    uint64 hStart = ((uint64)HEAP_START_ADDR);
+    uint64 hEnd = ((uint64)HEAP_END_ADDR);
+    uint64 bEnd = ((uint64)Buddy::BUDDY_START_ADDR + (Buddy::BLOCKS_AVAILABLE<<12));
 
-    for(uint64 i=0x80000000;i< uTextStart;i+=4096) {
+
+    for(uint64 i=0x80000000;i< kTextEnd;i+=0x1000) {
         handlePageFault(kPMT,i, 0xb);
     }
 
-    for(uint64 i=uTextStart;i<eText;i+=4096) {
-        handlePageFault(kPMT,i, 0x1b);
-    }
-
-    for(uint64 i = (uint64)(&etext); i<kTextStart;i+=4096){
-        handlePageFault(kPMT,i, 0x17);
-    }
-
-    for(uint64 i=(uint64)(&kernelTextStart);i<kDataStart;i+=4096) {
-        handlePageFault(kPMT,i, 0xb);
-    }
-
-    for(uint64 i=(uint64)&kernelDataStart;i<(uint64)HEAP_START_ADDR;i+=4096) {
+    for(uint64 i=kTextEnd;i<uTextStart;i+=0x1000) {
         handlePageFault(kPMT,i, 0x7);
     }
 
-    for(uint64 i=(uint64)HEAP_START_ADDR;i<(uint64)Buddy::BUDDY_START_ADDR + (Buddy::BLOCKS_AVAILABLE<<12);i+=4096) {
+    for (uint64 i = uTextStart; i < uDataStart; i+=0x1000) {
+        handlePageFault(kPMT, i, 0x1b);
+    }
+
+
+    for(uint64 i=uDataStart;i<uDataEnd;i++) {
+        handlePageFault(kPMT,i, 0x1f);
+    }
+
+    for(uint64 i=uDataEnd;i<hStart;i+=0x1000) {
         handlePageFault(kPMT,i, 0x7);
     }
 
-    for(uint64 i = (uint64)Buddy::BUDDY_START_ADDR + (Buddy::BLOCKS_AVAILABLE<<12);i<(uint64)HEAP_END_ADDR;i+=4096){
+    for(uint64 i=hStart;i<bEnd;i+=0x1000) {
+        handlePageFault(kPMT,i, 0x7);
+    }
+
+    for(uint64 i = bEnd;i<hEnd;i+=0x1000){
         handlePageFault(kPMT,i, 0x17);
     }
 
@@ -101,12 +107,16 @@ void RiscV::initialize(){
     handlePageFault(kPMT, (uint64)CONSOLE_STATUS,0xf);
     handlePageFault(kPMT, (uint64)0xc201004,0xf);
 
-    ConsoleUtil::print("kTextStart", kTextStart, "\n");
-    ConsoleUtil::print("kDataStart", kDataStart, "\n");
-    ConsoleUtil::print("kTextStart", (uint64)HEAP_START_ADDR, "\n");
+//    ConsoleUtil::print("kTextEnd:", kTextEnd, "\n");
+//    ConsoleUtil::print("uTextStart:", uTextStart, "\n");
+//    ConsoleUtil::print("uDataStart:", uDataStart, "\n");
+//    ConsoleUtil::print("uDataEnd:", uDataEnd, "\n");
+//    ConsoleUtil::print("hStart:", hStart, "\n");
+//    ConsoleUtil::print("bEnd:", bEnd, "\n");
+//    ConsoleUtil::print("hEnd:", hEnd, "\n");
 
-//    uint64 satp = ((uint64)1<<63) | ((uint64)(RiscV::kPMT)>>12);
-//    asm("csrw satp, %[satp]" : : [satp] "r" (satp));
+    uint64 satp = ((uint64)1<<63) | ((uint64)(RiscV::kPMT)>>12);
+    asm("csrw satp, %[satp]" : : [satp] "r" (satp));
 
     RiscV::enableInterrupts();
 //    RiscV::enableHardwareInterrupts();
@@ -114,7 +124,16 @@ void RiscV::initialize(){
 
 //get previous privilege and previous interrupt status
 void RiscV::popSppSpie() {
-    asm("csrw sepc, ra");
+    uint64 ra = 0;
+    if(TCB::running->mode == TCB::Mode::SUPERVISOR)
+        asm("csrw sepc, ra");
+    else
+    {
+        ra = (uint64)TCBWrapper::tcbWrap;
+        asm("mv a0, %[iarg]" : : [iarg] "r" (TCB::running->body));
+        asm("mv a1, %[iarg]" : : [iarg] "r" (TCB::running->args));
+        asm("csrw sepc, %[ra]" : : [ra] "r" (ra));
+    }
     asm("sret");
 }
 
@@ -134,11 +153,21 @@ void RiscV::popSppSpie2() {
 void RiscV::handleSupervisorTrap() {
 
     //read scause
+    uint64 stval;
+    asm("csrr %[stval], stval" : [stval] "=r" (stval));
     uint64 volatile scause = RiscV::r_scause();
 
     asm("csrr %[sscratch], sscratch" : [sscratch] "=r" (TCB::running->a0Location));
 
     //interrupt from ecall (both user and supervisor mode)
+//    if(scause == 0x0c){
+//        uint64 stvec = RiscV::r_stvec();
+//        handlePageFault(kPMT, stvec, 0xb);
+//    }
+//    else if(scause == 0xd || scause == 0xf){
+//        uint64 stvec = RiscV::r_stvec();
+//        handlePageFault(kPMT, stvec, 0x17);
+//    }
     if(scause == 0x09 || scause == 0x08) {
 
         //save sstatus and sepc
@@ -277,6 +306,7 @@ void RiscV::handleSupervisorTrap() {
         uint64 sepc = RiscV::r_sepc();
         ConsoleUtil::printInt(sepc,16);
         ConsoleUtil::printString("\n");
+        ConsoleUtil::print("stvec: ",stval,"\n");
         TCB* old = TCB::running;
         old->status = TCB::Status::FINISHED;
         ConsoleUtil::printString("Exiting thread...\n");
@@ -603,7 +633,6 @@ void RiscV::executePutcSyscall() {
 //if ready read data from output buffer
 void RiscV::putcWrapper(void* arg)
 {
-    //RiscV::popSppSpie();
     while(true)
     {
         //read console status from status register
@@ -627,7 +656,7 @@ void RiscV::putcWrapper(void* arg)
                 ConsoleUtil::pendingPutc--;
         }
         else
-            thread_dispatch();
+            TCB::dispatch();
     }
 }
 
@@ -666,7 +695,7 @@ void RiscV::finalize() {
     Scheduler::put(TCB::putcThread);
 
     while(ConsoleUtil::outputHead != ConsoleUtil::outputTail)
-        thread_dispatch();
+        TCB::dispatch();
 }
 
 //write value in a0 to a memory location where a0 is store on stack for currently running thread
@@ -793,4 +822,42 @@ void RiscV::getPC(){
     asm("mv %[ra], ra" : [ra] "=r"(ra));
 
     TCB::currentPC = ra + 8;
+}
+
+void RiscV::threadCreateUtil(TCB **handle, void (*start_routine)(void *), void *arg) {
+    uint64 ihandle = (uint64)handle;
+    uint64 iroutine = (uint64)start_routine;
+    uint64 iarg = (uint64)arg;
+    uint64 istack = 0;
+
+    if(start_routine) {
+        istack = (uint64) MemoryAllocator::kmalloc(DEFAULT_STACK_SIZE);
+        if(istack == 0) {
+            *handle = nullptr;
+            return;
+        }
+    }
+
+    asm("mv a7, %[istack]" : : [istack] "r" (istack));
+    asm("mv a3, %[iarg]" : : [iarg] "r" (iarg));
+    asm("mv a2, %[iroutine]" : : [iroutine] "r" (iroutine));
+    asm("mv a1, %[ihandle]" : : [ihandle] "r" (ihandle));
+    asm("li a0, 0x11");
+
+    asm("ecall");
+
+    uint64 status;
+
+    asm("mv %[status], a0" : [status] "=r" (status));
+
+}
+
+void RiscV::threadExitUtil() {
+    asm("li a0, 0x12");
+
+    asm("ecall");
+
+    uint64 status;
+
+    asm("mv %[status], a0" : [status] "=r" (status));
 }

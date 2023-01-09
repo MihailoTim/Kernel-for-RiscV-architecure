@@ -246,3 +246,15 @@ int fork(){
 
     return status;
 }
+
+void tcb_free(void* addr){
+    uint64 iptr = (uint64)addr;
+
+    asm("mv a1, %[iptr]" : : [iptr] "r" (iptr));
+    asm("li a0, 0x51");
+    asm("ecall");
+
+    uint64 status;
+
+    asm("mv %[status], a0" : [status] "=r" (status));
+}

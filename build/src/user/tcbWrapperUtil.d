@@ -9,7 +9,14 @@ build/src/user/tcbWrapperUtil.o: src/user/tcbWrapperUtil.cpp \
  src/user/../../h/../h/../h/../h/../h/cache_t.hpp \
  src/user/../../h/../h/../h/../h/../h/../h/slab_t.hpp \
  src/user/../../h/syscall_c.h src/user/../../h/../h/_thread.hpp \
- src/user/../../h/../h/_semaphore.hpp
+ src/user/../../h/../h/_semaphore.hpp \
+ src/user/../../src/user/tests/testUser.hpp \
+ src/user/../../src/user/tests/../../../h/syscall_c.h \
+ src/user/../../src/user/tests/../../../h/syscall_cpp.hpp \
+ src/user/../../src/user/tests/../../../h/../h/syscall_c.h \
+ src/user/../../src/user/tests/../../../h/printing.hpp \
+ src/user/../../src/user/tests/../../../h/syscall_c.h \
+ src/user/../../src/user/tests/userMain.hpp
 
 src/user/../../h/tcbWrapperUtil.hpp:
 
@@ -38,3 +45,17 @@ src/user/../../h/syscall_c.h:
 src/user/../../h/../h/_thread.hpp:
 
 src/user/../../h/../h/_semaphore.hpp:
+
+src/user/../../src/user/tests/testUser.hpp:
+
+src/user/../../src/user/tests/../../../h/syscall_c.h:
+
+src/user/../../src/user/tests/../../../h/syscall_cpp.hpp:
+
+src/user/../../src/user/tests/../../../h/../h/syscall_c.h:
+
+src/user/../../src/user/tests/../../../h/printing.hpp:
+
+src/user/../../src/user/tests/../../../h/syscall_c.h:
+
+src/user/../../src/user/tests/userMain.hpp:

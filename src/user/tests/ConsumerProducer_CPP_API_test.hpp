@@ -5,10 +5,10 @@
 #ifndef XV6_CONSUMERPRODUCER_CPP_API_TEST_HPP
 #define XV6_CONSUMERPRODUCER_CPP_API_TEST_HPP
 
-#include "../h/syscall_cpp.hpp"
+#include "../../../h/syscall_cpp.hpp"
 
 #include "buffer_CPP_API.hpp"
-#include "../h/printing.hpp"
+#include "../../../h/printing.hpp"
 
 namespace ConsumerProducerCPP {
 

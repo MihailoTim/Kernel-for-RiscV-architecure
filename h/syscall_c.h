@@ -40,4 +40,6 @@ void putc(char c);
 
 int fork();
 
+void tcb_free(void* addr);
+
 #endif //TM200047_SYSCALL_C_H

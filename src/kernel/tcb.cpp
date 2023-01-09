@@ -90,13 +90,9 @@ void TCB::dispatch() {
 void TCB::wrapper(void *args) {
     RiscV::popSppSpie();
 
-    //running->body(running->args);
-    //thread_exit();
-    TCBWrapper::tcbWrap(running);
+    running->body(running->args);
+    RiscV::threadExitUtil();
 
-    //running->body(running->args);
-
-    //thread_exit();
 }
 
 //overload operator new, to not use system call for every kernel object that is being allocated

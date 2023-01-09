@@ -5,7 +5,7 @@
 #ifndef OS1_KERNEL_RISCV_HPP
 #define OS1_KERNEL_RISCV_HPP
 #include "../lib/hw.h"
-
+class TCB;
 
 class RiscV{
 
@@ -65,6 +65,10 @@ class RiscV{
     static void executeForkSyscall();
 
     static void putcWrapper(void *arg);
+
+    static void threadCreateUtil(TCB** handle, void(*start_routine)(void*), void *arg);
+
+    static void threadExitUtil();
 
     static uint64 r_scause();
 

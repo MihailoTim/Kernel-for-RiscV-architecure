@@ -1,5 +1,6 @@
-#include "../h/syscall_c.h"
-#include "../h/syscall_cpp.hpp"
+#include "../../../h/syscall_c.h"
+#include "../../../h/syscall_cpp.hpp"
+#include "../../../h/printing.hpp"
 
 
 struct thread_data {
@@ -10,7 +11,10 @@ class ForkThread : public Thread {
 public:
     ForkThread(long _id) noexcept : Thread(), id(_id), finished(false) {}
     virtual void run() {
-        ConsoleUtil::print("Started thread id:",id,"\n");
+        printString("Started thread id: ");
+        printInt(id,10);
+        printString("\n");
+//        ConsoleUtil::print("Started thread id:",id,"\n");
 
         ForkThread* thread = new ForkThread(id + 1);
         ForkThread** threads = (ForkThread** ) mem_alloc(sizeof(ForkThread*) * id);
@@ -44,7 +48,10 @@ public:
             mem_free(threads);
         }
 
-        ConsoleUtil::print("Finished thread id:",id,"\n");
+        printString("Finished thread id: ");
+        printInt(id,10);
+        printString("\n");
+//        ConsoleUtil::print("Finished thread id:",id,"\n");
 
         finished = true;
     }
@@ -68,5 +75,6 @@ void testUser() {
         thread_dispatch();
     }
 
-    ConsoleUtil::printString("User main finished\n");
+//    ConsoleUtil::printString("User main finished\n");
+    printString("User main finished\n");
 }

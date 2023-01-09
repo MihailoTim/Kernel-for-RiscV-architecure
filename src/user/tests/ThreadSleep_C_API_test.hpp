@@ -5,9 +5,9 @@
 #ifndef XV6_THREADSLEEP_C_API_TEST_HPP
 #define XV6_THREADSLEEP_C_API_TEST_HPP
 
-#include "../h/syscall_c.h"
+#include "../../../h/syscall_c.h"
 
-#include "../h/printing.hpp"
+#include "../../../h/printing.hpp"
 
 bool finished[2];
 

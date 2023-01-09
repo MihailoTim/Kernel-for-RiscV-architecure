@@ -7,7 +7,9 @@ build/src/user/_thread.o: src/user/_thread.cpp \
  src/user/../../h/../h/../h/../h/../h/utility.hpp \
  src/user/../../h/../h/../h/../h/consoleUtil.hpp \
  src/user/../../h/../h/../h/../h/cache_t.hpp \
- src/user/../../h/../h/../h/../h/../h/slab_t.hpp
+ src/user/../../h/../h/../h/../h/../h/slab_t.hpp \
+ src/user/../../h/syscall_c.h src/user/../../h/../h/_thread.hpp \
+ src/user/../../h/../h/_semaphore.hpp
 
 src/user/../../h/_thread.hpp:
 
@@ -30,3 +32,9 @@ src/user/../../h/../h/../h/../h/consoleUtil.hpp:
 src/user/../../h/../h/../h/../h/cache_t.hpp:
 
 src/user/../../h/../h/../h/../h/../h/slab_t.hpp:
+
+src/user/../../h/syscall_c.h:
+
+src/user/../../h/../h/_thread.hpp:
+
+src/user/../../h/../h/_semaphore.hpp:

@@ -14,10 +14,7 @@ build/src/kernel/system.o: src/kernel/system.cpp \
  src/kernel/../../h/../h/../h/../h/cache_t.hpp \
  src/kernel/../../h/../h/../h/../h/../h/slab_t.hpp \
  src/kernel/../../h/scheduler.hpp src/kernel/../../h/../h/tcb.hpp \
- src/kernel/../../tests/testUser.hpp \
- src/kernel/../../tests/../h/syscall_c.h \
- src/kernel/../../tests/../h/syscall_cpp.hpp \
- src/kernel/../../tests/../h/../h/syscall_c.h
+ src/kernel/../../h/tcbWrapperUtil.hpp
 
 src/kernel/../../h/system.hpp:
 
@@ -61,10 +58,4 @@ src/kernel/../../h/scheduler.hpp:
 
 src/kernel/../../h/../h/tcb.hpp:
 
-src/kernel/../../tests/testUser.hpp:
-
-src/kernel/../../tests/../h/syscall_c.h:
-
-src/kernel/../../tests/../h/syscall_cpp.hpp:
-
-src/kernel/../../tests/../h/../h/syscall_c.h:
+src/kernel/../../h/tcbWrapperUtil.hpp:

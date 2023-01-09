@@ -11,50 +11,51 @@ SECTIONS
 
   .text : {
     *(.entry_os) . = ALIGN(0x1000);
-    PROVIDE(userTextStart = .);
-    EXCLUDE_FILE(build/src/kernel/*)
+    PROVIDE(kernelTextStart = .);
+    EXCLUDE_FILE(build/src/user/*)
     *(.text .text.*)
     . = ALIGN(0x1000);
-    PROVIDE(etext = .);
+    PROVIDE(kernelTextEnd = .);
   }
 
   .rodata : {
     . = ALIGN(16);
-    EXCLUDE_FILE(build/src/kernel/*)
+    EXCLUDE_FILE(build/src/user/*)
     *(.srodata .srodata.*) /* do not need to distinguish this from .rodata */
     . = ALIGN(16);
-    EXCLUDE_FILE(build/src/kernel/*)
+    EXCLUDE_FILE(build/src/user/*)
     *(.rodata .rodata.*)
   }
 
   .data : {
     . = ALIGN(16);
-    EXCLUDE_FILE(build/src/kernel/*)
+    EXCLUDE_FILE(build/src/user/*)
     *(.sdata .sdata.*) /* do not need to distinguish this from .data */
     . = ALIGN(16);
-    EXCLUDE_FILE(build/src/kernel/*)
+    EXCLUDE_FILE(build/src/user/*)
     *(.data .data.*)
   }
 
   .bss : {
     . = ALIGN(16);
-    EXCLUDE_FILE(build/src/kernel/*)
+    EXCLUDE_FILE(build/src/user/*)
     *(.sbss .sbss.*) /* do not need to distinguish this from .bss */
     . = ALIGN(16);
-    EXCLUDE_FILE(build/src/kernel/*)
+    EXCLUDE_FILE(build/src/user/*)
     *(.bss .bss.*)
   }
 
   .eh_frame : {
-    EXCLUDE_FILE(build/src/kernel/*)
+    EXCLUDE_FILE(build/src/user/*)
     *(.eh_frame .eh_frame.*)
   }
 
-  .kernel : {
+  .user : {
     . = ALIGN(0x1000);
-    PROVIDE(kernelTextStart = .);
+    PROVIDE(userTextStart = .);
     *(.text .text.*)
-    PROVIDE(kernelDataStart = .);
+    . = ALIGN(0x1000);
+    PROVIDE(userDataStart = .);
     *(.srodata .srodata.*)
     *(.rodata .rodata.*)
     *(.sdata .sdata.*)
@@ -62,6 +63,8 @@ SECTIONS
     *(.sbss .sbss.*)
     *(.bss .bss.*)
     *(.eh_frame .eh_frame.*)
+    . = ALIGN(0x1000);
+    PROVIDE(userDataEnd = .);
   }
 
   PROVIDE(end = .);

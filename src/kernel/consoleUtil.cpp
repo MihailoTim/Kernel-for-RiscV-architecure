@@ -17,16 +17,18 @@ uint64 ConsoleUtil::pendingPutc = 0;
 SCB* ConsoleUtil::outputSem = nullptr;
 SCB* ConsoleUtil::inputSem = nullptr;
 
-char* ConsoleUtil::inputBuffer = nullptr;
-char* ConsoleUtil::outputBuffer = nullptr;
+//char* ConsoleUtil::inputBuffer = nullptr;
+//char* ConsoleUtil::outputBuffer = nullptr;
+char ConsoleUtil::inputBuffer[8192];
+char ConsoleUtil::outputBuffer[8192];
 
 uint64 ConsoleUtil::bufferSize = 8192;
 
 void ConsoleUtil::initialize() {
     inputSem = new SCB(0);
     outputSem = new SCB(0);
-    inputBuffer = (char*)kmalloc(ConsoleUtil::bufferSize);
-    outputBuffer = (char*)kmalloc(ConsoleUtil::bufferSize);
+//    inputBuffer = (char*)kmalloc(ConsoleUtil::bufferSize);
+//    outputBuffer = (char*)kmalloc(ConsoleUtil::bufferSize);
 }
 
 void ConsoleUtil::putInput(char c) {
