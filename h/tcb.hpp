@@ -9,6 +9,7 @@
 #include "../h/slab.hpp"
 
 class SCB;
+class TCBWrapper;
 
 class TCB {
     using Body = void(*)(void*);
@@ -88,6 +89,7 @@ class TCB {
     friend class SCB;
     friend class System;
     friend class _thread;
+    friend class TCBWrapper;
 };
 
 #endif //OS1_KERNEL_TCB_HPP

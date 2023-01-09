@@ -100,6 +100,8 @@ class RiscV{
 
     static void popSppSpie();
 
+    static void popSppSpie2();
+
     static void getPC();
 
     static void supervisorTrap();      //supervisorTrap defined in /src/supervisorTrap.S

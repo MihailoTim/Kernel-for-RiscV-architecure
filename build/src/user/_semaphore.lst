@@ -1,0 +1,122 @@
+GAS LISTING /tmp/cchsozOi.s 			page 1
+
+
+   1              		.file	"_semaphore.cpp"
+   2              		.option pic
+   3              		.option norelax
+   4              		.text
+   5              	.Ltext0:
+   6              		.align	2
+   7              		.globl	_ZN10_semaphoredlEPv
+   9              	_ZN10_semaphoredlEPv:
+  10              	.LFB12:
+  11              		.file 1 "src/user/_semaphore.cpp"
+   1:src/user/_semaphore.cpp **** //
+   2:src/user/_semaphore.cpp **** // Created by os on 6/3/22.
+   3:src/user/_semaphore.cpp **** //
+   4:src/user/_semaphore.cpp **** 
+   5:src/user/_semaphore.cpp **** #include "../../h/_semaphore.hpp"
+   6:src/user/_semaphore.cpp **** #include "../../h/printing.hpp"
+   7:src/user/_semaphore.cpp **** 
+   8:src/user/_semaphore.cpp **** //operator delete will now call sem_close instead of just deallocating the space
+   9:src/user/_semaphore.cpp **** //sem_close will take care of any remaining threads that are blocked and release allocated memory
+  10:src/user/_semaphore.cpp **** void _semaphore::operator delete(void *addr){
+  12              		.loc 1 10 45
+  13              		.cfi_startproc
+  14              	.LVL0:
+  15 0000 130101FF 		addi	sp,sp,-16
+  16              		.cfi_def_cfa_offset 16
+  17 0004 23341100 		sd	ra,8(sp)
+  18 0008 23308100 		sd	s0,0(sp)
+  19              		.cfi_offset 1, -8
+  20              		.cfi_offset 8, -16
+  21 000c 13040101 		addi	s0,sp,16
+  22              		.cfi_def_cfa 8, 0
+  11:src/user/_semaphore.cpp ****     sem_close((sem_t)addr);
+  23              		.loc 1 11 5
+  24              		.loc 1 11 14 is_stmt 0
+  25 0010 97000000 		call	_Z9sem_closeP10_semaphore@plt
+  25      E7800000 
+  26              	.LVL1:
+  12:src/user/_semaphore.cpp **** }
+  27              		.loc 1 12 1
+  28 0018 83308100 		ld	ra,8(sp)
+  29              		.cfi_restore 1
+  30 001c 03340100 		ld	s0,0(sp)
+  31              		.cfi_restore 8
+  32              		.cfi_def_cfa 2, 16
+  33 0020 13010101 		addi	sp,sp,16
+  34              		.cfi_def_cfa_offset 0
+  35 0024 67800000 		jr	ra
+  36              		.cfi_endproc
+  37              	.LFE12:
+  39              	.Letext0:
+  40              		.file 2 "src/user/../../h/_semaphore.hpp"
+  41              		.file 3 "src/user/../../h/../lib/hw.h"
+  42              		.file 4 "src/user/../../h/syscall_c.h"
+GAS LISTING /tmp/cchsozOi.s 			page 2
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 _semaphore.cpp
+     /tmp/cchsozOi.s:9      .text:0000000000000000 _ZN10_semaphoredlEPv
+     /tmp/cchsozOi.s:13     .text:0000000000000000 .L0 
+     /tmp/cchsozOi.s:15     .text:0000000000000000 .L0 
+     /tmp/cchsozOi.s:16     .text:0000000000000004 .L0 
+     /tmp/cchsozOi.s:19     .text:000000000000000c .L0 
+     /tmp/cchsozOi.s:20     .text:000000000000000c .L0 
+     /tmp/cchsozOi.s:22     .text:0000000000000010 .L0 
+     /tmp/cchsozOi.s:24     .text:0000000000000010 .L0 
+     /tmp/cchsozOi.s:25     .text:0000000000000010 .L0 
+     /tmp/cchsozOi.s:28     .text:0000000000000018 .L0 
+     /tmp/cchsozOi.s:29     .text:000000000000001c .L0 
+     /tmp/cchsozOi.s:31     .text:0000000000000020 .L0 
+     /tmp/cchsozOi.s:32     .text:0000000000000020 .L0 
+     /tmp/cchsozOi.s:34     .text:0000000000000024 .L0 
+     /tmp/cchsozOi.s:36     .text:0000000000000028 .L0 
+     /tmp/cchsozOi.s:43     .text:0000000000000028 .L0 
+     /tmp/cchsozOi.s:258    .debug_abbrev:0000000000000000 .Ldebug_abbrev0
+     /tmp/cchsozOi.s:598    .debug_str:000000000000008b .LASF21
+     /tmp/cchsozOi.s:616    .debug_str:00000000000001e9 .LASF22
+     /tmp/cchsozOi.s:618    .debug_str:0000000000000201 .LASF23
+     /tmp/cchsozOi.s:5      .text:0000000000000000 .Ltext0
+     /tmp/cchsozOi.s:39     .text:0000000000000028 .Letext0
+     /tmp/cchsozOi.s:578    .debug_line:0000000000000000 .Ldebug_line0
+     /tmp/cchsozOi.s:628    .debug_str:0000000000000277 .LASF0
+     /tmp/cchsozOi.s:612    .debug_str:00000000000001cb .LASF1
+     /tmp/cchsozOi.s:632    .debug_str:0000000000000289 .LASF2
+     /tmp/cchsozOi.s:604    .debug_str:000000000000018b .LASF24
+     /tmp/cchsozOi.s:594    .debug_str:0000000000000063 .LASF25
+     /tmp/cchsozOi.s:636    .debug_str:00000000000002a4 .LASF6
+     /tmp/cchsozOi.s:582    .debug_str:0000000000000010 .LASF3
+     /tmp/cchsozOi.s:622    .debug_str:0000000000000245 .LASF4
+     /tmp/cchsozOi.s:608    .debug_str:00000000000001a7 .LASF5
+     /tmp/cchsozOi.s:630    .debug_str:0000000000000282 .LASF7
+     /tmp/cchsozOi.s:592    .debug_str:0000000000000051 .LASF8
+     /tmp/cchsozOi.s:588    .debug_str:000000000000003a .LASF9
+     /tmp/cchsozOi.s:596    .debug_str:0000000000000078 .LASF10
+     /tmp/cchsozOi.s:620    .debug_str:0000000000000232 .LASF11
+     /tmp/cchsozOi.s:580    .debug_str:0000000000000000 .LASF12
+     /tmp/cchsozOi.s:584    .debug_str:000000000000001d .LASF13
+     /tmp/cchsozOi.s:586    .debug_str:000000000000002b .LASF14
+     /tmp/cchsozOi.s:626    .debug_str:0000000000000268 .LASF15
+     /tmp/cchsozOi.s:590    .debug_str:0000000000000041 .LASF16
+     /tmp/cchsozOi.s:624    .debug_str:0000000000000258 .LASF17
+     /tmp/cchsozOi.s:606    .debug_str:000000000000019b .LASF18
+     /tmp/cchsozOi.s:600    .debug_str:000000000000015b .LASF19
+     /tmp/cchsozOi.s:610    .debug_str:00000000000001b5 .LASF20
+     /tmp/cchsozOi.s:10     .text:0000000000000000 .LFB12
+     /tmp/cchsozOi.s:37     .text:0000000000000028 .LFE12
+     /tmp/cchsozOi.s:634    .debug_str:000000000000029f .LASF26
+     /tmp/cchsozOi.s:551    .debug_loc:0000000000000000 .LLST0
+     /tmp/cchsozOi.s:26     .text:0000000000000018 .LVL1
+     /tmp/cchsozOi.s:602    .debug_str:0000000000000171 .LASF27
+     /tmp/cchsozOi.s:614    .debug_str:00000000000001df .LASF28
+     /tmp/cchsozOi.s:14     .text:0000000000000000 .LVL0
+     /tmp/cchsozOi.s:44     .debug_info:0000000000000000 .Ldebug_info0
+GAS LISTING /tmp/cchsozOi.s 			page 3
+
+
+
+UNDEFINED SYMBOLS
+_Z9sem_closeP10_semaphore

@@ -60,6 +60,7 @@ private:
     static void compress(uint64 size);
 
     friend class SlabAllocator;
+    friend class RiscV;
 };
 
 #endif //KERNEL_FOR_RISCV_ARCHITECURE_BUDDYALLOCATOR_HPP

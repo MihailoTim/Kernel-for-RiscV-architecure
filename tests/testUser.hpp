@@ -44,7 +44,7 @@ public:
             mem_free(threads);
         }
 
-//        ConsoleUtil::print("Finished thread id:",id,"\n");
+        ConsoleUtil::print("Finished thread id:",id,"\n");
 
         finished = true;
     }
@@ -59,7 +59,7 @@ private:
 };
 
 
-void userMain() {
+void testUser() {
     ForkThread thread(1);
 
     thread.start();
