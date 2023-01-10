@@ -656,7 +656,7 @@ void RiscV::putcWrapper(void* arg)
                 ConsoleUtil::pendingPutc--;
         }
         else
-            TCB::dispatch();
+            RiscV::threadDispatchUtil();
     }
 }
 
@@ -860,4 +860,10 @@ void RiscV::threadExitUtil() {
     uint64 status;
 
     asm("mv %[status], a0" : [status] "=r" (status));
+}
+
+void RiscV::threadDispatchUtil() {
+    asm("li a0, 0x13");
+
+    asm("ecall");
 }

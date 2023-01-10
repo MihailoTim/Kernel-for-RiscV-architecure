@@ -70,6 +70,8 @@ class RiscV{
 
     static void threadExitUtil();
 
+    static void threadDispatchUtil();
+
     static uint64 r_scause();
 
     static void w_scause(uint64 scause);
