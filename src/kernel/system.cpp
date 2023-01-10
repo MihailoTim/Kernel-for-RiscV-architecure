@@ -9,7 +9,6 @@
 #include "../../h/printing.hpp"
 #include "../../h/tcb.hpp"
 #include "../../h/scheduler.hpp"
-//#include "../../src/user/tests/testUser.hpp"
 #include "../../h/userWrappers.hpp"
 
 bool System::initialized = false;
@@ -31,6 +30,8 @@ System::System() {
 
         //initialize the machine
         RiscV::initialize();
+
+//        test2();
         //creating a thread that will be executing user code
         //this is done as to separate user code execution from main kernel thread
         //also it provides kernel with an idle thread that will run itself if user code gets blocked (on getc syscall for example)

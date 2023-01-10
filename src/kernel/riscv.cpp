@@ -25,7 +25,8 @@ void RiscV::initialize(){
     SCB::initialize();
     ConsoleUtil::initialize();
     RiscV::buildKernelPMT();
-    RiscV::startVirtualMemory();
+    RiscV::buildUserPMT();
+    RiscV::startVirtualMemory(RiscV::kPMT);
     RiscV::enableInterrupts();
 }
 
@@ -559,9 +560,11 @@ void RiscV::executePutcUtilSyscall() {
 void RiscV::jumpToDesignatedPrivilegeMode() {
     if(TCB::running->mode == TCB::Mode::SUPERVISOR) {
         RiscV::ms_sstatus(RiscV::SSTATUS_SPP);
+        RiscV::startVirtualMemory(RiscV::kPMT);
     }
     else {
         RiscV::mc_sstatus(RiscV::SSTATUS_SPP);
+        RiscV::startVirtualMemory(RiscV::uPMT);
     }
 }
 
@@ -756,7 +759,7 @@ void RiscV::threadDispatchUtil() {
 
 void RiscV::buildSection(void *PMT, uint64 start, uint64 end, uint64 mask) {
     for(uint64 i=start;i< end;i+=0x1000) {
-        handlePageFault(kPMT,i, mask);
+        handlePageFault(PMT,i, mask);
     }
 }
 
@@ -772,12 +775,24 @@ void RiscV::buildKernelPMT() {
     RiscV::buildSection(kPMT, USER_DATA_END, bEnd, 0x7);
     RiscV::buildSection(kPMT, bEnd, HEAP_END, 0x17);
 
-
+    RiscV::mapConsoleRegisters(kPMT);
     RiscV::ms_sstatus(1<<18);
-    handlePageFault(kPMT, (uint64)CONSOLE_RX_DATA,0xf);
-    handlePageFault(kPMT, (uint64)CONSOLE_TX_DATA,0xf);
-    handlePageFault(kPMT, (uint64)CONSOLE_STATUS,0xf);
-    handlePageFault(kPMT, (uint64)0xc201004,0xf);
+}
+
+void RiscV::buildUserPMT() {
+    RiscV::uPMT = RiscV::getPMT();
+    uint64 bEnd = ((uint64)Buddy::BUDDY_START_ADDR + (Buddy::BLOCKS_AVAILABLE<<12));
+
+
+    RiscV::buildSection(uPMT, OS_ENTRY, KERNEL_TEXT_END, 0xb);
+    RiscV::buildSection(uPMT, KERNEL_TEXT_END, USER_TEXT_START, 0x7);
+    RiscV::buildSection(uPMT, USER_TEXT_START, USER_DATA_START, 0x1b);
+    RiscV::buildSection(uPMT, USER_DATA_START, USER_DATA_END, 0x17);
+    RiscV::buildSection(uPMT, USER_DATA_END, bEnd, 0x7);
+    RiscV::buildSection(uPMT, bEnd, HEAP_END, 0x17);
+
+    RiscV::mapConsoleRegisters(uPMT);
+    RiscV::ms_sstatus(1<<18);
 }
 
 void* RiscV::getPMT(){
@@ -812,4 +827,11 @@ void RiscV::handlePageFault(void* PMT, uint64 addr, uint64 mask){
     if(pmt0Desc == 0) {
         ((uint64 *) pmt0)[pmt0Entry] = ((addr >> 12) << 10) | mask;
     }
+}
+
+void RiscV::mapConsoleRegisters(void *PMT) {
+    handlePageFault(PMT, (uint64)CONSOLE_RX_DATA,0xf);
+    handlePageFault(PMT, (uint64)CONSOLE_TX_DATA,0xf);
+    handlePageFault(PMT, (uint64)CONSOLE_STATUS,0xf);
+    handlePageFault(PMT, (uint64)0xc201004,0xf);
 }

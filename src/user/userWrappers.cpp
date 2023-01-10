@@ -3,7 +3,6 @@
 //
 #include "../../h/userWrappers.hpp"
 #include "../../h/syscall_c.h"
-#include "../../src/user/tests/testUser.hpp"
 #include "../../src/user/tests/userMain.hpp"
 
 void bodyWrapper(void (*body)(void*), void* args)

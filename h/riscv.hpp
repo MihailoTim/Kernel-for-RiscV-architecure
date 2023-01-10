@@ -100,7 +100,7 @@ class RiscV{
 
     static void mc_sie(uint64 mask);
 
-    static void startVirtualMemory();
+    static void startVirtualMemory(void *PMT);
     static void shutVirtualMemory();
 
     static void saveA0toSscratch();
@@ -140,6 +140,10 @@ class RiscV{
     static void buildSection(void* PMT, uint64 start, uint64 end, uint64 mask);
 
     static void buildKernelPMT();
+
+    static void buildUserPMT();
+
+    static void mapConsoleRegisters(void *PMT);
 
     friend class TCB;
 
@@ -245,8 +249,8 @@ inline void RiscV::disableTimerInterrupts(){
     RiscV::mc_sie(SIP_SSIE);
 }
 
-inline void RiscV::startVirtualMemory() {
-    uint64 satp = ((uint64)1<<63) | ((uint64)(RiscV::kPMT)>>12);
+inline void RiscV::startVirtualMemory(void* PMT) {
+    uint64 satp = ((uint64)1<<63) | ((uint64)(PMT)>>12);
     asm("csrw satp, %[satp]" : : [satp] "r" (satp));
 }
 
