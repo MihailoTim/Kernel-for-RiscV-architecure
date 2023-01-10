@@ -14,7 +14,7 @@ build/src/kernel/riscv.o: src/kernel/riscv.cpp \
  src/kernel/../../h/printing.hpp src/kernel/../../h/syscall_c.h \
  src/kernel/../../h/../h/_thread.hpp \
  src/kernel/../../h/../h/_semaphore.hpp src/kernel/../../h/scb.hpp \
- src/kernel/../../h/tcb.hpp src/kernel/../../h/tcbWrapperUtil.hpp
+ src/kernel/../../h/tcb.hpp src/kernel/../../h/userWrappers.hpp
 
 src/kernel/../../h/riscv.hpp:
 
@@ -58,4 +58,4 @@ src/kernel/../../h/scb.hpp:
 
 src/kernel/../../h/tcb.hpp:
 
-src/kernel/../../h/tcbWrapperUtil.hpp:
+src/kernel/../../h/userWrappers.hpp:

@@ -24,6 +24,18 @@
 #define BLOCK_SIZE_BITS 12
 
 extern const char *numbers[13];
+extern char *userTextStart;
+extern char *userDataStart;
+extern char *userDataEnd;
+extern char *kernelTextEnd;
+
+#define OS_ENTRY 0x80000000
+#define KERNEL_TEXT_END ((uint64)(&kernelTextEnd))
+#define USER_TEXT_START ((uint64)(&userTextStart))
+#define USER_DATA_START ((uint64)(&userDataStart))
+#define USER_DATA_END ((uint64)(&userDataEnd))
+#define HEAP_START (uint64)HEAP_START_ADDR
+#define HEAP_END (uint64)HEAP_END_ADDR
 
 char* strcpy(const char* src, char* dst);
 char* strcat(char* dst, const char* src);

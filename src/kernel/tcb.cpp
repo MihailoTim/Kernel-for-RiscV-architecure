@@ -8,7 +8,6 @@
 #include "../../h/syscall_c.h"
 #include "../../h/printing.hpp"
 #include "../../h/riscv.hpp"
-#include "../../h/tcbWrapperUtil.hpp"
 
 TCB* TCB::running = nullptr;
 

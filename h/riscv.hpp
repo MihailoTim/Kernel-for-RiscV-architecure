@@ -100,6 +100,9 @@ class RiscV{
 
     static void mc_sie(uint64 mask);
 
+    static void startVirtualMemory();
+    static void shutVirtualMemory();
+
     static void saveA0toSscratch();
 
     static void jumpToDesignatedPrivilegeMode();
@@ -133,6 +136,10 @@ class RiscV{
     static void finalize();
 
     static void* getPMT();
+
+    static void buildSection(void* PMT, uint64 start, uint64 end, uint64 mask);
+
+    static void buildKernelPMT();
 
     friend class TCB;
 
@@ -236,5 +243,15 @@ inline void RiscV::enableTimerInterrupts() {
 
 inline void RiscV::disableTimerInterrupts(){
     RiscV::mc_sie(SIP_SSIE);
+}
+
+inline void RiscV::startVirtualMemory() {
+    uint64 satp = ((uint64)1<<63) | ((uint64)(RiscV::kPMT)>>12);
+    asm("csrw satp, %[satp]" : : [satp] "r" (satp));
+}
+
+inline void RiscV::shutVirtualMemory() {
+    uint64 satp = 0;
+    asm("csrw satp, %[satp]" : : [satp] "r" (satp));
 }
 #endif //OS1_KERNEL_RISCV_HPP

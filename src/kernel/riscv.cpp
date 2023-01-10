@@ -8,50 +8,13 @@
 #include "../../h/scheduler.hpp"
 #include "../../h/printing.hpp"
 #include "../../h/scb.hpp"
-#include "../../h/tcbWrapperUtil.hpp"
+#include "../../h/userWrappers.hpp"
 
 uint64 RiscV::globalTime = 0;
 bool RiscV::userMainFinished = false;
 void* RiscV::kPMT = nullptr;
 void* RiscV::uPMT = nullptr;
-extern char *userTextStart;
-extern char *userDataStart;
-extern char *userDataEnd;
-extern char *kernelTextEnd;
 
-void* RiscV::getPMT(){
-    void* ret = Buddy::alloc(1);
-    uint64* arr = (uint64*)ret;
-    for(int i=0;i<512;i++)
-        arr[i] = 0;
-    return ret;
-}
-
-void RiscV::handlePageFault(void* PMT, uint64 addr, uint64 mask){
-    uint64 pmt2Entry = (addr >> 30) & (0x1ff);;
-    uint64 pmt1Entry = (addr >> 21) & (0x1ff);
-    uint64 pmt0Entry = (addr >> 12) & (0x1ff);
-    uint64 pmt2Desc = ((uint64*)PMT)[pmt2Entry];
-    void* pmt1 = nullptr;
-    if(pmt2Desc == 0){
-        pmt1 = RiscV::getPMT();
-        ((uint64*)PMT)[pmt2Entry] = (((uint64)pmt1 >> 12) << 10) | (uint64)1;
-    }
-    else
-        pmt1 = (void*)((pmt2Desc >> 10) << 12);
-    uint64 pmt1Desc = ((uint64*)pmt1)[pmt1Entry];
-    void* pmt0 = nullptr;
-    if(pmt1Desc == 0){
-        pmt0 = RiscV::getPMT();
-        ((uint64*)pmt1)[pmt1Entry] = (((uint64)pmt0 >> 12) << 10) | (uint64)1;
-    }
-    else
-        pmt0 = (void*)((pmt1Desc >> 10) << 12);
-    uint64 pmt0Desc = ((uint64*)pmt0)[pmt0Entry];
-    if(pmt0Desc == 0) {
-        ((uint64 *) pmt0)[pmt0Entry] = ((addr >> 12) << 10) | mask;
-    }
-}
 //initailize each of the key components and switch to user mode for user code execution
 void RiscV::initialize(){
     RiscV::w_stvec((uint64) &RiscV::supervisorTrap);
@@ -61,65 +24,9 @@ void RiscV::initialize(){
     TCB::initialize();
     SCB::initialize();
     ConsoleUtil::initialize();
-    RiscV::kPMT = RiscV::getPMT();
-    uint64 kTextEnd = ((uint64)(&kernelTextEnd));
-    uint64 uTextStart = ((uint64)(&userTextStart));
-    uint64 uDataStart = ((uint64)(&userDataStart));
-    uint64 uDataEnd = ((uint64)(&userDataEnd));
-    uint64 hStart = ((uint64)HEAP_START_ADDR);
-    uint64 hEnd = ((uint64)HEAP_END_ADDR);
-    uint64 bEnd = ((uint64)Buddy::BUDDY_START_ADDR + (Buddy::BLOCKS_AVAILABLE<<12));
-
-
-    for(uint64 i=0x80000000;i< kTextEnd;i+=0x1000) {
-        handlePageFault(kPMT,i, 0xb);
-    }
-
-    for(uint64 i=kTextEnd;i<uTextStart;i+=0x1000) {
-        handlePageFault(kPMT,i, 0x7);
-    }
-
-    for (uint64 i = uTextStart; i < uDataStart; i+=0x1000) {
-        handlePageFault(kPMT, i, 0x1b);
-    }
-
-
-    for(uint64 i=uDataStart;i<uDataEnd;i++) {
-        handlePageFault(kPMT,i, 0x1f);
-    }
-
-    for(uint64 i=uDataEnd;i<hStart;i+=0x1000) {
-        handlePageFault(kPMT,i, 0x7);
-    }
-
-    for(uint64 i=hStart;i<bEnd;i+=0x1000) {
-        handlePageFault(kPMT,i, 0x7);
-    }
-
-    for(uint64 i = bEnd;i<hEnd;i+=0x1000){
-        handlePageFault(kPMT,i, 0x17);
-    }
-
-
-    RiscV::ms_sstatus(1<<18);
-    handlePageFault(kPMT, (uint64)CONSOLE_RX_DATA,0xf);
-    handlePageFault(kPMT, (uint64)CONSOLE_TX_DATA,0xf);
-    handlePageFault(kPMT, (uint64)CONSOLE_STATUS,0xf);
-    handlePageFault(kPMT, (uint64)0xc201004,0xf);
-
-//    ConsoleUtil::print("kTextEnd:", kTextEnd, "\n");
-//    ConsoleUtil::print("uTextStart:", uTextStart, "\n");
-//    ConsoleUtil::print("uDataStart:", uDataStart, "\n");
-//    ConsoleUtil::print("uDataEnd:", uDataEnd, "\n");
-//    ConsoleUtil::print("hStart:", hStart, "\n");
-//    ConsoleUtil::print("bEnd:", bEnd, "\n");
-//    ConsoleUtil::print("hEnd:", hEnd, "\n");
-
-    uint64 satp = ((uint64)1<<63) | ((uint64)(RiscV::kPMT)>>12);
-    asm("csrw satp, %[satp]" : : [satp] "r" (satp));
-
+    RiscV::buildKernelPMT();
+    RiscV::startVirtualMemory();
     RiscV::enableInterrupts();
-//    RiscV::enableHardwareInterrupts();
 }
 
 //get previous privilege and previous interrupt status
@@ -129,21 +36,9 @@ void RiscV::popSppSpie() {
         asm("csrw sepc, ra");
     else
     {
-        ra = (uint64)TCBWrapper::tcbWrap;
+        ra = (uint64)bodyWrapper;
         asm("mv a0, %[iarg]" : : [iarg] "r" (TCB::running->body));
         asm("mv a1, %[iarg]" : : [iarg] "r" (TCB::running->args));
-        asm("csrw sepc, %[ra]" : : [ra] "r" (ra));
-    }
-    asm("sret");
-}
-
-void RiscV::popSppSpie2() {
-    uint64 ra = 0;
-    if(TCB::running->mode == TCB::Mode::SUPERVISOR)
-        asm("csrw sepc, ra");
-    else
-    {
-        ra = (uint64)TCBWrapper::tcbWrap;
         asm("csrw sepc, %[ra]" : : [ra] "r" (ra));
     }
     asm("sret");
@@ -159,15 +54,6 @@ void RiscV::handleSupervisorTrap() {
 
     asm("csrr %[sscratch], sscratch" : [sscratch] "=r" (TCB::running->a0Location));
 
-    //interrupt from ecall (both user and supervisor mode)
-//    if(scause == 0x0c){
-//        uint64 stvec = RiscV::r_stvec();
-//        handlePageFault(kPMT, stvec, 0xb);
-//    }
-//    else if(scause == 0xd || scause == 0xf){
-//        uint64 stvec = RiscV::r_stvec();
-//        handlePageFault(kPMT, stvec, 0x17);
-//    }
     if(scause == 0x09 || scause == 0x08) {
 
         //save sstatus and sepc
@@ -866,4 +752,64 @@ void RiscV::threadDispatchUtil() {
     asm("li a0, 0x13");
 
     asm("ecall");
+}
+
+void RiscV::buildSection(void *PMT, uint64 start, uint64 end, uint64 mask) {
+    for(uint64 i=start;i< end;i+=0x1000) {
+        handlePageFault(kPMT,i, mask);
+    }
+}
+
+void RiscV::buildKernelPMT() {
+    RiscV::kPMT = RiscV::getPMT();
+    uint64 bEnd = ((uint64)Buddy::BUDDY_START_ADDR + (Buddy::BLOCKS_AVAILABLE<<12));
+
+
+    RiscV::buildSection(kPMT, OS_ENTRY, KERNEL_TEXT_END, 0xb);
+    RiscV::buildSection(kPMT, KERNEL_TEXT_END, USER_TEXT_START, 0x7);
+    RiscV::buildSection(kPMT, USER_TEXT_START, USER_DATA_START, 0x1b);
+    RiscV::buildSection(kPMT, USER_DATA_START, USER_DATA_END, 0x17);
+    RiscV::buildSection(kPMT, USER_DATA_END, bEnd, 0x7);
+    RiscV::buildSection(kPMT, bEnd, HEAP_END, 0x17);
+
+
+    RiscV::ms_sstatus(1<<18);
+    handlePageFault(kPMT, (uint64)CONSOLE_RX_DATA,0xf);
+    handlePageFault(kPMT, (uint64)CONSOLE_TX_DATA,0xf);
+    handlePageFault(kPMT, (uint64)CONSOLE_STATUS,0xf);
+    handlePageFault(kPMT, (uint64)0xc201004,0xf);
+}
+
+void* RiscV::getPMT(){
+    void* ret = Buddy::alloc(1);
+    uint64* arr = (uint64*)ret;
+    for(int i=0;i<512;i++)
+        arr[i] = 0;
+    return ret;
+}
+
+void RiscV::handlePageFault(void* PMT, uint64 addr, uint64 mask){
+    uint64 pmt2Entry = (addr >> 30) & (0x1ff);;
+    uint64 pmt1Entry = (addr >> 21) & (0x1ff);
+    uint64 pmt0Entry = (addr >> 12) & (0x1ff);
+    uint64 pmt2Desc = ((uint64*)PMT)[pmt2Entry];
+    void* pmt1 = nullptr;
+    if(pmt2Desc == 0){
+        pmt1 = RiscV::getPMT();
+        ((uint64*)PMT)[pmt2Entry] = (((uint64)pmt1 >> 12) << 10) | (uint64)1;
+    }
+    else
+        pmt1 = (void*)((pmt2Desc >> 10) << 12);
+    uint64 pmt1Desc = ((uint64*)pmt1)[pmt1Entry];
+    void* pmt0 = nullptr;
+    if(pmt1Desc == 0){
+        pmt0 = RiscV::getPMT();
+        ((uint64*)pmt1)[pmt1Entry] = (((uint64)pmt0 >> 12) << 10) | (uint64)1;
+    }
+    else
+        pmt0 = (void*)((pmt1Desc >> 10) << 12);
+    uint64 pmt0Desc = ((uint64*)pmt0)[pmt0Entry];
+    if(pmt0Desc == 0) {
+        ((uint64 *) pmt0)[pmt0Entry] = ((addr >> 12) << 10) | mask;
+    }
 }

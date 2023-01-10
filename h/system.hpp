@@ -10,9 +10,6 @@
 
 
 class System {
-
-    static void userMainWrapper(void* arg);
-
     static bool initialized;
 
 public:

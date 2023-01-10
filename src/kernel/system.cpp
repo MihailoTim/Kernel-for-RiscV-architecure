@@ -5,12 +5,12 @@
 #include "../../h/system.hpp"
 #include "../../h/riscv.hpp"
 #include "../../h/syscall_c.h"
-//#include "../../tests/userMain.hpp"
+#include "../../src/user/tests/userMain.hpp"
 #include "../../h/printing.hpp"
 #include "../../h/tcb.hpp"
 #include "../../h/scheduler.hpp"
 //#include "../../src/user/tests/testUser.hpp"
-#include "../../h/tcbWrapperUtil.hpp"
+#include "../../h/userWrappers.hpp"
 
 bool System::initialized = false;
 
@@ -36,7 +36,7 @@ System::System() {
         //also it provides kernel with an idle thread that will run itself if user code gets blocked (on getc syscall for example)
 
         thread_t userMainThread;
-        RiscV::threadCreateUtil((TCB**)(&userMainThread), TCBWrapper::userMainWrapper, nullptr);
+        RiscV::threadCreateUtil((TCB**)(&userMainThread), userMainWrapper, nullptr);
 
 
 //        //return control to user code until it reaches the end
@@ -48,19 +48,4 @@ System::System() {
         //finalize the machine
         RiscV::finalize();
     }
-}
-
-//wrapper function for userMain as per POSIX threads
-void System::userMainWrapper(void *arg){
-//    int ret = fork();
-//
-//    if(ret == 0){
-//        printString("dete\n");
-//    }
-//    else {
-//        printString("otac\n");
-//        thread_dispatch();
-//    }
-//    MemoryAllocator::showMemory();
-//    testUser();
 }
