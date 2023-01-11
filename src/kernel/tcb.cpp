@@ -31,7 +31,7 @@ void TCB::initialize() {
 
     TCB::running->mode = Mode::SUPERVISOR;
     //stack for thread that will be running console output
-    uint64 *putcStack = (uint64*)kmalloc(DEFAULT_STACK_SIZE);
+    uint64 *putcStack = (uint64*)MemoryAllocator::kmalloc((DEFAULT_STACK_SIZE+MEM_BLOCK_SIZE-1)/MEM_BLOCK_SIZE);
 
     //console output thread
     putcThread = new TCB(RiscV::putcWrapper, nullptr, putcStack, DEFAULT_TIME_SLICE);

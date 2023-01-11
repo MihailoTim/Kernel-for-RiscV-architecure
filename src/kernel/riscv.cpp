@@ -14,6 +14,7 @@ uint64 RiscV::globalTime = 0;
 bool RiscV::userMainFinished = false;
 void* RiscV::kPMT = nullptr;
 void* RiscV::uPMT = nullptr;
+bool RiscV::initialized = false;
 
 //initailize each of the key components and switch to user mode for user code execution
 void RiscV::initialize(){
@@ -26,6 +27,7 @@ void RiscV::initialize(){
     ConsoleUtil::initialize();
     RiscV::buildKernelPMT();
     RiscV::buildUserPMT();
+    RiscV::initialized = true;
     RiscV::startVirtualMemory(RiscV::kPMT);
     RiscV::enableInterrupts();
 }

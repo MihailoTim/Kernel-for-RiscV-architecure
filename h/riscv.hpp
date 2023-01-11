@@ -6,6 +6,7 @@
 #define OS1_KERNEL_RISCV_HPP
 #include "../lib/hw.h"
 class TCB;
+class SlabAllocator;
 
 class RiscV{
 
@@ -13,6 +14,8 @@ class RiscV{
 
     static void* kPMT;
     static void* uPMT;
+
+    static bool initialized;
 
     static bool userMainFinished;
 
@@ -152,6 +155,8 @@ class RiscV{
     friend class Scheduler;
 
     friend class ConsoleUtil;
+
+    friend class SlabAllocator;
 };
 
 inline uint64 RiscV::r_scause(){

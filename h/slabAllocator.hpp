@@ -41,8 +41,7 @@ public:
 
     static Cache *sizeN[13];
     static Cache *cache;
-    static void* startAddr;
-    static uint64 blocksResponsibleFor;
+    static Cache *slabHeaders;
 
 private:
     static void insertIntoList(Slab* &head, Slab* slab);

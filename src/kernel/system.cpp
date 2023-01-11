@@ -6,6 +6,7 @@
 #include "../../h/riscv.hpp"
 #include "../../h/syscall_c.h"
 #include "../../src/user/tests/userMain.hpp"
+#include "../../src/kernel/tests/test2.hpp"
 #include "../../h/printing.hpp"
 #include "../../h/tcb.hpp"
 #include "../../h/scheduler.hpp"
@@ -23,6 +24,8 @@ void ctor(void* tst){
     ((Test*)tst)->c = 13;
 
 }
+
+
 System::System() {
     //check whether system is already running to prevent user malicious access
     if (!initialized) {
@@ -31,7 +34,24 @@ System::System() {
         //initialize the machine
         RiscV::initialize();
 
-//        test2();
+        void* ret1 = kmalloc(1<<17);
+        if(ret1 == nullptr){
+            ConsoleUtil::printString("ERROR\n");
+        }
+        else{
+            ConsoleUtil::print("",(uint64)ret1,"\n");
+        };
+        void* ret2 = kmalloc(1<<17);
+        if(ret2 == nullptr){
+            ConsoleUtil::printString("ERROR\n");
+        }
+        else{
+            ConsoleUtil::print("",(uint64)ret2,"\n");
+        };
+//        for(int i=0;i<BUCKET_SIZE;i++){
+//            kmem_cache_info(SlabAllocator::sizeN[i]);
+//        }
+        test2();
         //creating a thread that will be executing user code
         //this is done as to separate user code execution from main kernel thread
         //also it provides kernel with an idle thread that will run itself if user code gets blocked (on getc syscall for example)
