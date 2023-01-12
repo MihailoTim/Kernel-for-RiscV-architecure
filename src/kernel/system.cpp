@@ -34,40 +34,26 @@ System::System() {
         //initialize the machine
         RiscV::initialize();
 
+        kmem_cache_info(SlabAllocator::largeSlabCache);
+        SlabAllocator::printSlab(SlabAllocator::largeSlabCache->partialHead);
+
         kmem_cache_t* cache1 = kmem_cache_create("Cache 1", 512, nullptr, nullptr);
         kmem_cache_t* cache2 = kmem_cache_create("Cache 1", 1<<15, nullptr, nullptr);
         kmem_cache_alloc(cache1);
+        void* ret1 =kmem_cache_alloc(cache2);
         kmem_cache_alloc(cache2);
         kmem_cache_alloc(cache2);
         kmem_cache_alloc(cache2);
-        void *ret = kmem_cache_alloc(cache2);
-
+        kmem_cache_alloc(cache2);
+        kmem_cache_info(cache2);
+        kmem_cache_free(cache2,ret1);
+        SlabAllocator::printSlab(cache2->partialHead);
         SlabAllocator::printSlab(cache2->fullHead);
 
-        kmem_cache_free(cache2, ret);
+        kmem_cache_info(SlabAllocator::largeSlabCache);
+        SlabAllocator::printSlab(SlabAllocator::largeSlabCache->partialHead);
 
-        SlabAllocator::printSlab(cache2->partialHead);
-
-        kmem_cache_info(cache1);
-        kmem_cache_info(cache2);
-        void* ret1 = kmalloc(1<<17);
-        if(ret1 == nullptr){
-            ConsoleUtil::printString("ERROR\n");
-        }
-        else{
-            ConsoleUtil::print("",(uint64)ret1,"\n");
-        };
-        void* ret2 = kmalloc(1<<17);
-        if(ret2 == nullptr){
-            ConsoleUtil::printString("ERROR\n");
-        }
-        else{
-            ConsoleUtil::print("",(uint64)ret2,"\n");
-        };
-        for(int i=0;i<BUCKET_SIZE;i++){
-            kmem_cache_info(SlabAllocator::sizeN[i]);
-        }
-        test2();
+//        test2();
         //creating a thread that will be executing user code
         //this is done as to separate user code execution from main kernel thread
         //also it provides kernel with an idle thread that will run itself if user code gets blocked (on getc syscall for example)

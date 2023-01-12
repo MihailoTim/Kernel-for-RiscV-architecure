@@ -28,7 +28,7 @@ void SlabAllocator::initialize(void* space, uint64 blockNum) {
     largeSlabCache->emptyHead = nullptr;
     largeSlabCache->partialHead = nullptr;
     largeSlabCache->fullHead = nullptr;
-    largeSlabCache->objectSize = sizeof(Cache);
+    largeSlabCache->objectSize = sizeof(Slab);
     largeSlabCache->slabSize = 4;
     strcpy("Large Slab Cache", cache->name);
 
