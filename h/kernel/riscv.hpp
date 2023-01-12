@@ -103,6 +103,12 @@ class RiscV{
 
     static void mc_sie(uint64 mask);
 
+    static uint64 getPMT2Entry(uint64 addr);
+
+    static uint64 getPMT1Entry(uint64 addr);
+
+    static uint64 getPMT0Entry(uint64 addr);
+
     static void startVirtualMemory(void *PMT);
     static void shutVirtualMemory();
 
@@ -262,5 +268,17 @@ inline void RiscV::startVirtualMemory(void* PMT) {
 inline void RiscV::shutVirtualMemory() {
     uint64 satp = 0;
     asm("csrw satp, %[satp]" : : [satp] "r" (satp));
+}
+
+inline uint64 RiscV::getPMT2Entry(uint64 addr) {
+    return (addr >> 30) & (0x1ff);
+}
+
+inline uint64 RiscV::getPMT1Entry(uint64 addr) {
+    return (addr >> 21) & (0x1ff);
+}
+
+inline uint64 RiscV::getPMT0Entry(uint64 addr) {
+    return (addr >> 12) & (0x1ff);
 }
 #endif //OS1_KERNEL_RISCV_HPP

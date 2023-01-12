@@ -20,6 +20,7 @@ SECTIONS
 
   .rodata : {
     . = ALIGN(16);
+    PROVIDE(kernelDataStart = .);
     EXCLUDE_FILE(build/src/user/*)
     *(.srodata .srodata.*) /* do not need to distinguish this from .rodata */
     . = ALIGN(16);
@@ -43,6 +44,8 @@ SECTIONS
     . = ALIGN(16);
     EXCLUDE_FILE(build/src/user/*)
     *(.bss .bss.*)
+    . = ALIGN(0x1000);
+    PROVIDE(kernelDataEnd = .);
   }
 
   .user : {
@@ -50,6 +53,7 @@ SECTIONS
     PROVIDE(userTextStart = .);
     *(.text .text.*)
     . = ALIGN(0x1000);
+    PROVIDE(userTextEnd = .);
     PROVIDE(userDataStart = .);
     *(.srodata .srodata.*)
     *(.rodata .rodata.*)

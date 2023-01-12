@@ -10,6 +10,8 @@
 #include "../../../h/kernel/buddy_allocator.hpp"
 
 void userMain() {
+    uint64 *x = (uint64*)HEAP_START_ADDR;
+    *x=3;
 //    Threads_C_API_test(); // zadatak 2., niti C API i sinhrona promena konteksta
 //    Threads_CPP_API_test(); // zadatak 2., niti CPP API i sinhrona promena konteksta
 
@@ -17,6 +19,6 @@ void userMain() {
 //    producerConsumer_CPP_Sync_API(); // zadatak 3., kompletan CPP API sa semaforima, sinhrona promena konteksta
 
 //    testSleeping(); // thread_sleep test C API
-//    ConsumerProducerCPP::testConsumerProducer(); // zadatak 4. CPP API i asinhrona promena konteksta, kompletan test svega
+    ConsumerProducerCPP::testConsumerProducer(); // zadatak 4. CPP API i asinhrona promena konteksta, kompletan test svega
     testUser();
 }

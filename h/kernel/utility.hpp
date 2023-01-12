@@ -25,6 +25,7 @@
 #define MAX_NUMBER_OF_SLOTS 1024
 #define SMALL_CACHE_DEFAULT_SLAB_SIZE 1
 #define SLAB_HEADER_DEFAULT_SLAB_SIZE 4
+#define PLIC_CLAIM_PF 0xC201004
 
 extern const char *numbers[13];
 extern char *userTextStart;
