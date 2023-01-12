@@ -825,10 +825,7 @@ void RiscV::handlePageFault(void* PMT, uint64 addr, uint64 mask){
     }
     else
         pmt0 = (void*)((pmt1Desc >> 10) << 12);
-    uint64 pmt0Desc = ((uint64*)pmt0)[pmt0Entry];
-    if(pmt0Desc == 0) {
-        ((uint64 *) pmt0)[pmt0Entry] = ((addr >> 12) << 10) | mask;
-    }
+    ((uint64 *) pmt0)[pmt0Entry] = ((addr >> 12) << 10) | mask;
 }
 
 void RiscV::mapConsoleRegisters(void *PMT) {

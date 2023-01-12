@@ -8,7 +8,7 @@
 Cache* SlabAllocator::cache = nullptr;
 Cache* SlabAllocator::largeSlabCache = nullptr;
 Cache* SlabAllocator::sizeN[BUCKET_SIZE] = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
-const char* SlabAllocator::names[13] = {"Buffer Cache No. 0", "Buffer Cache No. 1", "Buffer Cache No. 2", "Buffer Cache No. 3", "Buffer Cache No. 4", "Buffer Cache No. 5", "Buffer Cache No. 6", "Buffer Cache No. 7", "Buffer Cache No. 8", "Buffer Cache No. 9", "Buffer Cache No. 10", "Buffer Cache No. 11", "Buffer Cache No. 12"};
+const char* SlabAllocator::names[13] = {"Buffer Cache No. 5", "Buffer Cache No. 6", "Buffer Cache No. 7", "Buffer Cache No. 8", "Buffer Cache No. 9", "Buffer Cache No. 10", "Buffer Cache No. 11", "Buffer Cache No. 12", "Buffer Cache No. 13", "Buffer Cache No. 14", "Buffer Cache No. 15", "Buffer Cache No. 16", "Buffer Cache No. 17"};
 
 void SlabAllocator::initialize(void* space, uint64 blockNum) {
     Buddy::initialize(space, blockNum);
@@ -20,6 +20,7 @@ void SlabAllocator::initialize(void* space, uint64 blockNum) {
     cache->fullHead = nullptr;
     cache->objectSize = sizeof(Cache);
     cache->slabSize = DEFAULT_SLAB_SIZE;
+    cache->errCode = 0;
     strcpy("Main Cache", cache->name);
 
     largeSlabCache = (Cache*)BUDDY_META_ADDR_CONST;
@@ -30,6 +31,7 @@ void SlabAllocator::initialize(void* space, uint64 blockNum) {
     largeSlabCache->fullHead = nullptr;
     largeSlabCache->objectSize = sizeof(Slab);
     largeSlabCache->slabSize = SLAB_HEADER_DEFAULT_SLAB_SIZE;
+    cache->errCode = 0;
     strcpy("Large Slab Cache", cache->name);
 
 
@@ -40,8 +42,10 @@ void SlabAllocator::initialize(void* space, uint64 blockNum) {
 
 bool SlabAllocator::allocateSlab(Cache *cache) {
     Slab* slab = (Slab*)Buddy::alloc(cache->slabSize);
-    if(!slab)
+    if(!slab) {
+        cache->errCode = 2;
         return false;
+    }
     SlabAllocator::insertIntoList(cache->emptyHead, slab);
     slab->totalNumOfSlots = slab->numOfFreeSlots = (((1<<cache->slabSize) << BLOCK_SIZE_BITS) - sizeof(Slab)) / cache->objectSize;
     if(slab->totalNumOfSlots > MAX_NUMBER_OF_SLOTS)
@@ -73,6 +77,7 @@ void* SlabAllocator::allocateSlot(Slab *slab) {
             return (void*)((uint64)slab->objectOffset + i*slab->parent->objectSize);
         }
     }
+    slab->parent->errCode = 1;
     return nullptr;
 }
 
@@ -177,6 +182,7 @@ Cache* SlabAllocator::createCache(const char *name, size_t size, void (*ctor)(vo
     ret->dtor = dtor;
     ret->emptyHead = ret->partialHead = ret->fullHead = nullptr;
     ret->objectSize = size;
+    ret->errCode = 0;
     int deg = Buddy::getDeg(Buddy::ceil(size));
     if(size <= sizeof(Slab)){
         ret->slabSize = SMALL_CACHE_DEFAULT_SLAB_SIZE;
@@ -280,4 +286,13 @@ void SlabAllocator::removeFromList(Slab* &head, Slab* slab) {
 void SlabAllocator::move(Slab* &headFrom, Slab* &headTo, Slab* slab) {
     SlabAllocator::removeFromList(headFrom, slab);
     SlabAllocator::insertIntoList(headTo, slab);
+}
+
+int SlabAllocator::cacheErrorHandler(Cache *cache) {
+    switch(cache->errCode){
+        case 0: ConsoleUtil::printString("No errors\n");break;
+        case 1: ConsoleUtil::printString("No available slots\n");break;
+        case 2: ConsoleUtil::printString("Couldn't allocate slab\n");break;
+    }
+    return cache->errCode;
 }

@@ -15,6 +15,7 @@ void kmem_cache_info(kmem_cache_t* cachep);
 int kmem_cache_shrink(kmem_cache_t* cachep);
 void* kmalloc(size_t size);
 void kfree(const void* objp);
+int kmem_cache_error(kmem_cache_t* cachep);
 
 
 #endif //KERNEL_FOR_RISCV_ARCHITECURE_SLAB_HPP

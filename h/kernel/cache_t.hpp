@@ -14,6 +14,7 @@ public:
     char name[CACHE_MAX_NAME_LENGTH];
     uint64 objectSize;
     uint64 slabSize;
+    uint64 errCode;
     void (*ctor)(void*);
     void (*dtor)(void*);
 

@@ -37,3 +37,7 @@ void* kmalloc(size_t size){
 void kfree(const void* objp){
     SlabAllocator::freeBuffer(objp);
 }
+
+int kmem_cache_error(kmem_cache_t* cachep){
+    return SlabAllocator::cacheErrorHandler(cachep);
+}

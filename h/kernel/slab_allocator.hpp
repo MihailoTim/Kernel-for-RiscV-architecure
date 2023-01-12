@@ -39,6 +39,8 @@ public:
 
     static void printCache(Cache *cache);
 
+    static int cacheErrorHandler(Cache* cache);
+
     static Cache *sizeN[13];
     static Cache *cache;
     static Cache *largeSlabCache;
