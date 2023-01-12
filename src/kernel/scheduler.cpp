@@ -4,7 +4,7 @@
 
 #include "../../h/kernel/scheduler.hpp"
 #include "../../h/user/printing.hpp"
-#include "../../h/kernel/consoleUtil.hpp"
+#include "../../h/kernel/console_util.hpp"
 #include "../../h/kernel/riscv.hpp"
 
 TCB* Scheduler::readyHead = nullptr;

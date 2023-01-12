@@ -10,7 +10,7 @@
 #include "../../h/user/printing.hpp"
 #include "../../h/kernel/tcb.hpp"
 #include "../../h/kernel/scheduler.hpp"
-#include "../../h/user/userWrappers.hpp"
+#include "../../h/user/user_wrappers.hpp"
 
 bool System::initialized = false;
 
@@ -34,26 +34,38 @@ System::System() {
         //initialize the machine
         RiscV::initialize();
 
-        kmem_cache_info(SlabAllocator::largeSlabCache);
-        SlabAllocator::printSlab(SlabAllocator::largeSlabCache->partialHead);
+        ConsoleUtil::print("",sizeof(Slab),"\n",10);
 
-        kmem_cache_t* cache1 = kmem_cache_create("Cache 1", 512, nullptr, nullptr);
-        kmem_cache_t* cache2 = kmem_cache_create("Cache 1", 1<<15, nullptr, nullptr);
-        kmem_cache_alloc(cache1);
-        void* ret1 =kmem_cache_alloc(cache2);
-        kmem_cache_alloc(cache2);
-        kmem_cache_alloc(cache2);
-        kmem_cache_alloc(cache2);
-        kmem_cache_alloc(cache2);
-        kmem_cache_info(cache2);
-        kmem_cache_free(cache2,ret1);
-        SlabAllocator::printSlab(cache2->partialHead);
-        SlabAllocator::printSlab(cache2->fullHead);
+        Cache* cache=kmem_cache_create("",20,nullptr, nullptr);
+        kmem_cache_alloc(cache);
+        SlabAllocator::printSlab(cache->partialHead);
+//        Cache* cache1 = kmem_cache_create("Cache size 0", 1, nullptr, nullptr);
+//        kmem_cache_alloc(cache1);
+//        SlabAllocator::printSlab(cache1->partialHead);
+//        kmem_cache_info(cache1);
 
-        kmem_cache_info(SlabAllocator::largeSlabCache);
-        SlabAllocator::printSlab(SlabAllocator::largeSlabCache->partialHead);
 
-//        test2();
+//        kmem_cache_info(SlabAllocator::largeSlabCache);
+//        SlabAllocator::printSlab(SlabAllocator::largeSlabCache->partialHead);
+//
+//        kmem_cache_t* cache1 = kmem_cache_create("Cache 1", 512, nullptr, nullptr);
+//        kmem_cache_t* cache2 = kmem_cache_create("Cache 1", 1500, nullptr, nullptr);
+//        kmem_cache_alloc(cache1);
+//        void* ret1 =kmem_cache_alloc(cache2);
+//        kmem_cache_info(cache2);
+//        kmem_cache_alloc(cache2);
+//        kmem_cache_alloc(cache2);
+//        kmem_cache_alloc(cache2);
+//        kmem_cache_alloc(cache2);
+//        kmem_cache_info(cache2);
+//        kmem_cache_free(cache2,ret1);
+//        SlabAllocator::printSlab(cache2->partialHead);
+//        SlabAllocator::printSlab(cache2->fullHead);
+//
+//        kmem_cache_info(SlabAllocator::largeSlabCache);
+//        SlabAllocator::printSlab(SlabAllocator::largeSlabCache->partialHead);
+
+        test2();
         //creating a thread that will be executing user code
         //this is done as to separate user code execution from main kernel thread
         //also it provides kernel with an idle thread that will run itself if user code gets blocked (on getc syscall for example)

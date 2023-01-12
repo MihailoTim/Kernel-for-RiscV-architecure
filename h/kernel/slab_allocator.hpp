@@ -6,8 +6,8 @@
 #define KERNEL_FOR_RISCV_ARCHITECURE_SLAN_HPP
 
 #include "utility.hpp"
-#include "buddyAllocator.hpp"
-#include "consoleUtil.hpp"
+#include "buddy_allocator.hpp"
+#include "console_util.hpp"
 #include "cache_t.hpp"
 
 class SlabAllocator{

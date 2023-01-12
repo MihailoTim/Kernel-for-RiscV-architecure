@@ -2,7 +2,7 @@
 // Created by os on 5/29/22.
 //
 
-#include "../../h/kernel/consoleUtil.hpp"
+#include "../../h/kernel/console_util.hpp"
 #include "../../h/user/printing.hpp"
 #include "../../h/kernel/scb.hpp"
 

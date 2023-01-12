@@ -1,7 +1,7 @@
 //
 // Created by os on 1/10/23.
 //
-#include "../../h/user/userWrappers.hpp"
+#include "../../h/user/user_wrappers.hpp"
 #include "../../h/user/syscall_c.h"
 #include "tests/userMain.hpp"
 

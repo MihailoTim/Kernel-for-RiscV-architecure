@@ -3,12 +3,12 @@
 //
 
 #include "../../h/kernel/riscv.hpp"
-#include "../../h/kernel/memoryAllocator.hpp"
+#include "../../h/kernel/memory_allocator.hpp"
 #include "../../h/kernel/tcb.hpp"
 #include "../../h/kernel/scheduler.hpp"
 #include "../../h/user/printing.hpp"
 #include "../../h/kernel/scb.hpp"
-#include "../../h/user/userWrappers.hpp"
+#include "../../h/user/user_wrappers.hpp"
 
 uint64 RiscV::globalTime = 0;
 bool RiscV::userMainFinished = false;
@@ -562,11 +562,11 @@ void RiscV::executePutcUtilSyscall() {
 void RiscV::jumpToDesignatedPrivilegeMode() {
     if(TCB::running->mode == TCB::Mode::SUPERVISOR) {
         RiscV::ms_sstatus(RiscV::SSTATUS_SPP);
-        RiscV::startVirtualMemory(RiscV::kPMT);
+//        RiscV::startVirtualMemory(RiscV::kPMT);
     }
     else {
         RiscV::mc_sstatus(RiscV::SSTATUS_SPP);
-        RiscV::startVirtualMemory(RiscV::uPMT);
+//        RiscV::startVirtualMemory(RiscV::uPMT);
     }
 }
 

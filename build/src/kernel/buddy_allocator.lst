@@ -1,0 +1,2237 @@
+GAS LISTING /tmp/ccarrZFM.s 			page 1
+
+
+   1              		.file	"buddy_allocator.cpp"
+   2              		.option pic
+   3              		.option norelax
+   4              		.text
+   5              	.Ltext0:
+   6              		.align	2
+   8              	_Z41__static_initialization_and_destruction_0ii:
+   9              	.LFB10:
+  10              		.file 1 "src/kernel/buddy_allocator.cpp"
+   1:src/kernel/buddy_allocator.cpp **** #include "../../h/kernel/buddy_allocator.hpp"
+   2:src/kernel/buddy_allocator.cpp **** #include "../../h/kernel/console_util.hpp"
+   3:src/kernel/buddy_allocator.cpp **** 
+   4:src/kernel/buddy_allocator.cpp **** void* Buddy::BUDDY_START_ADDR = BUDDY_START_ADDR_CONST;
+   5:src/kernel/buddy_allocator.cpp **** void* Buddy::BUDDY_META_DATA_ADDR = BUDDY_META_ADDR_CONST;
+   6:src/kernel/buddy_allocator.cpp **** uint64 Buddy::BLOCKS_AVAILABLE = BUDDY_NUMBER_OF_BLOCKS;
+   7:src/kernel/buddy_allocator.cpp **** Buddy::Bucket* Buddy::head[BUCKET_SIZE] = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nu
+   8:src/kernel/buddy_allocator.cpp **** Buddy::Bucket* Buddy::tail[BUCKET_SIZE] = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nu
+   9:src/kernel/buddy_allocator.cpp **** 
+  10:src/kernel/buddy_allocator.cpp **** void Buddy::initialize(void* addr, uint64 block_num){
+  11:src/kernel/buddy_allocator.cpp ****     Buddy::BUDDY_START_ADDR = addr;
+  12:src/kernel/buddy_allocator.cpp ****     Buddy::BUDDY_META_DATA_ADDR = BUDDY_META_ADDR_CONST;
+  13:src/kernel/buddy_allocator.cpp ****     Buddy::BLOCKS_AVAILABLE = block_num;
+  14:src/kernel/buddy_allocator.cpp ****     head[getDeg(block_num)] = tail[getDeg(block_num)] = (Block*)BUDDY_START_ADDR;
+  15:src/kernel/buddy_allocator.cpp ****     head[getDeg(block_num)]->next = tail[getDeg(block_num)]->next = nullptr;
+  16:src/kernel/buddy_allocator.cpp **** }
+  17:src/kernel/buddy_allocator.cpp **** 
+  18:src/kernel/buddy_allocator.cpp **** void* Buddy::alloc(uint64 size) {
+  19:src/kernel/buddy_allocator.cpp **** 
+  20:src/kernel/buddy_allocator.cpp ****     if(size<0 || size>=BUCKET_SIZE)
+  21:src/kernel/buddy_allocator.cpp ****         return nullptr;
+  22:src/kernel/buddy_allocator.cpp **** 
+  23:src/kernel/buddy_allocator.cpp ****     Block* blk = nullptr;
+  24:src/kernel/buddy_allocator.cpp **** 
+  25:src/kernel/buddy_allocator.cpp ****     for(uint64 i=size;i<BUCKET_SIZE;i++){
+  26:src/kernel/buddy_allocator.cpp ****         if(head[i] != nullptr){
+  27:src/kernel/buddy_allocator.cpp ****             blk = head[i];
+  28:src/kernel/buddy_allocator.cpp ****             head[i] = head[i]->next;
+  29:src/kernel/buddy_allocator.cpp ****             if(!head[i])
+  30:src/kernel/buddy_allocator.cpp ****                 tail[i] = nullptr;
+  31:src/kernel/buddy_allocator.cpp ****             split(blk, i, size);
+  32:src/kernel/buddy_allocator.cpp ****             break;
+  33:src/kernel/buddy_allocator.cpp ****         }
+  34:src/kernel/buddy_allocator.cpp ****     }
+  35:src/kernel/buddy_allocator.cpp ****     return blk;
+  36:src/kernel/buddy_allocator.cpp **** }
+  37:src/kernel/buddy_allocator.cpp **** 
+  38:src/kernel/buddy_allocator.cpp **** void Buddy::free(void *addr, uint64 size) {
+  39:src/kernel/buddy_allocator.cpp ****     if(addr == nullptr)
+  40:src/kernel/buddy_allocator.cpp ****         return;
+  41:src/kernel/buddy_allocator.cpp ****     insert(addr,size);
+  42:src/kernel/buddy_allocator.cpp **** }
+  43:src/kernel/buddy_allocator.cpp **** 
+  44:src/kernel/buddy_allocator.cpp **** void Buddy::insert(void *addr, uint64 size) {
+  45:src/kernel/buddy_allocator.cpp ****     if(!head[size]){
+  46:src/kernel/buddy_allocator.cpp ****         head[size] = tail[size] = (Block*)addr;
+  47:src/kernel/buddy_allocator.cpp ****         head[size]->next = tail[size]->next = nullptr;
+  48:src/kernel/buddy_allocator.cpp ****         return;
+GAS LISTING /tmp/ccarrZFM.s 			page 2
+
+
+  49:src/kernel/buddy_allocator.cpp ****     }
+  50:src/kernel/buddy_allocator.cpp ****     else {
+  51:src/kernel/buddy_allocator.cpp ****         if ((uint64) addr < (uint64) head[size]) {
+  52:src/kernel/buddy_allocator.cpp ****             Bucket *newHead = (Bucket *) addr;
+  53:src/kernel/buddy_allocator.cpp ****             newHead->next = head[size];
+  54:src/kernel/buddy_allocator.cpp ****             head[size] = newHead;
+  55:src/kernel/buddy_allocator.cpp ****             compress(size);
+  56:src/kernel/buddy_allocator.cpp ****             return;
+  57:src/kernel/buddy_allocator.cpp ****         } else {
+  58:src/kernel/buddy_allocator.cpp ****             Block *prev = nullptr, *iter = head[size];
+  59:src/kernel/buddy_allocator.cpp ****             while (iter != nullptr) {
+  60:src/kernel/buddy_allocator.cpp ****                 if ((uint64) addr < (uint64) iter) {
+  61:src/kernel/buddy_allocator.cpp ****                     Block *newBlock = (Block *) addr;
+  62:src/kernel/buddy_allocator.cpp ****                     newBlock->next = iter;
+  63:src/kernel/buddy_allocator.cpp ****                     prev->next = newBlock;
+  64:src/kernel/buddy_allocator.cpp ****                     compress(size);
+  65:src/kernel/buddy_allocator.cpp ****                     return;
+  66:src/kernel/buddy_allocator.cpp ****                 } else {
+  67:src/kernel/buddy_allocator.cpp ****                     prev = iter;
+  68:src/kernel/buddy_allocator.cpp ****                     iter = iter->next;
+  69:src/kernel/buddy_allocator.cpp ****                 }
+  70:src/kernel/buddy_allocator.cpp ****             }
+  71:src/kernel/buddy_allocator.cpp ****         }
+  72:src/kernel/buddy_allocator.cpp ****     }
+  73:src/kernel/buddy_allocator.cpp ****     tail[size]->next = (Block*)addr;
+  74:src/kernel/buddy_allocator.cpp ****     tail[size] = tail[size]->next;
+  75:src/kernel/buddy_allocator.cpp ****     compress(size);
+  76:src/kernel/buddy_allocator.cpp **** }
+  77:src/kernel/buddy_allocator.cpp **** 
+  78:src/kernel/buddy_allocator.cpp **** void Buddy::compress(uint64 size) {
+  79:src/kernel/buddy_allocator.cpp ****     if(size == BUCKET_SIZE-1)
+  80:src/kernel/buddy_allocator.cpp ****         return;
+  81:src/kernel/buddy_allocator.cpp ****     Block *curr = head[size];
+  82:src/kernel/buddy_allocator.cpp ****     Block *prev = nullptr;
+  83:src/kernel/buddy_allocator.cpp ****     while(curr && curr->next != nullptr){
+  84:src/kernel/buddy_allocator.cpp ****         uint64 blkNoCurr = ((uint64)(curr) - (uint64)Buddy::BUDDY_START_ADDR) >> (BUDDY_BLOCK_BITS+
+  85:src/kernel/buddy_allocator.cpp ****         uint64 blkNoNext = ((uint64)(curr->next) - (uint64)Buddy::BUDDY_START_ADDR) >> (BUDDY_BLOCK
+  86:src/kernel/buddy_allocator.cpp ****         uint64 pair = (blkNoCurr % 2 == 0) ? blkNoCurr + 1 : blkNoCurr - 1;
+  87:src/kernel/buddy_allocator.cpp ****         Block *blk = curr;
+  88:src/kernel/buddy_allocator.cpp ****         if(blkNoNext == pair){
+  89:src/kernel/buddy_allocator.cpp ****             if(prev){
+  90:src/kernel/buddy_allocator.cpp ****                 prev->next = curr->next->next;
+  91:src/kernel/buddy_allocator.cpp ****             }
+  92:src/kernel/buddy_allocator.cpp ****             else{
+  93:src/kernel/buddy_allocator.cpp ****                 head[size] = curr->next->next;
+  94:src/kernel/buddy_allocator.cpp ****                 if(!head[size])
+  95:src/kernel/buddy_allocator.cpp ****                     tail[size] = nullptr;
+  96:src/kernel/buddy_allocator.cpp ****             }
+  97:src/kernel/buddy_allocator.cpp ****         }
+  98:src/kernel/buddy_allocator.cpp ****         else
+  99:src/kernel/buddy_allocator.cpp ****             prev = curr;
+ 100:src/kernel/buddy_allocator.cpp ****         if(blkNoNext == pair){
+ 101:src/kernel/buddy_allocator.cpp ****             blk->next = nullptr;
+ 102:src/kernel/buddy_allocator.cpp ****             insert(blk, size+1);
+ 103:src/kernel/buddy_allocator.cpp ****         }
+ 104:src/kernel/buddy_allocator.cpp ****         curr = curr->next;
+ 105:src/kernel/buddy_allocator.cpp ****     }
+GAS LISTING /tmp/ccarrZFM.s 			page 3
+
+
+ 106:src/kernel/buddy_allocator.cpp **** }
+ 107:src/kernel/buddy_allocator.cpp **** 
+ 108:src/kernel/buddy_allocator.cpp **** void Buddy::split(Block *block, int currentBucket, int startBucket) {
+ 109:src/kernel/buddy_allocator.cpp ****     while(--currentBucket>=startBucket){
+ 110:src/kernel/buddy_allocator.cpp ****         if(tail[currentBucket]) {
+ 111:src/kernel/buddy_allocator.cpp ****             tail[currentBucket]->next = (Block *) ((uint64) block + (1 << (currentBucket + BUDDY_BL
+ 112:src/kernel/buddy_allocator.cpp ****             tail[currentBucket] = tail[currentBucket]->next;
+ 113:src/kernel/buddy_allocator.cpp ****         }
+ 114:src/kernel/buddy_allocator.cpp ****         else{
+ 115:src/kernel/buddy_allocator.cpp ****             head[currentBucket] = tail[currentBucket] = (Block *) ((uint64) block + (1 << (currentB
+ 116:src/kernel/buddy_allocator.cpp ****             head[currentBucket]->next = tail[currentBucket]->next = nullptr;
+ 117:src/kernel/buddy_allocator.cpp ****         }
+ 118:src/kernel/buddy_allocator.cpp ****     }
+ 119:src/kernel/buddy_allocator.cpp **** }
+ 120:src/kernel/buddy_allocator.cpp **** 
+ 121:src/kernel/buddy_allocator.cpp **** void Buddy::printList() {
+ 122:src/kernel/buddy_allocator.cpp ****     for(int i=0;i<BUCKET_SIZE;i++){
+ 123:src/kernel/buddy_allocator.cpp ****         ConsoleUtil::printInt(i,10);
+ 124:src/kernel/buddy_allocator.cpp ****         ConsoleUtil::printString(": ");
+ 125:src/kernel/buddy_allocator.cpp ****         Bucket *tmp = head[i];
+ 126:src/kernel/buddy_allocator.cpp ****         while(tmp != nullptr){
+ 127:src/kernel/buddy_allocator.cpp ****             ConsoleUtil::printInt((uint64)tmp,16);
+ 128:src/kernel/buddy_allocator.cpp ****             ConsoleUtil::printString(" ");
+ 129:src/kernel/buddy_allocator.cpp ****             tmp = tmp->next;
+ 130:src/kernel/buddy_allocator.cpp ****         }
+ 131:src/kernel/buddy_allocator.cpp ****         ConsoleUtil::printString("\n");
+ 132:src/kernel/buddy_allocator.cpp ****     }
+ 133:src/kernel/buddy_allocator.cpp **** }...
+  11              		.loc 1 133 1
+  12              		.cfi_startproc
+  13              	.LVL0:
+  14 0000 130101FF 		addi	sp,sp,-16
+  15              		.cfi_def_cfa_offset 16
+  16 0004 23348100 		sd	s0,8(sp)
+  17              		.cfi_offset 8, -8
+  18 0008 13040101 		addi	s0,sp,16
+  19              		.cfi_def_cfa 8, 0
+  20              		.loc 1 133 1 is_stmt 0
+  21 000c 93071000 		li	a5,1
+  22 0010 6308F500 		beq	a0,a5,.L4
+  23              	.L1:
+  24 0014 03348100 		ld	s0,8(sp)
+  25              		.cfi_remember_state
+  26              		.cfi_restore 8
+  27              		.cfi_def_cfa 2, 16
+  28 0018 13010101 		addi	sp,sp,16
+  29              		.cfi_def_cfa_offset 0
+  30 001c 67800000 		jr	ra
+  31              	.L4:
+  32              		.cfi_restore_state
+  33              		.loc 1 133 1 discriminator 1
+  34 0020 B7070100 		li	a5,65536
+  35 0024 9387F7FF 		addi	a5,a5,-1
+  36 0028 E396F5FE 		bne	a1,a5,.L1
+   4:src/kernel/buddy_allocator.cpp **** void* Buddy::BUDDY_START_ADDR = BUDDY_START_ADDR_CONST;
+  37              		.loc 1 4 33
+  38 002c 97070000 		la	a5,HEAP_START_ADDR
+GAS LISTING /tmp/ccarrZFM.s 			page 4
+
+
+  38      83B70700 
+  39 0034 03B70700 		ld	a4,0(a5)
+  40 0038 9357C700 		srli	a5,a4,12
+  41 003c 93872700 		addi	a5,a5,2
+  42 0040 9397C700 		slli	a5,a5,12
+   4:src/kernel/buddy_allocator.cpp **** void* Buddy::BUDDY_START_ADDR = BUDDY_START_ADDR_CONST;
+  43              		.loc 1 4 7
+  44 0044 97060000 		lla	a3,.LANCHOR0
+  44      93860600 
+  45 004c 23B0F600 		sd	a5,0(a3)
+   5:src/kernel/buddy_allocator.cpp **** void* Buddy::BUDDY_META_DATA_ADDR = BUDDY_META_ADDR_CONST;
+  46              		.loc 1 5 37
+  47 0050 B7F7FFFF 		li	a5,-4096
+  48 0054 3377F700 		and	a4,a4,a5
+   5:src/kernel/buddy_allocator.cpp **** void* Buddy::BUDDY_META_DATA_ADDR = BUDDY_META_ADDR_CONST;
+  49              		.loc 1 5 7
+  50 0058 23B4E600 		sd	a4,8(a3)
+  51              		.loc 1 133 1
+  52 005c 6FF09FFB 		j	.L1
+  53              		.cfi_endproc
+  54              	.LFE10:
+  56              		.align	2
+  57              		.globl	_ZN5Buddy10initializeEPvm
+  59              	_ZN5Buddy10initializeEPvm:
+  60              	.LFB3:
+  10:src/kernel/buddy_allocator.cpp **** void Buddy::initialize(void* addr, uint64 block_num){
+  61              		.loc 1 10 53 is_stmt 1
+  62              		.cfi_startproc
+  63              	.LVL1:
+  64 0060 130101FF 		addi	sp,sp,-16
+  65              		.cfi_def_cfa_offset 16
+  66 0064 23348100 		sd	s0,8(sp)
+  67              		.cfi_offset 8, -8
+  68 0068 13040101 		addi	s0,sp,16
+  69              		.cfi_def_cfa 8, 0
+  11:src/kernel/buddy_allocator.cpp ****     Buddy::BUDDY_START_ADDR = addr;
+  70              		.loc 1 11 5
+  11:src/kernel/buddy_allocator.cpp ****     Buddy::BUDDY_START_ADDR = addr;
+  71              		.loc 1 11 29 is_stmt 0
+  72 006c 17070000 		lla	a4,.LANCHOR0
+  72      13070700 
+  73 0074 2330A700 		sd	a0,0(a4)
+  12:src/kernel/buddy_allocator.cpp ****     Buddy::BUDDY_META_DATA_ADDR = BUDDY_META_ADDR_CONST;
+  74              		.loc 1 12 5 is_stmt 1
+  12:src/kernel/buddy_allocator.cpp ****     Buddy::BUDDY_META_DATA_ADDR = BUDDY_META_ADDR_CONST;
+  75              		.loc 1 12 35 is_stmt 0
+  76 0078 97070000 		la	a5,HEAP_START_ADDR
+  76      83B70700 
+  77 0080 83B70700 		ld	a5,0(a5)
+  78 0084 B7F6FFFF 		li	a3,-4096
+  79 0088 B3F7D700 		and	a5,a5,a3
+  12:src/kernel/buddy_allocator.cpp ****     Buddy::BUDDY_META_DATA_ADDR = BUDDY_META_ADDR_CONST;
+  80              		.loc 1 12 33
+  81 008c 2334F700 		sd	a5,8(a4)
+  13:src/kernel/buddy_allocator.cpp ****     Buddy::BLOCKS_AVAILABLE = block_num;
+  82              		.loc 1 13 5 is_stmt 1
+  13:src/kernel/buddy_allocator.cpp ****     Buddy::BLOCKS_AVAILABLE = block_num;
+GAS LISTING /tmp/ccarrZFM.s 			page 5
+
+
+  83              		.loc 1 13 29 is_stmt 0
+  84 0090 97070000 		sd	a1,.LANCHOR1,a5
+  84      23B0B700 
+  14:src/kernel/buddy_allocator.cpp ****     head[getDeg(block_num)] = tail[getDeg(block_num)] = (Block*)BUDDY_START_ADDR;
+  85              		.loc 1 14 5 is_stmt 1
+  86              	.LVL2:
+  87              	.LBB10:
+  88              	.LBB11:
+  89              		.file 2 "src/kernel/../../h/kernel/buddy_allocator.hpp"
+   1:src/kernel/../../h/kernel/buddy_allocator.hpp **** //
+   2:src/kernel/../../h/kernel/buddy_allocator.hpp **** // Created by os on 12/24/22.
+   3:src/kernel/../../h/kernel/buddy_allocator.hpp **** //
+   4:src/kernel/../../h/kernel/buddy_allocator.hpp **** 
+   5:src/kernel/../../h/kernel/buddy_allocator.hpp **** #ifndef KERNEL_FOR_RISCV_ARCHITECURE_BUDDY_ALLOCATOR_HPP
+   6:src/kernel/../../h/kernel/buddy_allocator.hpp **** #define KERNEL_FOR_RISCV_ARCHITECURE_BUDDY_ALLOCATOR_HPP
+   7:src/kernel/../../h/kernel/buddy_allocator.hpp **** 
+   8:src/kernel/../../h/kernel/buddy_allocator.hpp **** #include "../../lib/hw.h"
+   9:src/kernel/../../h/kernel/buddy_allocator.hpp **** #include "utility.hpp"
+  10:src/kernel/../../h/kernel/buddy_allocator.hpp **** 
+  11:src/kernel/../../h/kernel/buddy_allocator.hpp **** class SlabAllocator;
+  12:src/kernel/../../h/kernel/buddy_allocator.hpp **** 
+  13:src/kernel/../../h/kernel/buddy_allocator.hpp **** class Buddy{
+  14:src/kernel/../../h/kernel/buddy_allocator.hpp **** public:
+  15:src/kernel/../../h/kernel/buddy_allocator.hpp ****     static void initialize(void* addr, uint64 block_num);
+  16:src/kernel/../../h/kernel/buddy_allocator.hpp **** 
+  17:src/kernel/../../h/kernel/buddy_allocator.hpp ****     static void* alloc(uint64 num);
+  18:src/kernel/../../h/kernel/buddy_allocator.hpp **** 
+  19:src/kernel/../../h/kernel/buddy_allocator.hpp ****     static void free(void *addr, uint64 size);
+  20:src/kernel/../../h/kernel/buddy_allocator.hpp **** 
+  21:src/kernel/../../h/kernel/buddy_allocator.hpp ****     typedef struct Block{
+  22:src/kernel/../../h/kernel/buddy_allocator.hpp ****         Block *next;
+  23:src/kernel/../../h/kernel/buddy_allocator.hpp ****     }Bucket;
+  24:src/kernel/../../h/kernel/buddy_allocator.hpp **** 
+  25:src/kernel/../../h/kernel/buddy_allocator.hpp ****     static void printList();
+  26:src/kernel/../../h/kernel/buddy_allocator.hpp **** 
+  27:src/kernel/../../h/kernel/buddy_allocator.hpp ****     static inline bool canAllocate(uint64 size){
+  28:src/kernel/../../h/kernel/buddy_allocator.hpp ****         return head[size] != nullptr;
+  29:src/kernel/../../h/kernel/buddy_allocator.hpp ****     };
+  30:src/kernel/../../h/kernel/buddy_allocator.hpp **** 
+  31:src/kernel/../../h/kernel/buddy_allocator.hpp **** private:
+  32:src/kernel/../../h/kernel/buddy_allocator.hpp ****     static void* BUDDY_META_DATA_ADDR;
+  33:src/kernel/../../h/kernel/buddy_allocator.hpp ****     static void* BUDDY_START_ADDR;
+  34:src/kernel/../../h/kernel/buddy_allocator.hpp ****     static uint64 BLOCKS_AVAILABLE;
+  35:src/kernel/../../h/kernel/buddy_allocator.hpp ****     static Bucket *head[BUCKET_SIZE], *tail[BUCKET_SIZE];
+  36:src/kernel/../../h/kernel/buddy_allocator.hpp **** 
+  37:src/kernel/../../h/kernel/buddy_allocator.hpp ****     static inline uint64 ceil(uint64 num){
+  38:src/kernel/../../h/kernel/buddy_allocator.hpp ****         num--;
+  39:src/kernel/../../h/kernel/buddy_allocator.hpp ****         num |= num>>1;
+  40:src/kernel/../../h/kernel/buddy_allocator.hpp ****         num |= num>>2;
+  41:src/kernel/../../h/kernel/buddy_allocator.hpp ****         num |= num>>4;
+  42:src/kernel/../../h/kernel/buddy_allocator.hpp ****         num |= num>>8;
+  43:src/kernel/../../h/kernel/buddy_allocator.hpp ****         num |= num>>16;
+  44:src/kernel/../../h/kernel/buddy_allocator.hpp ****         num |= num>>32;
+  45:src/kernel/../../h/kernel/buddy_allocator.hpp ****         return ++num;
+  46:src/kernel/../../h/kernel/buddy_allocator.hpp ****     }
+  47:src/kernel/../../h/kernel/buddy_allocator.hpp **** 
+  48:src/kernel/../../h/kernel/buddy_allocator.hpp ****     static inline uint64 getDeg(uint64 num){
+GAS LISTING /tmp/ccarrZFM.s 			page 6
+
+
+  49:src/kernel/../../h/kernel/buddy_allocator.hpp ****         uint64 deg = 0;
+  90              		.loc 2 49 9
+  91              	.LBE11:
+  92              	.LBE10:
+  13:src/kernel/buddy_allocator.cpp ****     Buddy::BLOCKS_AVAILABLE = block_num;
+  93              		.loc 1 13 29 is_stmt 0
+  94 0098 93870500 		mv	a5,a1
+  95              	.LBB13:
+  96              	.LBB12:
+  97              		.loc 2 49 16
+  98 009c 13070000 		li	a4,0
+  99              	.LVL3:
+ 100              	.L7:
+  50:src/kernel/../../h/kernel/buddy_allocator.hpp ****         while(num>1){
+ 101              		.loc 2 50 9 is_stmt 1
+ 102              		.loc 2 50 18
+ 103 00a0 93061000 		li	a3,1
+ 104 00a4 63F8F600 		bleu	a5,a3,.L6
+  51:src/kernel/../../h/kernel/buddy_allocator.hpp ****             num/=2;
+ 105              		.loc 2 51 13
+ 106              		.loc 2 51 16 is_stmt 0
+ 107 00a8 93D71700 		srli	a5,a5,1
+ 108              	.LVL4:
+  52:src/kernel/../../h/kernel/buddy_allocator.hpp ****             deg++;
+ 109              		.loc 2 52 13 is_stmt 1
+ 110              		.loc 2 52 16 is_stmt 0
+ 111 00ac 13071700 		addi	a4,a4,1
+ 112              	.LVL5:
+  50:src/kernel/../../h/kernel/buddy_allocator.hpp ****         while(num>1){
+ 113              		.loc 2 50 9
+ 114 00b0 6FF01FFF 		j	.L7
+ 115              	.L6:
+  53:src/kernel/../../h/kernel/buddy_allocator.hpp ****         }
+  54:src/kernel/../../h/kernel/buddy_allocator.hpp ****         return deg;
+ 116              		.loc 2 54 9 is_stmt 1
+ 117              	.LVL6:
+ 118              	.LBE12:
+ 119              	.LBE13:
+  14:src/kernel/buddy_allocator.cpp ****     head[getDeg(block_num)] = tail[getDeg(block_num)] = (Block*)BUDDY_START_ADDR;
+ 120              		.loc 1 14 55 is_stmt 0
+ 121 00b4 13173700 		slli	a4,a4,3
+ 122 00b8 97070000 		lla	a5,.LANCHOR0
+ 122      93870700 
+ 123 00c0 3387E700 		add	a4,a5,a4
+ 124 00c4 2338A700 		sd	a0,16(a4)
+ 125              	.LVL7:
+ 126 00c8 93870500 		mv	a5,a1
+ 127              	.LBB14:
+ 128              	.LBB15:
+  49:src/kernel/../../h/kernel/buddy_allocator.hpp ****         while(num>1){
+ 129              		.loc 2 49 16
+ 130 00cc 13070000 		li	a4,0
+ 131              	.LVL8:
+ 132              	.L9:
+  50:src/kernel/../../h/kernel/buddy_allocator.hpp ****             num/=2;
+ 133              		.loc 2 50 9 is_stmt 1
+  50:src/kernel/../../h/kernel/buddy_allocator.hpp ****             num/=2;
+GAS LISTING /tmp/ccarrZFM.s 			page 7
+
+
+ 134              		.loc 2 50 18
+ 135 00d0 93061000 		li	a3,1
+ 136 00d4 63F8F600 		bleu	a5,a3,.L8
+  51:src/kernel/../../h/kernel/buddy_allocator.hpp ****             deg++;
+ 137              		.loc 2 51 13
+  51:src/kernel/../../h/kernel/buddy_allocator.hpp ****             deg++;
+ 138              		.loc 2 51 16 is_stmt 0
+ 139 00d8 93D71700 		srli	a5,a5,1
+ 140              	.LVL9:
+  52:src/kernel/../../h/kernel/buddy_allocator.hpp ****         }
+ 141              		.loc 2 52 13 is_stmt 1
+  52:src/kernel/../../h/kernel/buddy_allocator.hpp ****         }
+ 142              		.loc 2 52 16 is_stmt 0
+ 143 00dc 13071700 		addi	a4,a4,1
+ 144              	.LVL10:
+  50:src/kernel/../../h/kernel/buddy_allocator.hpp ****             num/=2;
+ 145              		.loc 2 50 9
+ 146 00e0 6FF01FFF 		j	.L9
+ 147              	.L8:
+ 148              		.loc 2 54 9 is_stmt 1
+ 149              	.LVL11:
+ 150              	.LBE15:
+ 151              	.LBE14:
+  14:src/kernel/buddy_allocator.cpp ****     head[getDeg(block_num)] = tail[getDeg(block_num)] = (Block*)BUDDY_START_ADDR;
+ 152              		.loc 1 14 29 is_stmt 0
+ 153 00e4 13173700 		slli	a4,a4,3
+ 154 00e8 97070000 		lla	a5,.LANCHOR0
+ 154      93870700 
+ 155 00f0 3387E700 		add	a4,a5,a4
+ 156 00f4 233CA706 		sd	a0,120(a4)
+  15:src/kernel/buddy_allocator.cpp ****     head[getDeg(block_num)]->next = tail[getDeg(block_num)]->next = nullptr;
+ 157              		.loc 1 15 5 is_stmt 1
+ 158              	.LVL12:
+  14:src/kernel/buddy_allocator.cpp ****     head[getDeg(block_num)] = tail[getDeg(block_num)] = (Block*)BUDDY_START_ADDR;
+ 159              		.loc 1 14 29 is_stmt 0
+ 160 00f8 93870500 		mv	a5,a1
+ 161              	.LBB16:
+ 162              	.LBB17:
+  49:src/kernel/../../h/kernel/buddy_allocator.hpp ****         while(num>1){
+ 163              		.loc 2 49 16
+ 164 00fc 13070000 		li	a4,0
+ 165              	.LVL13:
+ 166              	.L11:
+  50:src/kernel/../../h/kernel/buddy_allocator.hpp ****             num/=2;
+ 167              		.loc 2 50 9 is_stmt 1
+  50:src/kernel/../../h/kernel/buddy_allocator.hpp ****             num/=2;
+ 168              		.loc 2 50 18
+ 169 0100 93061000 		li	a3,1
+ 170 0104 63F8F600 		bleu	a5,a3,.L10
+  51:src/kernel/../../h/kernel/buddy_allocator.hpp ****             deg++;
+ 171              		.loc 2 51 13
+  51:src/kernel/../../h/kernel/buddy_allocator.hpp ****             deg++;
+ 172              		.loc 2 51 16 is_stmt 0
+ 173 0108 93D71700 		srli	a5,a5,1
+ 174              	.LVL14:
+  52:src/kernel/../../h/kernel/buddy_allocator.hpp ****         }
+ 175              		.loc 2 52 13 is_stmt 1
+GAS LISTING /tmp/ccarrZFM.s 			page 8
+
+
+  52:src/kernel/../../h/kernel/buddy_allocator.hpp ****         }
+ 176              		.loc 2 52 16 is_stmt 0
+ 177 010c 13071700 		addi	a4,a4,1
+ 178              	.LVL15:
+  50:src/kernel/../../h/kernel/buddy_allocator.hpp ****             num/=2;
+ 179              		.loc 2 50 9
+ 180 0110 6FF01FFF 		j	.L11
+ 181              	.L10:
+ 182              		.loc 2 54 9 is_stmt 1
+ 183              	.LVL16:
+ 184              	.LBE17:
+ 185              	.LBE16:
+  15:src/kernel/buddy_allocator.cpp ****     head[getDeg(block_num)]->next = tail[getDeg(block_num)]->next = nullptr;
+ 186              		.loc 1 15 59 is_stmt 0
+ 187 0114 13173700 		slli	a4,a4,3
+ 188 0118 97070000 		lla	a5,.LANCHOR0
+ 188      93870700 
+ 189 0120 3387E700 		add	a4,a5,a4
+ 190 0124 83370701 		ld	a5,16(a4)
+  15:src/kernel/buddy_allocator.cpp ****     head[getDeg(block_num)]->next = tail[getDeg(block_num)]->next = nullptr;
+ 191              		.loc 1 15 67
+ 192 0128 23B00700 		sd	zero,0(a5)
+ 193              	.LVL17:
+ 194              	.LBB18:
+ 195              	.LBB19:
+  49:src/kernel/../../h/kernel/buddy_allocator.hpp ****         while(num>1){
+ 196              		.loc 2 49 16
+ 197 012c 93070000 		li	a5,0
+ 198 0130 6F00C000 		j	.L13
+ 199              	.LVL18:
+ 200              	.L15:
+  51:src/kernel/../../h/kernel/buddy_allocator.hpp ****             deg++;
+ 201              		.loc 2 51 13 is_stmt 1
+  51:src/kernel/../../h/kernel/buddy_allocator.hpp ****             deg++;
+ 202              		.loc 2 51 16 is_stmt 0
+ 203 0134 93D51500 		srli	a1,a1,1
+ 204              	.LVL19:
+  52:src/kernel/../../h/kernel/buddy_allocator.hpp ****         }
+ 205              		.loc 2 52 13 is_stmt 1
+  52:src/kernel/../../h/kernel/buddy_allocator.hpp ****         }
+ 206              		.loc 2 52 16 is_stmt 0
+ 207 0138 93871700 		addi	a5,a5,1
+ 208              	.LVL20:
+ 209              	.L13:
+  50:src/kernel/../../h/kernel/buddy_allocator.hpp ****             num/=2;
+ 210              		.loc 2 50 9 is_stmt 1
+  50:src/kernel/../../h/kernel/buddy_allocator.hpp ****             num/=2;
+ 211              		.loc 2 50 18
+ 212 013c 13071000 		li	a4,1
+ 213 0140 E36AB7FE 		bgtu	a1,a4,.L15
+ 214              		.loc 2 54 9
+ 215              	.LVL21:
+ 216              	.LBE19:
+ 217              	.LBE18:
+  15:src/kernel/buddy_allocator.cpp ****     head[getDeg(block_num)]->next = tail[getDeg(block_num)]->next = nullptr;
+ 218              		.loc 1 15 27 is_stmt 0
+ 219 0144 93973700 		slli	a5,a5,3
+GAS LISTING /tmp/ccarrZFM.s 			page 9
+
+
+ 220 0148 17070000 		lla	a4,.LANCHOR0
+ 220      13070700 
+ 221 0150 B307F700 		add	a5,a4,a5
+ 222 0154 83B78707 		ld	a5,120(a5)
+  15:src/kernel/buddy_allocator.cpp ****     head[getDeg(block_num)]->next = tail[getDeg(block_num)]->next = nullptr;
+ 223              		.loc 1 15 35
+ 224 0158 23B00700 		sd	zero,0(a5)
+  16:src/kernel/buddy_allocator.cpp **** }
+ 225              		.loc 1 16 1
+ 226 015c 03348100 		ld	s0,8(sp)
+ 227              		.cfi_restore 8
+ 228              		.cfi_def_cfa 2, 16
+ 229 0160 13010101 		addi	sp,sp,16
+ 230              		.cfi_def_cfa_offset 0
+ 231 0164 67800000 		jr	ra
+ 232              		.cfi_endproc
+ 233              	.LFE3:
+ 235              		.align	2
+ 236              		.globl	_ZN5Buddy8compressEm
+ 238              	_ZN5Buddy8compressEm:
+ 239              	.LFB7:
+  78:src/kernel/buddy_allocator.cpp **** void Buddy::compress(uint64 size) {
+ 240              		.loc 1 78 35 is_stmt 1
+ 241              		.cfi_startproc
+ 242              	.LVL22:
+  79:src/kernel/buddy_allocator.cpp ****     if(size == BUCKET_SIZE-1)
+ 243              		.loc 1 79 5
+ 244 0168 9307C000 		li	a5,12
+ 245 016c 6300F510 		beq	a0,a5,.L26
+  78:src/kernel/buddy_allocator.cpp **** void Buddy::compress(uint64 size) {
+ 246              		.loc 1 78 35 is_stmt 0
+ 247 0170 130101FD 		addi	sp,sp,-48
+ 248              		.cfi_def_cfa_offset 48
+ 249 0174 23341102 		sd	ra,40(sp)
+ 250 0178 23308102 		sd	s0,32(sp)
+ 251 017c 233C9100 		sd	s1,24(sp)
+ 252 0180 23382101 		sd	s2,16(sp)
+ 253 0184 23343101 		sd	s3,8(sp)
+ 254              		.cfi_offset 1, -8
+ 255              		.cfi_offset 8, -16
+ 256              		.cfi_offset 9, -24
+ 257              		.cfi_offset 18, -32
+ 258              		.cfi_offset 19, -40
+ 259 0188 13040103 		addi	s0,sp,48
+ 260              		.cfi_def_cfa 8, 0
+ 261 018c 13090500 		mv	s2,a0
+  81:src/kernel/buddy_allocator.cpp ****     Block *curr = head[size];
+ 262              		.loc 1 81 5 is_stmt 1
+  81:src/kernel/buddy_allocator.cpp ****     Block *curr = head[size];
+ 263              		.loc 1 81 12 is_stmt 0
+ 264 0190 13173500 		slli	a4,a0,3
+ 265 0194 97070000 		lla	a5,.LANCHOR0
+ 265      93870700 
+ 266 019c B387E700 		add	a5,a5,a4
+ 267 01a0 83B48707 		ld	s1,120(a5)
+ 268              	.LVL23:
+  82:src/kernel/buddy_allocator.cpp ****     Block *prev = nullptr;
+GAS LISTING /tmp/ccarrZFM.s 			page 10
+
+
+ 269              		.loc 1 82 5 is_stmt 1
+  82:src/kernel/buddy_allocator.cpp ****     Block *prev = nullptr;
+ 270              		.loc 1 82 12 is_stmt 0
+ 271 01a4 93090000 		li	s3,0
+ 272 01a8 6F008001 		j	.L23
+ 273              	.LVL24:
+ 274              	.L18:
+ 275              	.LBB20:
+  86:src/kernel/buddy_allocator.cpp ****         uint64 pair = (blkNoCurr % 2 == 0) ? blkNoCurr + 1 : blkNoCurr - 1;
+ 276              		.loc 1 86 44 discriminator 2
+ 277 01ac 1307F7FF 		addi	a4,a4,-1
+ 278              	.LVL25:
+ 279              	.L19:
+  87:src/kernel/buddy_allocator.cpp ****         Block *blk = curr;
+ 280              		.loc 1 87 9 is_stmt 1 discriminator 4
+  88:src/kernel/buddy_allocator.cpp ****         if(blkNoNext == pair){
+ 281              		.loc 1 88 9 discriminator 4
+ 282 01b0 6304F704 		beq	a4,a5,.L29
+  99:src/kernel/buddy_allocator.cpp ****             prev = curr;
+ 283              		.loc 1 99 18 is_stmt 0
+ 284 01b4 93890400 		mv	s3,s1
+ 285              	.LVL26:
+ 286              	.L20:
+ 100:src/kernel/buddy_allocator.cpp ****         if(blkNoNext == pair){
+ 287              		.loc 1 100 9 is_stmt 1
+ 288 01b8 6300F708 		beq	a4,a5,.L30
+ 289              	.LVL27:
+ 290              	.L22:
+ 104:src/kernel/buddy_allocator.cpp ****         curr = curr->next;
+ 291              		.loc 1 104 9
+ 104:src/kernel/buddy_allocator.cpp ****         curr = curr->next;
+ 292              		.loc 1 104 14 is_stmt 0
+ 293 01bc 83B40400 		ld	s1,0(s1)
+ 294              	.LVL28:
+ 295              	.L23:
+ 296              	.LBE20:
+  83:src/kernel/buddy_allocator.cpp ****     while(curr && curr->next != nullptr){
+ 297              		.loc 1 83 5 is_stmt 1
+  83:src/kernel/buddy_allocator.cpp ****     while(curr && curr->next != nullptr){
+ 298              		.loc 1 83 16
+ 299 01c0 63880408 		beqz	s1,.L16
+  83:src/kernel/buddy_allocator.cpp ****     while(curr && curr->next != nullptr){
+ 300              		.loc 1 83 25 is_stmt 0 discriminator 1
+ 301 01c4 83B60400 		ld	a3,0(s1)
+  83:src/kernel/buddy_allocator.cpp ****     while(curr && curr->next != nullptr){
+ 302              		.loc 1 83 16 discriminator 1
+ 303 01c8 63840608 		beqz	a3,.L16
+ 304              	.LBB21:
+  84:src/kernel/buddy_allocator.cpp ****         uint64 blkNoCurr = ((uint64)(curr) - (uint64)Buddy::BUDDY_START_ADDR) >> (BUDDY_BLOCK_BITS+
+ 305              		.loc 1 84 9 is_stmt 1
+  84:src/kernel/buddy_allocator.cpp ****         uint64 blkNoCurr = ((uint64)(curr) - (uint64)Buddy::BUDDY_START_ADDR) >> (BUDDY_BLOCK_BITS+
+ 306              		.loc 1 84 44 is_stmt 0
+ 307 01cc 97070000 		ld	a5,.LANCHOR0
+ 307      83B70700 
+ 308 01d4 3387F440 		sub	a4,s1,a5
+  84:src/kernel/buddy_allocator.cpp ****         uint64 blkNoCurr = ((uint64)(curr) - (uint64)Buddy::BUDDY_START_ADDR) >> (BUDDY_BLOCK_BITS+
+ 309              		.loc 1 84 99
+GAS LISTING /tmp/ccarrZFM.s 			page 11
+
+
+ 310 01d8 1B06C900 		addiw	a2,s2,12
+  84:src/kernel/buddy_allocator.cpp ****         uint64 blkNoCurr = ((uint64)(curr) - (uint64)Buddy::BUDDY_START_ADDR) >> (BUDDY_BLOCK_BITS+
+ 311              		.loc 1 84 16
+ 312 01dc 3357C700 		srl	a4,a4,a2
+ 313              	.LVL29:
+  85:src/kernel/buddy_allocator.cpp ****         uint64 blkNoNext = ((uint64)(curr->next) - (uint64)Buddy::BUDDY_START_ADDR) >> (BUDDY_BLOCK
+ 314              		.loc 1 85 9 is_stmt 1
+  85:src/kernel/buddy_allocator.cpp ****         uint64 blkNoNext = ((uint64)(curr->next) - (uint64)Buddy::BUDDY_START_ADDR) >> (BUDDY_BLOCK
+ 315              		.loc 1 85 50 is_stmt 0
+ 316 01e0 B387F640 		sub	a5,a3,a5
+  85:src/kernel/buddy_allocator.cpp ****         uint64 blkNoNext = ((uint64)(curr->next) - (uint64)Buddy::BUDDY_START_ADDR) >> (BUDDY_BLOCK
+ 317              		.loc 1 85 16
+ 318 01e4 B3D7C700 		srl	a5,a5,a2
+ 319              	.LVL30:
+  86:src/kernel/buddy_allocator.cpp ****         uint64 pair = (blkNoCurr % 2 == 0) ? blkNoCurr + 1 : blkNoCurr - 1;
+ 320              		.loc 1 86 9 is_stmt 1
+  86:src/kernel/buddy_allocator.cpp ****         uint64 pair = (blkNoCurr % 2 == 0) ? blkNoCurr + 1 : blkNoCurr - 1;
+ 321              		.loc 1 86 34 is_stmt 0
+ 322 01e8 13761700 		andi	a2,a4,1
+  86:src/kernel/buddy_allocator.cpp ****         uint64 pair = (blkNoCurr % 2 == 0) ? blkNoCurr + 1 : blkNoCurr - 1;
+ 323              		.loc 1 86 44
+ 324 01ec E31006FC 		bnez	a2,.L18
+  86:src/kernel/buddy_allocator.cpp ****         uint64 pair = (blkNoCurr % 2 == 0) ? blkNoCurr + 1 : blkNoCurr - 1;
+ 325              		.loc 1 86 44 discriminator 1
+ 326 01f0 13071700 		addi	a4,a4,1
+ 327              	.LVL31:
+ 328 01f4 6FF0DFFB 		j	.L19
+ 329              	.LVL32:
+ 330              	.L29:
+  89:src/kernel/buddy_allocator.cpp ****             if(prev){
+ 331              		.loc 1 89 13 is_stmt 1
+ 332 01f8 63880900 		beqz	s3,.L21
+  90:src/kernel/buddy_allocator.cpp ****                 prev->next = curr->next->next;
+ 333              		.loc 1 90 17
+  90:src/kernel/buddy_allocator.cpp ****                 prev->next = curr->next->next;
+ 334              		.loc 1 90 42 is_stmt 0
+ 335 01fc 83B60600 		ld	a3,0(a3)
+  90:src/kernel/buddy_allocator.cpp ****                 prev->next = curr->next->next;
+ 336              		.loc 1 90 28
+ 337 0200 23B0D900 		sd	a3,0(s3)
+ 338              	.LVL33:
+ 339 0204 6FF05FFB 		j	.L20
+ 340              	.LVL34:
+ 341              	.L21:
+  93:src/kernel/buddy_allocator.cpp ****                 head[size] = curr->next->next;
+ 342              		.loc 1 93 17 is_stmt 1
+  93:src/kernel/buddy_allocator.cpp ****                 head[size] = curr->next->next;
+ 343              		.loc 1 93 42 is_stmt 0
+ 344 0208 03B60600 		ld	a2,0(a3)
+  93:src/kernel/buddy_allocator.cpp ****                 head[size] = curr->next->next;
+ 345              		.loc 1 93 28
+ 346 020c 93153900 		slli	a1,s2,3
+ 347 0210 97060000 		lla	a3,.LANCHOR0
+ 347      93860600 
+ 348 0218 B386B600 		add	a3,a3,a1
+ 349 021c 23BCC606 		sd	a2,120(a3)
+  94:src/kernel/buddy_allocator.cpp ****                 if(!head[size])
+GAS LISTING /tmp/ccarrZFM.s 			page 12
+
+
+ 350              		.loc 1 94 17 is_stmt 1
+ 351 0220 E31C06F8 		bnez	a2,.L20
+  95:src/kernel/buddy_allocator.cpp ****                     tail[size] = nullptr;
+ 352              		.loc 1 95 21
+  95:src/kernel/buddy_allocator.cpp ****                     tail[size] = nullptr;
+ 353              		.loc 1 95 32 is_stmt 0
+ 354 0224 97060000 		lla	a3,.LANCHOR0
+ 354      93860600 
+ 355 022c B386B600 		add	a3,a3,a1
+ 356 0230 23B80600 		sd	zero,16(a3)
+ 357 0234 6FF05FF8 		j	.L20
+ 358              	.LVL35:
+ 359              	.L30:
+ 101:src/kernel/buddy_allocator.cpp ****             blk->next = nullptr;
+ 360              		.loc 1 101 13 is_stmt 1
+ 101:src/kernel/buddy_allocator.cpp ****             blk->next = nullptr;
+ 361              		.loc 1 101 23 is_stmt 0
+ 362 0238 23B00400 		sd	zero,0(s1)
+ 102:src/kernel/buddy_allocator.cpp ****             insert(blk, size+1);
+ 363              		.loc 1 102 13 is_stmt 1
+ 102:src/kernel/buddy_allocator.cpp ****             insert(blk, size+1);
+ 364              		.loc 1 102 19 is_stmt 0
+ 365 023c 93051900 		addi	a1,s2,1
+ 366 0240 13850400 		mv	a0,s1
+ 367 0244 97000000 		call	_ZN5Buddy6insertEPvm
+ 367      E7800000 
+ 368              	.LVL36:
+ 369 024c 6FF01FF7 		j	.L22
+ 370              	.LVL37:
+ 371              	.L16:
+ 372              	.LBE21:
+ 106:src/kernel/buddy_allocator.cpp **** }
+ 373              		.loc 1 106 1
+ 374 0250 83308102 		ld	ra,40(sp)
+ 375              		.cfi_restore 1
+ 376 0254 03340102 		ld	s0,32(sp)
+ 377              		.cfi_restore 8
+ 378              		.cfi_def_cfa 2, 48
+ 379 0258 83348101 		ld	s1,24(sp)
+ 380              		.cfi_restore 9
+ 381              	.LVL38:
+ 382 025c 03390101 		ld	s2,16(sp)
+ 383              		.cfi_restore 18
+ 384              	.LVL39:
+ 385 0260 83398100 		ld	s3,8(sp)
+ 386              		.cfi_restore 19
+ 387              	.LVL40:
+ 388 0264 13010103 		addi	sp,sp,48
+ 389              		.cfi_def_cfa_offset 0
+ 390 0268 67800000 		jr	ra
+ 391              	.LVL41:
+ 392              	.L26:
+ 393 026c 67800000 		ret
+ 394              		.cfi_endproc
+ 395              	.LFE7:
+ 397              		.align	2
+ 398              		.globl	_ZN5Buddy6insertEPvm
+GAS LISTING /tmp/ccarrZFM.s 			page 13
+
+
+ 400              	_ZN5Buddy6insertEPvm:
+ 401              	.LFB6:
+  44:src/kernel/buddy_allocator.cpp **** void Buddy::insert(void *addr, uint64 size) {
+ 402              		.loc 1 44 45 is_stmt 1
+ 403              		.cfi_startproc
+ 404              	.LVL42:
+ 405 0270 93060500 		mv	a3,a0
+  45:src/kernel/buddy_allocator.cpp ****     if(!head[size]){
+ 406              		.loc 1 45 5
+ 407              	.LBB22:
+  45:src/kernel/buddy_allocator.cpp ****     if(!head[size]){
+ 408              		.loc 1 45 18 is_stmt 0
+ 409 0274 13973500 		slli	a4,a1,3
+ 410 0278 97070000 		lla	a5,.LANCHOR0
+ 410      93870700 
+ 411 0280 B387E700 		add	a5,a5,a4
+ 412 0284 83B78707 		ld	a5,120(a5)
+  45:src/kernel/buddy_allocator.cpp ****     if(!head[size]){
+ 413              		.loc 1 45 5
+ 414 0288 638C0702 		beqz	a5,.L41
+ 415              	.LBE22:
+  44:src/kernel/buddy_allocator.cpp **** void Buddy::insert(void *addr, uint64 size) {
+ 416              		.loc 1 44 45
+ 417 028c 130101FF 		addi	sp,sp,-16
+ 418              		.cfi_def_cfa_offset 16
+ 419 0290 23341100 		sd	ra,8(sp)
+ 420 0294 23308100 		sd	s0,0(sp)
+ 421              		.cfi_offset 1, -8
+ 422              		.cfi_offset 8, -16
+ 423 0298 13040101 		addi	s0,sp,16
+ 424              		.cfi_def_cfa 8, 0
+ 425 029c 13850500 		mv	a0,a1
+ 426              	.LVL43:
+  51:src/kernel/buddy_allocator.cpp ****         if ((uint64) addr < (uint64) head[size]) {
+ 427              		.loc 1 51 9 is_stmt 1
+ 428              	.LBB33:
+ 429              	.LBB23:
+  51:src/kernel/buddy_allocator.cpp ****         if ((uint64) addr < (uint64) head[size]) {
+ 430              		.loc 1 51 27 is_stmt 0
+ 431 02a0 13870600 		mv	a4,a3
+  51:src/kernel/buddy_allocator.cpp ****         if ((uint64) addr < (uint64) head[size]) {
+ 432              		.loc 1 51 9
+ 433 02a4 63E0F604 		bgtu	a5,a3,.L42
+ 434              	.LBB24:
+  58:src/kernel/buddy_allocator.cpp ****             Block *prev = nullptr, *iter = head[size];
+ 435              		.loc 1 58 20
+ 436 02a8 13060000 		li	a2,0
+ 437              	.L34:
+ 438              	.LVL44:
+  59:src/kernel/buddy_allocator.cpp ****             while (iter != nullptr) {
+ 439              		.loc 1 59 13 is_stmt 1
+  59:src/kernel/buddy_allocator.cpp ****             while (iter != nullptr) {
+ 440              		.loc 1 59 25
+ 441 02ac 63880706 		beqz	a5,.L35
+ 442              	.LBE24:
+ 443              	.LBE23:
+ 444              	.LBE33:
+GAS LISTING /tmp/ccarrZFM.s 			page 14
+
+
+  60:src/kernel/buddy_allocator.cpp ****                 if ((uint64) addr < (uint64) iter) {
+ 445              		.loc 1 60 17
+ 446              	.LBB34:
+ 447              	.LBB31:
+ 448              	.LBB28:
+ 449              	.LBB25:
+ 450 02b0 636CF704 		bltu	a4,a5,.L43
+  67:src/kernel/buddy_allocator.cpp ****                     prev = iter;
+ 451              		.loc 1 67 21
+ 452              	.LVL45:
+  68:src/kernel/buddy_allocator.cpp ****                     iter = iter->next;
+ 453              		.loc 1 68 21
+  67:src/kernel/buddy_allocator.cpp ****                     prev = iter;
+ 454              		.loc 1 67 26 is_stmt 0
+ 455 02b4 13860700 		mv	a2,a5
+  68:src/kernel/buddy_allocator.cpp ****                     iter = iter->next;
+ 456              		.loc 1 68 26
+ 457 02b8 83B70700 		ld	a5,0(a5)
+ 458              	.LVL46:
+ 459              	.LBE25:
+  59:src/kernel/buddy_allocator.cpp ****             while (iter != nullptr) {
+ 460              		.loc 1 59 13
+ 461 02bc 6FF01FFF 		j	.L34
+ 462              	.LVL47:
+ 463              	.L41:
+ 464              		.cfi_def_cfa_register 2
+ 465              		.cfi_restore 1
+ 466              		.cfi_restore 8
+ 467              	.LBE28:
+ 468              	.LBE31:
+  46:src/kernel/buddy_allocator.cpp ****         head[size] = tail[size] = (Block*)addr;
+ 469              		.loc 1 46 9 is_stmt 1
+  46:src/kernel/buddy_allocator.cpp ****         head[size] = tail[size] = (Block*)addr;
+ 470              		.loc 1 46 33 is_stmt 0
+ 471 02c0 97070000 		lla	a5,.LANCHOR0
+ 471      93870700 
+ 472 02c8 3385E700 		add	a0,a5,a4
+ 473              	.LVL48:
+ 474 02cc 2338D500 		sd	a3,16(a0)
+  46:src/kernel/buddy_allocator.cpp ****         head[size] = tail[size] = (Block*)addr;
+ 475              		.loc 1 46 20
+ 476 02d0 233CD506 		sd	a3,120(a0)
+  47:src/kernel/buddy_allocator.cpp ****         head[size]->next = tail[size]->next = nullptr;
+ 477              		.loc 1 47 9 is_stmt 1
+  47:src/kernel/buddy_allocator.cpp ****         head[size]->next = tail[size]->next = nullptr;
+ 478              		.loc 1 47 45 is_stmt 0
+ 479 02d4 23B00600 		sd	zero,0(a3)
+  47:src/kernel/buddy_allocator.cpp ****         head[size]->next = tail[size]->next = nullptr;
+ 480              		.loc 1 47 18
+ 481 02d8 83378507 		ld	a5,120(a0)
+  47:src/kernel/buddy_allocator.cpp ****         head[size]->next = tail[size]->next = nullptr;
+ 482              		.loc 1 47 26
+ 483 02dc 23B00700 		sd	zero,0(a5)
+  48:src/kernel/buddy_allocator.cpp ****         return;
+ 484              		.loc 1 48 9 is_stmt 1
+ 485 02e0 67800000 		ret
+ 486              	.LVL49:
+GAS LISTING /tmp/ccarrZFM.s 			page 15
+
+
+ 487              	.L42:
+ 488              		.cfi_def_cfa_register 8
+ 489              		.cfi_offset 1, -8
+ 490              		.cfi_offset 8, -16
+ 491              	.LBB32:
+ 492              	.LBB29:
+  52:src/kernel/buddy_allocator.cpp ****             Bucket *newHead = (Bucket *) addr;
+ 493              		.loc 1 52 13
+  53:src/kernel/buddy_allocator.cpp ****             newHead->next = head[size];
+ 494              		.loc 1 53 13
+  53:src/kernel/buddy_allocator.cpp ****             newHead->next = head[size];
+ 495              		.loc 1 53 27 is_stmt 0
+ 496 02e4 23B0F600 		sd	a5,0(a3)
+  54:src/kernel/buddy_allocator.cpp ****             head[size] = newHead;
+ 497              		.loc 1 54 13 is_stmt 1
+  54:src/kernel/buddy_allocator.cpp ****             head[size] = newHead;
+ 498              		.loc 1 54 24 is_stmt 0
+ 499 02e8 13973500 		slli	a4,a1,3
+ 500 02ec 97070000 		lla	a5,.LANCHOR0
+ 500      93870700 
+ 501 02f4 B387E700 		add	a5,a5,a4
+ 502 02f8 23BCD706 		sd	a3,120(a5)
+  55:src/kernel/buddy_allocator.cpp ****             compress(size);
+ 503              		.loc 1 55 13 is_stmt 1
+  55:src/kernel/buddy_allocator.cpp ****             compress(size);
+ 504              		.loc 1 55 21 is_stmt 0
+ 505 02fc 97000000 		call	_ZN5Buddy8compressEm
+ 505      E7800000 
+ 506              	.LVL50:
+  56:src/kernel/buddy_allocator.cpp ****             return;
+ 507              		.loc 1 56 13 is_stmt 1
+ 508 0304 6F004004 		j	.L31
+ 509              	.LVL51:
+ 510              	.L43:
+ 511              	.LBE29:
+ 512              	.LBB30:
+ 513              	.LBB27:
+ 514              	.LBB26:
+  61:src/kernel/buddy_allocator.cpp ****                     Block *newBlock = (Block *) addr;
+ 515              		.loc 1 61 21
+  62:src/kernel/buddy_allocator.cpp ****                     newBlock->next = iter;
+ 516              		.loc 1 62 21
+  62:src/kernel/buddy_allocator.cpp ****                     newBlock->next = iter;
+ 517              		.loc 1 62 36 is_stmt 0
+ 518 0308 23B0F600 		sd	a5,0(a3)
+  63:src/kernel/buddy_allocator.cpp ****                     prev->next = newBlock;
+ 519              		.loc 1 63 21 is_stmt 1
+  63:src/kernel/buddy_allocator.cpp ****                     prev->next = newBlock;
+ 520              		.loc 1 63 32 is_stmt 0
+ 521 030c 2330D600 		sd	a3,0(a2)
+  64:src/kernel/buddy_allocator.cpp ****                     compress(size);
+ 522              		.loc 1 64 21 is_stmt 1
+  64:src/kernel/buddy_allocator.cpp ****                     compress(size);
+ 523              		.loc 1 64 29 is_stmt 0
+ 524 0310 97000000 		call	_ZN5Buddy8compressEm
+ 524      E7800000 
+ 525              	.LVL52:
+GAS LISTING /tmp/ccarrZFM.s 			page 16
+
+
+  65:src/kernel/buddy_allocator.cpp ****                     return;
+ 526              		.loc 1 65 21 is_stmt 1
+ 527 0318 6F000003 		j	.L31
+ 528              	.LVL53:
+ 529              	.L35:
+ 530              	.LBE26:
+ 531              	.LBE27:
+ 532              	.LBE30:
+ 533              	.LBE32:
+ 534              	.LBE34:
+  73:src/kernel/buddy_allocator.cpp ****     tail[size]->next = (Block*)addr;
+ 535              		.loc 1 73 5
+  73:src/kernel/buddy_allocator.cpp ****     tail[size]->next = (Block*)addr;
+ 536              		.loc 1 73 14 is_stmt 0
+ 537 031c 13173500 		slli	a4,a0,3
+ 538 0320 97070000 		lla	a5,.LANCHOR0
+ 538      93870700 
+ 539              	.LVL54:
+ 540 0328 B387E700 		add	a5,a5,a4
+ 541 032c 03B70701 		ld	a4,16(a5)
+  73:src/kernel/buddy_allocator.cpp ****     tail[size]->next = (Block*)addr;
+ 542              		.loc 1 73 22
+ 543 0330 2330D700 		sd	a3,0(a4)
+  74:src/kernel/buddy_allocator.cpp ****     tail[size] = tail[size]->next;
+ 544              		.loc 1 74 5 is_stmt 1
+  74:src/kernel/buddy_allocator.cpp ****     tail[size] = tail[size]->next;
+ 545              		.loc 1 74 27 is_stmt 0
+ 546 0334 03B70701 		ld	a4,16(a5)
+  74:src/kernel/buddy_allocator.cpp ****     tail[size] = tail[size]->next;
+ 547              		.loc 1 74 30
+ 548 0338 03370700 		ld	a4,0(a4)
+  74:src/kernel/buddy_allocator.cpp ****     tail[size] = tail[size]->next;
+ 549              		.loc 1 74 16
+ 550 033c 23B8E700 		sd	a4,16(a5)
+  75:src/kernel/buddy_allocator.cpp ****     compress(size);
+ 551              		.loc 1 75 5 is_stmt 1
+  75:src/kernel/buddy_allocator.cpp ****     compress(size);
+ 552              		.loc 1 75 13 is_stmt 0
+ 553 0340 97000000 		call	_ZN5Buddy8compressEm
+ 553      E7800000 
+ 554              	.LVL55:
+ 555              	.L31:
+  76:src/kernel/buddy_allocator.cpp **** }
+ 556              		.loc 1 76 1
+ 557 0348 83308100 		ld	ra,8(sp)
+ 558              		.cfi_restore 1
+ 559 034c 03340100 		ld	s0,0(sp)
+ 560              		.cfi_restore 8
+ 561              		.cfi_def_cfa 2, 16
+ 562 0350 13010101 		addi	sp,sp,16
+ 563              		.cfi_def_cfa_offset 0
+ 564 0354 67800000 		jr	ra
+ 565              		.cfi_endproc
+ 566              	.LFE6:
+ 568              		.align	2
+ 569              		.globl	_ZN5Buddy4freeEPvm
+ 571              	_ZN5Buddy4freeEPvm:
+GAS LISTING /tmp/ccarrZFM.s 			page 17
+
+
+ 572              	.LFB5:
+  38:src/kernel/buddy_allocator.cpp **** void Buddy::free(void *addr, uint64 size) {
+ 573              		.loc 1 38 43 is_stmt 1
+ 574              		.cfi_startproc
+ 575              	.LVL56:
+  39:src/kernel/buddy_allocator.cpp ****     if(addr == nullptr)
+ 576              		.loc 1 39 5
+ 577 0358 63060502 		beqz	a0,.L47
+  38:src/kernel/buddy_allocator.cpp **** void Buddy::free(void *addr, uint64 size) {
+ 578              		.loc 1 38 43 is_stmt 0
+ 579 035c 130101FF 		addi	sp,sp,-16
+ 580              		.cfi_def_cfa_offset 16
+ 581 0360 23341100 		sd	ra,8(sp)
+ 582 0364 23308100 		sd	s0,0(sp)
+ 583              		.cfi_offset 1, -8
+ 584              		.cfi_offset 8, -16
+ 585 0368 13040101 		addi	s0,sp,16
+ 586              		.cfi_def_cfa 8, 0
+  41:src/kernel/buddy_allocator.cpp ****     insert(addr,size);
+ 587              		.loc 1 41 5 is_stmt 1
+  41:src/kernel/buddy_allocator.cpp ****     insert(addr,size);
+ 588              		.loc 1 41 11 is_stmt 0
+ 589 036c 97000000 		call	_ZN5Buddy6insertEPvm
+ 589      E7800000 
+ 590              	.LVL57:
+  42:src/kernel/buddy_allocator.cpp **** }
+ 591              		.loc 1 42 1
+ 592 0374 83308100 		ld	ra,8(sp)
+ 593              		.cfi_restore 1
+ 594 0378 03340100 		ld	s0,0(sp)
+ 595              		.cfi_restore 8
+ 596              		.cfi_def_cfa 2, 16
+ 597 037c 13010101 		addi	sp,sp,16
+ 598              		.cfi_def_cfa_offset 0
+ 599 0380 67800000 		jr	ra
+ 600              	.LVL58:
+ 601              	.L47:
+ 602 0384 67800000 		ret
+ 603              		.cfi_endproc
+ 604              	.LFE5:
+ 606              		.align	2
+ 607              		.globl	_ZN5Buddy5splitEPNS_5BlockEii
+ 609              	_ZN5Buddy5splitEPNS_5BlockEii:
+ 610              	.LFB8:
+ 108:src/kernel/buddy_allocator.cpp **** void Buddy::split(Block *block, int currentBucket, int startBucket) {
+ 611              		.loc 1 108 69 is_stmt 1
+ 612              		.cfi_startproc
+ 613              	.LVL59:
+ 614 0388 130101FF 		addi	sp,sp,-16
+ 615              		.cfi_def_cfa_offset 16
+ 616 038c 23348100 		sd	s0,8(sp)
+ 617              		.cfi_offset 8, -8
+ 618 0390 13040101 		addi	s0,sp,16
+ 619              		.cfi_def_cfa 8, 0
+ 620 0394 6F00C003 		j	.L51
+ 621              	.LVL60:
+ 622              	.L53:
+GAS LISTING /tmp/ccarrZFM.s 			page 18
+
+
+ 115:src/kernel/buddy_allocator.cpp ****             head[currentBucket] = tail[currentBucket] = (Block *) ((uint64) block + (1 << (currentB
+ 623              		.loc 1 115 13
+ 115:src/kernel/buddy_allocator.cpp ****             head[currentBucket] = tail[currentBucket] = (Block *) ((uint64) block + (1 << (currentB
+ 624              		.loc 1 115 106 is_stmt 0
+ 625 0398 9B85B500 		addiw	a1,a1,11
+ 626              	.LVL61:
+ 115:src/kernel/buddy_allocator.cpp ****             head[currentBucket] = tail[currentBucket] = (Block *) ((uint64) block + (1 << (currentB
+ 627              		.loc 1 115 88
+ 628 039c 13071000 		li	a4,1
+ 629 03a0 BB15B700 		sllw	a1,a4,a1
+ 115:src/kernel/buddy_allocator.cpp ****             head[currentBucket] = tail[currentBucket] = (Block *) ((uint64) block + (1 << (currentB
+ 630              		.loc 1 115 83
+ 631 03a4 B305B500 		add	a1,a0,a1
+ 115:src/kernel/buddy_allocator.cpp ****             head[currentBucket] = tail[currentBucket] = (Block *) ((uint64) block + (1 << (currentB
+ 632              		.loc 1 115 55
+ 633 03a8 93963700 		slli	a3,a5,3
+ 634 03ac 17070000 		lla	a4,.LANCHOR0
+ 634      13070700 
+ 635 03b4 3307D700 		add	a4,a4,a3
+ 636 03b8 2338B700 		sd	a1,16(a4)
+ 115:src/kernel/buddy_allocator.cpp ****             head[currentBucket] = tail[currentBucket] = (Block *) ((uint64) block + (1 << (currentB
+ 637              		.loc 1 115 33
+ 638 03bc 233CB706 		sd	a1,120(a4)
+ 116:src/kernel/buddy_allocator.cpp ****             head[currentBucket]->next = tail[currentBucket]->next = nullptr;
+ 639              		.loc 1 116 13 is_stmt 1
+ 116:src/kernel/buddy_allocator.cpp ****             head[currentBucket]->next = tail[currentBucket]->next = nullptr;
+ 640              		.loc 1 116 67 is_stmt 0
+ 641 03c0 23B00500 		sd	zero,0(a1)
+ 116:src/kernel/buddy_allocator.cpp ****             head[currentBucket]->next = tail[currentBucket]->next = nullptr;
+ 642              		.loc 1 116 31
+ 643 03c4 03378707 		ld	a4,120(a4)
+ 116:src/kernel/buddy_allocator.cpp ****             head[currentBucket]->next = tail[currentBucket]->next = nullptr;
+ 644              		.loc 1 116 39
+ 645 03c8 23300700 		sd	zero,0(a4)
+ 646              	.L54:
+ 108:src/kernel/buddy_allocator.cpp **** void Buddy::split(Block *block, int currentBucket, int startBucket) {
+ 647              		.loc 1 108 69
+ 648 03cc 93850700 		mv	a1,a5
+ 649              	.L51:
+ 650              	.LVL62:
+ 109:src/kernel/buddy_allocator.cpp ****     while(--currentBucket>=startBucket){
+ 651              		.loc 1 109 5 is_stmt 1
+ 109:src/kernel/buddy_allocator.cpp ****     while(--currentBucket>=startBucket){
+ 652              		.loc 1 109 26
+ 653 03d0 9B87F5FF 		addiw	a5,a1,-1
+ 654              	.LVL63:
+ 655 03d4 63C8C704 		blt	a5,a2,.L50
+ 110:src/kernel/buddy_allocator.cpp ****         if(tail[currentBucket]) {
+ 656              		.loc 1 110 9
+ 110:src/kernel/buddy_allocator.cpp ****         if(tail[currentBucket]) {
+ 657              		.loc 1 110 30 is_stmt 0
+ 658 03d8 93963700 		slli	a3,a5,3
+ 659 03dc 17070000 		lla	a4,.LANCHOR0
+ 659      13070700 
+ 660 03e4 3307D700 		add	a4,a4,a3
+ 661 03e8 83360701 		ld	a3,16(a4)
+ 110:src/kernel/buddy_allocator.cpp ****         if(tail[currentBucket]) {
+GAS LISTING /tmp/ccarrZFM.s 			page 19
+
+
+ 662              		.loc 1 110 9
+ 663 03ec E38606FA 		beqz	a3,.L53
+ 111:src/kernel/buddy_allocator.cpp ****             tail[currentBucket]->next = (Block *) ((uint64) block + (1 << (currentBucket + BUDDY_BL
+ 664              		.loc 1 111 13 is_stmt 1
+ 111:src/kernel/buddy_allocator.cpp ****             tail[currentBucket]->next = (Block *) ((uint64) block + (1 << (currentBucket + BUDDY_BL
+ 665              		.loc 1 111 90 is_stmt 0
+ 666 03f0 9B85B500 		addiw	a1,a1,11
+ 667              	.LVL64:
+ 111:src/kernel/buddy_allocator.cpp ****             tail[currentBucket]->next = (Block *) ((uint64) block + (1 << (currentBucket + BUDDY_BL
+ 668              		.loc 1 111 72
+ 669 03f4 13071000 		li	a4,1
+ 670 03f8 BB15B700 		sllw	a1,a4,a1
+ 111:src/kernel/buddy_allocator.cpp ****             tail[currentBucket]->next = (Block *) ((uint64) block + (1 << (currentBucket + BUDDY_BL
+ 671              		.loc 1 111 67
+ 672 03fc B305B500 		add	a1,a0,a1
+ 111:src/kernel/buddy_allocator.cpp ****             tail[currentBucket]->next = (Block *) ((uint64) block + (1 << (currentBucket + BUDDY_BL
+ 673              		.loc 1 111 39
+ 674 0400 23B0B600 		sd	a1,0(a3)
+ 112:src/kernel/buddy_allocator.cpp ****             tail[currentBucket] = tail[currentBucket]->next;
+ 675              		.loc 1 112 13 is_stmt 1
+ 112:src/kernel/buddy_allocator.cpp ****             tail[currentBucket] = tail[currentBucket]->next;
+ 676              		.loc 1 112 53 is_stmt 0
+ 677 0404 93963700 		slli	a3,a5,3
+ 678 0408 17070000 		lla	a4,.LANCHOR0
+ 678      13070700 
+ 679 0410 3307D700 		add	a4,a4,a3
+ 680 0414 83360701 		ld	a3,16(a4)
+ 112:src/kernel/buddy_allocator.cpp ****             tail[currentBucket] = tail[currentBucket]->next;
+ 681              		.loc 1 112 56
+ 682 0418 83B60600 		ld	a3,0(a3)
+ 112:src/kernel/buddy_allocator.cpp ****             tail[currentBucket] = tail[currentBucket]->next;
+ 683              		.loc 1 112 33
+ 684 041c 2338D700 		sd	a3,16(a4)
+ 685 0420 6FF0DFFA 		j	.L54
+ 686              	.LVL65:
+ 687              	.L50:
+ 119:src/kernel/buddy_allocator.cpp **** }
+ 688              		.loc 1 119 1
+ 689 0424 03348100 		ld	s0,8(sp)
+ 690              		.cfi_restore 8
+ 691              		.cfi_def_cfa 2, 16
+ 692 0428 13010101 		addi	sp,sp,16
+ 693              		.cfi_def_cfa_offset 0
+ 694 042c 67800000 		jr	ra
+ 695              		.cfi_endproc
+ 696              	.LFE8:
+ 698              		.align	2
+ 699              		.globl	_ZN5Buddy5allocEm
+ 701              	_ZN5Buddy5allocEm:
+ 702              	.LFB4:
+  18:src/kernel/buddy_allocator.cpp **** void* Buddy::alloc(uint64 size) {
+ 703              		.loc 1 18 33 is_stmt 1
+ 704              		.cfi_startproc
+ 705              	.LVL66:
+ 706 0430 130101FE 		addi	sp,sp,-32
+ 707              		.cfi_def_cfa_offset 32
+ 708 0434 233C1100 		sd	ra,24(sp)
+GAS LISTING /tmp/ccarrZFM.s 			page 20
+
+
+ 709 0438 23388100 		sd	s0,16(sp)
+ 710 043c 23349100 		sd	s1,8(sp)
+ 711              		.cfi_offset 1, -8
+ 712              		.cfi_offset 8, -16
+ 713              		.cfi_offset 9, -24
+ 714 0440 13040102 		addi	s0,sp,32
+ 715              		.cfi_def_cfa 8, 0
+  20:src/kernel/buddy_allocator.cpp ****     if(size<0 || size>=BUCKET_SIZE)
+ 716              		.loc 1 20 5
+ 717 0444 9307C000 		li	a5,12
+ 718 0448 63ECA706 		bgtu	a0,a5,.L61
+ 719              	.LBB35:
+  25:src/kernel/buddy_allocator.cpp ****     for(uint64 i=size;i<BUCKET_SIZE;i++){
+ 720              		.loc 1 25 16 is_stmt 0
+ 721 044c 93050500 		mv	a1,a0
+ 722              	.L60:
+ 723              	.LVL67:
+  25:src/kernel/buddy_allocator.cpp ****     for(uint64 i=size;i<BUCKET_SIZE;i++){
+ 724              		.loc 1 25 24 is_stmt 1 discriminator 1
+ 725 0450 9307C000 		li	a5,12
+ 726 0454 63EAB706 		bgtu	a1,a5,.L62
+  26:src/kernel/buddy_allocator.cpp ****         if(head[i] != nullptr){
+ 727              		.loc 1 26 9
+  26:src/kernel/buddy_allocator.cpp ****         if(head[i] != nullptr){
+ 728              		.loc 1 26 18 is_stmt 0
+ 729 0458 13973500 		slli	a4,a1,3
+ 730 045c 97070000 		lla	a5,.LANCHOR0
+ 730      93870700 
+ 731 0464 B387E700 		add	a5,a5,a4
+ 732 0468 83B48707 		ld	s1,120(a5)
+  26:src/kernel/buddy_allocator.cpp ****         if(head[i] != nullptr){
+ 733              		.loc 1 26 9
+ 734 046c 63960400 		bnez	s1,.L64
+  25:src/kernel/buddy_allocator.cpp ****     for(uint64 i=size;i<BUCKET_SIZE;i++){
+ 735              		.loc 1 25 5 is_stmt 1 discriminator 2
+ 736 0470 93851500 		addi	a1,a1,1
+ 737              	.LVL68:
+ 738 0474 6FF0DFFD 		j	.L60
+ 739              	.L64:
+  27:src/kernel/buddy_allocator.cpp ****             blk = head[i];
+ 740              		.loc 1 27 13
+ 741              	.LVL69:
+  28:src/kernel/buddy_allocator.cpp ****             head[i] = head[i]->next;
+ 742              		.loc 1 28 13
+  28:src/kernel/buddy_allocator.cpp ****             head[i] = head[i]->next;
+ 743              		.loc 1 28 32 is_stmt 0
+ 744 0478 03B70400 		ld	a4,0(s1)
+  28:src/kernel/buddy_allocator.cpp ****             head[i] = head[i]->next;
+ 745              		.loc 1 28 21
+ 746 047c 93963500 		slli	a3,a1,3
+ 747 0480 97070000 		lla	a5,.LANCHOR0
+ 747      93870700 
+ 748 0488 B387D700 		add	a5,a5,a3
+ 749 048c 23BCE706 		sd	a4,120(a5)
+  29:src/kernel/buddy_allocator.cpp ****             if(!head[i])
+ 750              		.loc 1 29 13 is_stmt 1
+ 751 0490 630E0700 		beqz	a4,.L65
+GAS LISTING /tmp/ccarrZFM.s 			page 21
+
+
+ 752              	.L59:
+  31:src/kernel/buddy_allocator.cpp ****             split(blk, i, size);
+ 753              		.loc 1 31 13
+  31:src/kernel/buddy_allocator.cpp ****             split(blk, i, size);
+ 754              		.loc 1 31 18 is_stmt 0
+ 755 0494 1B060500 		sext.w	a2,a0
+ 756 0498 9B850500 		sext.w	a1,a1
+ 757              	.LVL70:
+ 758 049c 13850400 		mv	a0,s1
+ 759              	.LVL71:
+ 760 04a0 97000000 		call	_ZN5Buddy5splitEPNS_5BlockEii
+ 760      E7800000 
+ 761              	.LVL72:
+  32:src/kernel/buddy_allocator.cpp ****             break;
+ 762              		.loc 1 32 13 is_stmt 1
+ 763 04a8 6F004002 		j	.L56
+ 764              	.LVL73:
+ 765              	.L65:
+  30:src/kernel/buddy_allocator.cpp ****                 tail[i] = nullptr;
+ 766              		.loc 1 30 17
+  30:src/kernel/buddy_allocator.cpp ****                 tail[i] = nullptr;
+ 767              		.loc 1 30 25 is_stmt 0
+ 768 04ac 97070000 		lla	a5,.LANCHOR0
+ 768      93870700 
+ 769 04b4 B387D700 		add	a5,a5,a3
+ 770 04b8 23B80700 		sd	zero,16(a5)
+ 771 04bc 6FF09FFD 		j	.L59
+ 772              	.LVL74:
+ 773              	.L61:
+ 774              	.LBE35:
+  21:src/kernel/buddy_allocator.cpp ****         return nullptr;
+ 775              		.loc 1 21 16
+ 776 04c0 93040000 		li	s1,0
+ 777 04c4 6F008000 		j	.L56
+ 778              	.LVL75:
+ 779              	.L62:
+  23:src/kernel/buddy_allocator.cpp ****     Block* blk = nullptr;
+ 780              		.loc 1 23 12
+ 781 04c8 93040000 		li	s1,0
+ 782              	.LVL76:
+ 783              	.L56:
+  36:src/kernel/buddy_allocator.cpp **** }
+ 784              		.loc 1 36 1
+ 785 04cc 13850400 		mv	a0,s1
+ 786 04d0 83308101 		ld	ra,24(sp)
+ 787              		.cfi_restore 1
+ 788 04d4 03340101 		ld	s0,16(sp)
+ 789              		.cfi_restore 8
+ 790              		.cfi_def_cfa 2, 32
+ 791 04d8 83348100 		ld	s1,8(sp)
+ 792              		.cfi_restore 9
+ 793 04dc 13010102 		addi	sp,sp,32
+ 794              		.cfi_def_cfa_offset 0
+ 795 04e0 67800000 		jr	ra
+ 796              		.cfi_endproc
+ 797              	.LFE4:
+ 799              		.section	.rodata.str1.8,"aMS",@progbits,1
+GAS LISTING /tmp/ccarrZFM.s 			page 22
+
+
+ 800              		.align	3
+ 801              	.LC0:
+ 802 0000 3A2000   		.string	": "
+ 803 0003 00000000 		.align	3
+ 803      00
+ 804              	.LC1:
+ 805 0008 2000     		.string	" "
+ 806 000a 00000000 		.align	3
+ 806      0000
+ 807              	.LC2:
+ 808 0010 0A00     		.string	"\n"
+ 809              		.text
+ 810              		.align	2
+ 811              		.globl	_ZN5Buddy9printListEv
+ 813              	_ZN5Buddy9printListEv:
+ 814              	.LFB9:
+ 121:src/kernel/buddy_allocator.cpp **** void Buddy::printList() {
+ 815              		.loc 1 121 25 is_stmt 1
+ 816              		.cfi_startproc
+ 817 04e4 130101FE 		addi	sp,sp,-32
+ 818              		.cfi_def_cfa_offset 32
+ 819 04e8 233C1100 		sd	ra,24(sp)
+ 820 04ec 23388100 		sd	s0,16(sp)
+ 821 04f0 23349100 		sd	s1,8(sp)
+ 822 04f4 23302101 		sd	s2,0(sp)
+ 823              		.cfi_offset 1, -8
+ 824              		.cfi_offset 8, -16
+ 825              		.cfi_offset 9, -24
+ 826              		.cfi_offset 18, -32
+ 827 04f8 13040102 		addi	s0,sp,32
+ 828              		.cfi_def_cfa 8, 0
+ 122:src/kernel/buddy_allocator.cpp ****     for(int i=0;i<BUCKET_SIZE;i++){
+ 829              		.loc 1 122 5
+ 830              	.LVL77:
+ 831              	.LBB36:
+ 122:src/kernel/buddy_allocator.cpp ****     for(int i=0;i<BUCKET_SIZE;i++){
+ 832              		.loc 1 122 13 is_stmt 0
+ 833 04fc 13090000 		li	s2,0
+ 834 0500 6F008001 		j	.L70
+ 835              	.LVL78:
+ 836              	.L68:
+ 837              	.LBB37:
+ 131:src/kernel/buddy_allocator.cpp ****         ConsoleUtil::printString("\n");
+ 838              		.loc 1 131 9 is_stmt 1 discriminator 2
+ 131:src/kernel/buddy_allocator.cpp ****         ConsoleUtil::printString("\n");
+ 839              		.loc 1 131 33 is_stmt 0 discriminator 2
+ 840 0504 17050000 		lla	a0,.LC2
+ 840      13050500 
+ 841 050c 97000000 		call	_ZN11ConsoleUtil11printStringEPKc@plt
+ 841      E7800000 
+ 842              	.LVL79:
+ 843              	.LBE37:
+ 122:src/kernel/buddy_allocator.cpp ****     for(int i=0;i<BUCKET_SIZE;i++){
+ 844              		.loc 1 122 5 is_stmt 1 discriminator 2
+ 845 0514 1B091900 		addiw	s2,s2,1
+ 846              	.LVL80:
+ 847              	.L70:
+GAS LISTING /tmp/ccarrZFM.s 			page 23
+
+
+ 122:src/kernel/buddy_allocator.cpp ****     for(int i=0;i<BUCKET_SIZE;i++){
+ 848              		.loc 1 122 18 discriminator 1
+ 849 0518 9307C000 		li	a5,12
+ 850 051c 63C62707 		bgt	s2,a5,.L66
+ 851              	.LBB38:
+ 123:src/kernel/buddy_allocator.cpp ****         ConsoleUtil::printInt(i,10);
+ 852              		.loc 1 123 9
+ 123:src/kernel/buddy_allocator.cpp ****         ConsoleUtil::printInt(i,10);
+ 853              		.loc 1 123 30 is_stmt 0
+ 854 0520 13060000 		li	a2,0
+ 855 0524 9305A000 		li	a1,10
+ 856 0528 13050900 		mv	a0,s2
+ 857 052c 97000000 		call	_ZN11ConsoleUtil8printIntEiii@plt
+ 857      E7800000 
+ 858              	.LVL81:
+ 124:src/kernel/buddy_allocator.cpp ****         ConsoleUtil::printString(": ");
+ 859              		.loc 1 124 9 is_stmt 1
+ 124:src/kernel/buddy_allocator.cpp ****         ConsoleUtil::printString(": ");
+ 860              		.loc 1 124 33 is_stmt 0
+ 861 0534 17050000 		lla	a0,.LC0
+ 861      13050500 
+ 862 053c 97000000 		call	_ZN11ConsoleUtil11printStringEPKc@plt
+ 862      E7800000 
+ 863              	.LVL82:
+ 125:src/kernel/buddy_allocator.cpp ****         Bucket *tmp = head[i];
+ 864              		.loc 1 125 9 is_stmt 1
+ 125:src/kernel/buddy_allocator.cpp ****         Bucket *tmp = head[i];
+ 865              		.loc 1 125 17 is_stmt 0
+ 866 0544 13173900 		slli	a4,s2,3
+ 867 0548 97070000 		lla	a5,.LANCHOR0
+ 867      93870700 
+ 868 0550 B387E700 		add	a5,a5,a4
+ 869 0554 83B48707 		ld	s1,120(a5)
+ 870              	.LVL83:
+ 871              	.L69:
+ 126:src/kernel/buddy_allocator.cpp ****         while(tmp != nullptr){
+ 872              		.loc 1 126 9 is_stmt 1
+ 126:src/kernel/buddy_allocator.cpp ****         while(tmp != nullptr){
+ 873              		.loc 1 126 19
+ 874 0558 E38604FA 		beqz	s1,.L68
+ 127:src/kernel/buddy_allocator.cpp ****             ConsoleUtil::printInt((uint64)tmp,16);
+ 875              		.loc 1 127 13
+ 127:src/kernel/buddy_allocator.cpp ****             ConsoleUtil::printInt((uint64)tmp,16);
+ 876              		.loc 1 127 34 is_stmt 0
+ 877 055c 13060000 		li	a2,0
+ 878 0560 93050001 		li	a1,16
+ 879 0564 1B850400 		sext.w	a0,s1
+ 880 0568 97000000 		call	_ZN11ConsoleUtil8printIntEiii@plt
+ 880      E7800000 
+ 881              	.LVL84:
+ 128:src/kernel/buddy_allocator.cpp ****             ConsoleUtil::printString(" ");
+ 882              		.loc 1 128 13 is_stmt 1
+ 128:src/kernel/buddy_allocator.cpp ****             ConsoleUtil::printString(" ");
+ 883              		.loc 1 128 37 is_stmt 0
+ 884 0570 17050000 		lla	a0,.LC1
+ 884      13050500 
+ 885 0578 97000000 		call	_ZN11ConsoleUtil11printStringEPKc@plt
+GAS LISTING /tmp/ccarrZFM.s 			page 24
+
+
+ 885      E7800000 
+ 886              	.LVL85:
+ 129:src/kernel/buddy_allocator.cpp ****             tmp = tmp->next;
+ 887              		.loc 1 129 13 is_stmt 1
+ 129:src/kernel/buddy_allocator.cpp ****             tmp = tmp->next;
+ 888              		.loc 1 129 17 is_stmt 0
+ 889 0580 83B40400 		ld	s1,0(s1)
+ 890              	.LVL86:
+ 126:src/kernel/buddy_allocator.cpp ****         while(tmp != nullptr){
+ 891              		.loc 1 126 9
+ 892 0584 6FF05FFD 		j	.L69
+ 893              	.LVL87:
+ 894              	.L66:
+ 895              	.LBE38:
+ 896              	.LBE36:
+ 897              		.loc 1 133 1
+ 898 0588 83308101 		ld	ra,24(sp)
+ 899              		.cfi_restore 1
+ 900 058c 03340101 		ld	s0,16(sp)
+ 901              		.cfi_restore 8
+ 902              		.cfi_def_cfa 2, 32
+ 903 0590 83348100 		ld	s1,8(sp)
+ 904              		.cfi_restore 9
+ 905 0594 03390100 		ld	s2,0(sp)
+ 906              		.cfi_restore 18
+ 907              	.LVL88:
+ 908 0598 13010102 		addi	sp,sp,32
+ 909              		.cfi_def_cfa_offset 0
+ 910 059c 67800000 		jr	ra
+ 911              		.cfi_endproc
+ 912              	.LFE9:
+ 914              		.align	2
+ 916              	_GLOBAL__sub_I__ZN5Buddy16BUDDY_START_ADDRE:
+ 917              	.LFB11:
+ 918              		.loc 1 133 1 is_stmt 1
+ 919              		.cfi_startproc
+ 920 05a0 130101FF 		addi	sp,sp,-16
+ 921              		.cfi_def_cfa_offset 16
+ 922 05a4 23341100 		sd	ra,8(sp)
+ 923 05a8 23308100 		sd	s0,0(sp)
+ 924              		.cfi_offset 1, -8
+ 925              		.cfi_offset 8, -16
+ 926 05ac 13040101 		addi	s0,sp,16
+ 927              		.cfi_def_cfa 8, 0
+ 928              		.loc 1 133 1 is_stmt 0
+ 929 05b0 B7050100 		li	a1,65536
+ 930 05b4 9385F5FF 		addi	a1,a1,-1
+ 931 05b8 13051000 		li	a0,1
+ 932 05bc 97000000 		call	_Z41__static_initialization_and_destruction_0ii
+ 932      E7800000 
+ 933              	.LVL89:
+ 934 05c4 83308100 		ld	ra,8(sp)
+ 935              		.cfi_restore 1
+ 936 05c8 03340100 		ld	s0,0(sp)
+ 937              		.cfi_restore 8
+ 938              		.cfi_def_cfa 2, 16
+ 939 05cc 13010101 		addi	sp,sp,16
+GAS LISTING /tmp/ccarrZFM.s 			page 25
+
+
+ 940              		.cfi_def_cfa_offset 0
+ 941 05d0 67800000 		jr	ra
+ 942              		.cfi_endproc
+ 943              	.LFE11:
+ 945              		.section	.init_array,"aw"
+ 946              		.align	3
+ 947 0000 00000000 		.dword	_GLOBAL__sub_I__ZN5Buddy16BUDDY_START_ADDRE
+ 947      00000000 
+ 948              		.globl	_ZN5Buddy4tailE
+ 949              		.globl	_ZN5Buddy4headE
+ 950              		.globl	_ZN5Buddy16BLOCKS_AVAILABLEE
+ 951              		.globl	_ZN5Buddy20BUDDY_META_DATA_ADDRE
+ 952              		.globl	_ZN5Buddy16BUDDY_START_ADDRE
+ 953              		.data
+ 954              		.align	3
+ 955              		.set	.LANCHOR1,. + 0
+ 958              	_ZN5Buddy16BLOCKS_AVAILABLEE:
+ 959 0000 00100000 		.dword	4096
+ 959      00000000 
+ 960              		.bss
+ 961              		.align	3
+ 962              		.set	.LANCHOR0,. + 0
+ 965              	_ZN5Buddy16BUDDY_START_ADDRE:
+ 966 0000 00000000 		.zero	8
+ 966      00000000 
+ 969              	_ZN5Buddy20BUDDY_META_DATA_ADDRE:
+ 970 0008 00000000 		.zero	8
+ 970      00000000 
+ 973              	_ZN5Buddy4tailE:
+ 974 0010 00000000 		.zero	104
+ 974      00000000 
+ 974      00000000 
+ 974      00000000 
+ 974      00000000 
+ 977              	_ZN5Buddy4headE:
+ 978 0078 00000000 		.zero	104
+ 978      00000000 
+ 978      00000000 
+ 978      00000000 
+ 978      00000000 
+ 979              		.text
+ 980              	.Letext0:
+ 981              		.file 3 "src/kernel/../../h/kernel/../../lib/hw.h"
+ 982              		.file 4 "src/kernel/../../h/kernel/utility.hpp"
+ 983              		.file 5 "src/kernel/../../h/kernel/console_util.hpp"
+GAS LISTING /tmp/ccarrZFM.s 			page 26
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 buddy_allocator.cpp
+     /tmp/ccarrZFM.s:8      .text:0000000000000000 _Z41__static_initialization_and_destruction_0ii
+     /tmp/ccarrZFM.s:12     .text:0000000000000000 .L0 
+     /tmp/ccarrZFM.s:14     .text:0000000000000000 .L0 
+     /tmp/ccarrZFM.s:15     .text:0000000000000004 .L0 
+     /tmp/ccarrZFM.s:17     .text:0000000000000008 .L0 
+     /tmp/ccarrZFM.s:19     .text:000000000000000c .L0 
+     /tmp/ccarrZFM.s:21     .text:000000000000000c .L0 
+     /tmp/ccarrZFM.s:25     .text:0000000000000018 .L0 
+     /tmp/ccarrZFM.s:26     .text:0000000000000018 .L0 
+     /tmp/ccarrZFM.s:27     .text:0000000000000018 .L0 
+     /tmp/ccarrZFM.s:29     .text:000000000000001c .L0 
+     /tmp/ccarrZFM.s:32     .text:0000000000000020 .L0 
+     /tmp/ccarrZFM.s:34     .text:0000000000000020 .L0 
+     /tmp/ccarrZFM.s:38     .text:000000000000002c .L0 
+     /tmp/ccarrZFM.s:44     .text:0000000000000044 .L0 
+     /tmp/ccarrZFM.s:47     .text:0000000000000050 .L0 
+     /tmp/ccarrZFM.s:50     .text:0000000000000058 .L0 
+     /tmp/ccarrZFM.s:52     .text:000000000000005c .L0 
+     /tmp/ccarrZFM.s:53     .text:0000000000000060 .L0 
+     /tmp/ccarrZFM.s:59     .text:0000000000000060 _ZN5Buddy10initializeEPvm
+     /tmp/ccarrZFM.s:62     .text:0000000000000060 .L0 
+     /tmp/ccarrZFM.s:64     .text:0000000000000060 .L0 
+     /tmp/ccarrZFM.s:65     .text:0000000000000064 .L0 
+     /tmp/ccarrZFM.s:67     .text:0000000000000068 .L0 
+     /tmp/ccarrZFM.s:69     .text:000000000000006c .L0 
+     /tmp/ccarrZFM.s:71     .text:000000000000006c .L0 
+     /tmp/ccarrZFM.s:72     .text:000000000000006c .L0 
+     /tmp/ccarrZFM.s:75     .text:0000000000000078 .L0 
+     /tmp/ccarrZFM.s:76     .text:0000000000000078 .L0 
+     /tmp/ccarrZFM.s:81     .text:000000000000008c .L0 
+     /tmp/ccarrZFM.s:83     .text:0000000000000090 .L0 
+     /tmp/ccarrZFM.s:84     .text:0000000000000090 .L0 
+     /tmp/ccarrZFM.s:90     .text:0000000000000098 .L0 
+     /tmp/ccarrZFM.s:93     .text:0000000000000098 .L0 
+     /tmp/ccarrZFM.s:94     .text:0000000000000098 .L0 
+     /tmp/ccarrZFM.s:98     .text:000000000000009c .L0 
+     /tmp/ccarrZFM.s:102    .text:00000000000000a0 .L0 
+     /tmp/ccarrZFM.s:103    .text:00000000000000a0 .L0 
+     /tmp/ccarrZFM.s:106    .text:00000000000000a8 .L0 
+     /tmp/ccarrZFM.s:107    .text:00000000000000a8 .L0 
+     /tmp/ccarrZFM.s:110    .text:00000000000000ac .L0 
+     /tmp/ccarrZFM.s:111    .text:00000000000000ac .L0 
+     /tmp/ccarrZFM.s:114    .text:00000000000000b0 .L0 
+     /tmp/ccarrZFM.s:120    .text:00000000000000b4 .L0 
+     /tmp/ccarrZFM.s:121    .text:00000000000000b4 .L0 
+     /tmp/ccarrZFM.s:130    .text:00000000000000cc .L0 
+     /tmp/ccarrZFM.s:134    .text:00000000000000d0 .L0 
+     /tmp/ccarrZFM.s:135    .text:00000000000000d0 .L0 
+     /tmp/ccarrZFM.s:138    .text:00000000000000d8 .L0 
+     /tmp/ccarrZFM.s:139    .text:00000000000000d8 .L0 
+     /tmp/ccarrZFM.s:142    .text:00000000000000dc .L0 
+     /tmp/ccarrZFM.s:143    .text:00000000000000dc .L0 
+     /tmp/ccarrZFM.s:146    .text:00000000000000e0 .L0 
+     /tmp/ccarrZFM.s:152    .text:00000000000000e4 .L0 
+     /tmp/ccarrZFM.s:153    .text:00000000000000e4 .L0 
+GAS LISTING /tmp/ccarrZFM.s 			page 27
+
+
+     /tmp/ccarrZFM.s:159    .text:00000000000000f8 .L0 
+     /tmp/ccarrZFM.s:160    .text:00000000000000f8 .L0 
+     /tmp/ccarrZFM.s:164    .text:00000000000000fc .L0 
+     /tmp/ccarrZFM.s:168    .text:0000000000000100 .L0 
+     /tmp/ccarrZFM.s:169    .text:0000000000000100 .L0 
+     /tmp/ccarrZFM.s:172    .text:0000000000000108 .L0 
+     /tmp/ccarrZFM.s:173    .text:0000000000000108 .L0 
+     /tmp/ccarrZFM.s:176    .text:000000000000010c .L0 
+     /tmp/ccarrZFM.s:177    .text:000000000000010c .L0 
+     /tmp/ccarrZFM.s:180    .text:0000000000000110 .L0 
+     /tmp/ccarrZFM.s:186    .text:0000000000000114 .L0 
+     /tmp/ccarrZFM.s:187    .text:0000000000000114 .L0 
+     /tmp/ccarrZFM.s:192    .text:0000000000000128 .L0 
+     /tmp/ccarrZFM.s:197    .text:000000000000012c .L0 
+     /tmp/ccarrZFM.s:202    .text:0000000000000134 .L0 
+     /tmp/ccarrZFM.s:203    .text:0000000000000134 .L0 
+     /tmp/ccarrZFM.s:206    .text:0000000000000138 .L0 
+     /tmp/ccarrZFM.s:207    .text:0000000000000138 .L0 
+     /tmp/ccarrZFM.s:211    .text:000000000000013c .L0 
+     /tmp/ccarrZFM.s:212    .text:000000000000013c .L0 
+     /tmp/ccarrZFM.s:218    .text:0000000000000144 .L0 
+     /tmp/ccarrZFM.s:219    .text:0000000000000144 .L0 
+     /tmp/ccarrZFM.s:224    .text:0000000000000158 .L0 
+     /tmp/ccarrZFM.s:226    .text:000000000000015c .L0 
+     /tmp/ccarrZFM.s:227    .text:0000000000000160 .L0 
+     /tmp/ccarrZFM.s:228    .text:0000000000000160 .L0 
+     /tmp/ccarrZFM.s:230    .text:0000000000000164 .L0 
+     /tmp/ccarrZFM.s:232    .text:0000000000000168 .L0 
+     /tmp/ccarrZFM.s:238    .text:0000000000000168 _ZN5Buddy8compressEm
+     /tmp/ccarrZFM.s:241    .text:0000000000000168 .L0 
+     /tmp/ccarrZFM.s:243    .text:0000000000000168 .L0 
+     /tmp/ccarrZFM.s:244    .text:0000000000000168 .L0 
+     /tmp/ccarrZFM.s:247    .text:0000000000000170 .L0 
+     /tmp/ccarrZFM.s:248    .text:0000000000000174 .L0 
+     /tmp/ccarrZFM.s:254    .text:0000000000000188 .L0 
+     /tmp/ccarrZFM.s:255    .text:0000000000000188 .L0 
+     /tmp/ccarrZFM.s:256    .text:0000000000000188 .L0 
+     /tmp/ccarrZFM.s:257    .text:0000000000000188 .L0 
+     /tmp/ccarrZFM.s:258    .text:0000000000000188 .L0 
+     /tmp/ccarrZFM.s:260    .text:000000000000018c .L0 
+     /tmp/ccarrZFM.s:263    .text:0000000000000190 .L0 
+     /tmp/ccarrZFM.s:264    .text:0000000000000190 .L0 
+     /tmp/ccarrZFM.s:270    .text:00000000000001a4 .L0 
+     /tmp/ccarrZFM.s:271    .text:00000000000001a4 .L0 
+     /tmp/ccarrZFM.s:277    .text:00000000000001ac .L0 
+     /tmp/ccarrZFM.s:281    .text:00000000000001b0 .L0 
+     /tmp/ccarrZFM.s:282    .text:00000000000001b0 .L0 
+     /tmp/ccarrZFM.s:284    .text:00000000000001b4 .L0 
+     /tmp/ccarrZFM.s:288    .text:00000000000001b8 .L0 
+     /tmp/ccarrZFM.s:292    .text:00000000000001bc .L0 
+     /tmp/ccarrZFM.s:293    .text:00000000000001bc .L0 
+     /tmp/ccarrZFM.s:298    .text:00000000000001c0 .L0 
+     /tmp/ccarrZFM.s:299    .text:00000000000001c0 .L0 
+     /tmp/ccarrZFM.s:301    .text:00000000000001c4 .L0 
+     /tmp/ccarrZFM.s:303    .text:00000000000001c8 .L0 
+     /tmp/ccarrZFM.s:306    .text:00000000000001cc .L0 
+     /tmp/ccarrZFM.s:307    .text:00000000000001cc .L0 
+GAS LISTING /tmp/ccarrZFM.s 			page 28
+
+
+     /tmp/ccarrZFM.s:310    .text:00000000000001d8 .L0 
+     /tmp/ccarrZFM.s:312    .text:00000000000001dc .L0 
+     /tmp/ccarrZFM.s:315    .text:00000000000001e0 .L0 
+     /tmp/ccarrZFM.s:316    .text:00000000000001e0 .L0 
+     /tmp/ccarrZFM.s:318    .text:00000000000001e4 .L0 
+     /tmp/ccarrZFM.s:321    .text:00000000000001e8 .L0 
+     /tmp/ccarrZFM.s:322    .text:00000000000001e8 .L0 
+     /tmp/ccarrZFM.s:324    .text:00000000000001ec .L0 
+     /tmp/ccarrZFM.s:326    .text:00000000000001f0 .L0 
+     /tmp/ccarrZFM.s:332    .text:00000000000001f8 .L0 
+     /tmp/ccarrZFM.s:334    .text:00000000000001fc .L0 
+     /tmp/ccarrZFM.s:335    .text:00000000000001fc .L0 
+     /tmp/ccarrZFM.s:337    .text:0000000000000200 .L0 
+     /tmp/ccarrZFM.s:343    .text:0000000000000208 .L0 
+     /tmp/ccarrZFM.s:344    .text:0000000000000208 .L0 
+     /tmp/ccarrZFM.s:346    .text:000000000000020c .L0 
+     /tmp/ccarrZFM.s:351    .text:0000000000000220 .L0 
+     /tmp/ccarrZFM.s:353    .text:0000000000000224 .L0 
+     /tmp/ccarrZFM.s:354    .text:0000000000000224 .L0 
+     /tmp/ccarrZFM.s:361    .text:0000000000000238 .L0 
+     /tmp/ccarrZFM.s:362    .text:0000000000000238 .L0 
+     /tmp/ccarrZFM.s:364    .text:000000000000023c .L0 
+     /tmp/ccarrZFM.s:365    .text:000000000000023c .L0 
+     /tmp/ccarrZFM.s:400    .text:0000000000000270 _ZN5Buddy6insertEPvm
+     /tmp/ccarrZFM.s:374    .text:0000000000000250 .L0 
+     /tmp/ccarrZFM.s:375    .text:0000000000000254 .L0 
+     /tmp/ccarrZFM.s:377    .text:0000000000000258 .L0 
+     /tmp/ccarrZFM.s:378    .text:0000000000000258 .L0 
+     /tmp/ccarrZFM.s:380    .text:000000000000025c .L0 
+     /tmp/ccarrZFM.s:383    .text:0000000000000260 .L0 
+     /tmp/ccarrZFM.s:386    .text:0000000000000264 .L0 
+     /tmp/ccarrZFM.s:389    .text:0000000000000268 .L0 
+     /tmp/ccarrZFM.s:394    .text:0000000000000270 .L0 
+     /tmp/ccarrZFM.s:403    .text:0000000000000270 .L0 
+     /tmp/ccarrZFM.s:405    .text:0000000000000270 .L0 
+     /tmp/ccarrZFM.s:408    .text:0000000000000274 .L0 
+     /tmp/ccarrZFM.s:409    .text:0000000000000274 .L0 
+     /tmp/ccarrZFM.s:414    .text:0000000000000288 .L0 
+     /tmp/ccarrZFM.s:417    .text:000000000000028c .L0 
+     /tmp/ccarrZFM.s:418    .text:0000000000000290 .L0 
+     /tmp/ccarrZFM.s:421    .text:0000000000000298 .L0 
+     /tmp/ccarrZFM.s:422    .text:0000000000000298 .L0 
+     /tmp/ccarrZFM.s:424    .text:000000000000029c .L0 
+     /tmp/ccarrZFM.s:430    .text:00000000000002a0 .L0 
+     /tmp/ccarrZFM.s:431    .text:00000000000002a0 .L0 
+     /tmp/ccarrZFM.s:433    .text:00000000000002a4 .L0 
+     /tmp/ccarrZFM.s:436    .text:00000000000002a8 .L0 
+     /tmp/ccarrZFM.s:440    .text:00000000000002ac .L0 
+     /tmp/ccarrZFM.s:441    .text:00000000000002ac .L0 
+     /tmp/ccarrZFM.s:450    .text:00000000000002b0 .L0 
+     /tmp/ccarrZFM.s:453    .text:00000000000002b4 .L0 
+     /tmp/ccarrZFM.s:454    .text:00000000000002b4 .L0 
+     /tmp/ccarrZFM.s:455    .text:00000000000002b4 .L0 
+     /tmp/ccarrZFM.s:457    .text:00000000000002b8 .L0 
+     /tmp/ccarrZFM.s:461    .text:00000000000002bc .L0 
+     /tmp/ccarrZFM.s:464    .text:00000000000002c0 .L0 
+     /tmp/ccarrZFM.s:465    .text:00000000000002c0 .L0 
+GAS LISTING /tmp/ccarrZFM.s 			page 29
+
+
+     /tmp/ccarrZFM.s:466    .text:00000000000002c0 .L0 
+     /tmp/ccarrZFM.s:470    .text:00000000000002c0 .L0 
+     /tmp/ccarrZFM.s:471    .text:00000000000002c0 .L0 
+     /tmp/ccarrZFM.s:476    .text:00000000000002d0 .L0 
+     /tmp/ccarrZFM.s:478    .text:00000000000002d4 .L0 
+     /tmp/ccarrZFM.s:479    .text:00000000000002d4 .L0 
+     /tmp/ccarrZFM.s:481    .text:00000000000002d8 .L0 
+     /tmp/ccarrZFM.s:483    .text:00000000000002dc .L0 
+     /tmp/ccarrZFM.s:485    .text:00000000000002e0 .L0 
+     /tmp/ccarrZFM.s:488    .text:00000000000002e4 .L0 
+     /tmp/ccarrZFM.s:489    .text:00000000000002e4 .L0 
+     /tmp/ccarrZFM.s:490    .text:00000000000002e4 .L0 
+     /tmp/ccarrZFM.s:494    .text:00000000000002e4 .L0 
+     /tmp/ccarrZFM.s:495    .text:00000000000002e4 .L0 
+     /tmp/ccarrZFM.s:496    .text:00000000000002e4 .L0 
+     /tmp/ccarrZFM.s:498    .text:00000000000002e8 .L0 
+     /tmp/ccarrZFM.s:499    .text:00000000000002e8 .L0 
+     /tmp/ccarrZFM.s:504    .text:00000000000002fc .L0 
+     /tmp/ccarrZFM.s:505    .text:00000000000002fc .L0 
+     /tmp/ccarrZFM.s:508    .text:0000000000000304 .L0 
+     /tmp/ccarrZFM.s:516    .text:0000000000000308 .L0 
+     /tmp/ccarrZFM.s:517    .text:0000000000000308 .L0 
+     /tmp/ccarrZFM.s:518    .text:0000000000000308 .L0 
+     /tmp/ccarrZFM.s:520    .text:000000000000030c .L0 
+     /tmp/ccarrZFM.s:521    .text:000000000000030c .L0 
+     /tmp/ccarrZFM.s:523    .text:0000000000000310 .L0 
+     /tmp/ccarrZFM.s:524    .text:0000000000000310 .L0 
+     /tmp/ccarrZFM.s:527    .text:0000000000000318 .L0 
+     /tmp/ccarrZFM.s:536    .text:000000000000031c .L0 
+     /tmp/ccarrZFM.s:537    .text:000000000000031c .L0 
+     /tmp/ccarrZFM.s:543    .text:0000000000000330 .L0 
+     /tmp/ccarrZFM.s:545    .text:0000000000000334 .L0 
+     /tmp/ccarrZFM.s:546    .text:0000000000000334 .L0 
+     /tmp/ccarrZFM.s:548    .text:0000000000000338 .L0 
+     /tmp/ccarrZFM.s:550    .text:000000000000033c .L0 
+     /tmp/ccarrZFM.s:552    .text:0000000000000340 .L0 
+     /tmp/ccarrZFM.s:553    .text:0000000000000340 .L0 
+     /tmp/ccarrZFM.s:557    .text:0000000000000348 .L0 
+     /tmp/ccarrZFM.s:558    .text:000000000000034c .L0 
+     /tmp/ccarrZFM.s:560    .text:0000000000000350 .L0 
+     /tmp/ccarrZFM.s:561    .text:0000000000000350 .L0 
+     /tmp/ccarrZFM.s:563    .text:0000000000000354 .L0 
+     /tmp/ccarrZFM.s:565    .text:0000000000000358 .L0 
+     /tmp/ccarrZFM.s:571    .text:0000000000000358 _ZN5Buddy4freeEPvm
+     /tmp/ccarrZFM.s:574    .text:0000000000000358 .L0 
+     /tmp/ccarrZFM.s:576    .text:0000000000000358 .L0 
+     /tmp/ccarrZFM.s:577    .text:0000000000000358 .L0 
+     /tmp/ccarrZFM.s:579    .text:000000000000035c .L0 
+     /tmp/ccarrZFM.s:580    .text:0000000000000360 .L0 
+     /tmp/ccarrZFM.s:583    .text:0000000000000368 .L0 
+     /tmp/ccarrZFM.s:584    .text:0000000000000368 .L0 
+     /tmp/ccarrZFM.s:586    .text:000000000000036c .L0 
+     /tmp/ccarrZFM.s:588    .text:000000000000036c .L0 
+     /tmp/ccarrZFM.s:589    .text:000000000000036c .L0 
+     /tmp/ccarrZFM.s:592    .text:0000000000000374 .L0 
+     /tmp/ccarrZFM.s:593    .text:0000000000000378 .L0 
+     /tmp/ccarrZFM.s:595    .text:000000000000037c .L0 
+GAS LISTING /tmp/ccarrZFM.s 			page 30
+
+
+     /tmp/ccarrZFM.s:596    .text:000000000000037c .L0 
+     /tmp/ccarrZFM.s:598    .text:0000000000000380 .L0 
+     /tmp/ccarrZFM.s:603    .text:0000000000000388 .L0 
+     /tmp/ccarrZFM.s:609    .text:0000000000000388 _ZN5Buddy5splitEPNS_5BlockEii
+     /tmp/ccarrZFM.s:612    .text:0000000000000388 .L0 
+     /tmp/ccarrZFM.s:614    .text:0000000000000388 .L0 
+     /tmp/ccarrZFM.s:615    .text:000000000000038c .L0 
+     /tmp/ccarrZFM.s:617    .text:0000000000000390 .L0 
+     /tmp/ccarrZFM.s:619    .text:0000000000000394 .L0 
+     /tmp/ccarrZFM.s:624    .text:0000000000000398 .L0 
+     /tmp/ccarrZFM.s:625    .text:0000000000000398 .L0 
+     /tmp/ccarrZFM.s:628    .text:000000000000039c .L0 
+     /tmp/ccarrZFM.s:631    .text:00000000000003a4 .L0 
+     /tmp/ccarrZFM.s:633    .text:00000000000003a8 .L0 
+     /tmp/ccarrZFM.s:638    .text:00000000000003bc .L0 
+     /tmp/ccarrZFM.s:640    .text:00000000000003c0 .L0 
+     /tmp/ccarrZFM.s:641    .text:00000000000003c0 .L0 
+     /tmp/ccarrZFM.s:643    .text:00000000000003c4 .L0 
+     /tmp/ccarrZFM.s:645    .text:00000000000003c8 .L0 
+     /tmp/ccarrZFM.s:648    .text:00000000000003cc .L0 
+     /tmp/ccarrZFM.s:652    .text:00000000000003d0 .L0 
+     /tmp/ccarrZFM.s:653    .text:00000000000003d0 .L0 
+     /tmp/ccarrZFM.s:657    .text:00000000000003d8 .L0 
+     /tmp/ccarrZFM.s:658    .text:00000000000003d8 .L0 
+     /tmp/ccarrZFM.s:663    .text:00000000000003ec .L0 
+     /tmp/ccarrZFM.s:665    .text:00000000000003f0 .L0 
+     /tmp/ccarrZFM.s:666    .text:00000000000003f0 .L0 
+     /tmp/ccarrZFM.s:669    .text:00000000000003f4 .L0 
+     /tmp/ccarrZFM.s:672    .text:00000000000003fc .L0 
+     /tmp/ccarrZFM.s:674    .text:0000000000000400 .L0 
+     /tmp/ccarrZFM.s:676    .text:0000000000000404 .L0 
+     /tmp/ccarrZFM.s:677    .text:0000000000000404 .L0 
+     /tmp/ccarrZFM.s:682    .text:0000000000000418 .L0 
+     /tmp/ccarrZFM.s:684    .text:000000000000041c .L0 
+     /tmp/ccarrZFM.s:689    .text:0000000000000424 .L0 
+     /tmp/ccarrZFM.s:690    .text:0000000000000428 .L0 
+     /tmp/ccarrZFM.s:691    .text:0000000000000428 .L0 
+     /tmp/ccarrZFM.s:693    .text:000000000000042c .L0 
+     /tmp/ccarrZFM.s:695    .text:0000000000000430 .L0 
+     /tmp/ccarrZFM.s:701    .text:0000000000000430 _ZN5Buddy5allocEm
+     /tmp/ccarrZFM.s:704    .text:0000000000000430 .L0 
+     /tmp/ccarrZFM.s:706    .text:0000000000000430 .L0 
+     /tmp/ccarrZFM.s:707    .text:0000000000000434 .L0 
+     /tmp/ccarrZFM.s:711    .text:0000000000000440 .L0 
+     /tmp/ccarrZFM.s:712    .text:0000000000000440 .L0 
+     /tmp/ccarrZFM.s:713    .text:0000000000000440 .L0 
+     /tmp/ccarrZFM.s:715    .text:0000000000000444 .L0 
+     /tmp/ccarrZFM.s:717    .text:0000000000000444 .L0 
+     /tmp/ccarrZFM.s:721    .text:000000000000044c .L0 
+     /tmp/ccarrZFM.s:725    .text:0000000000000450 .L0 
+     /tmp/ccarrZFM.s:728    .text:0000000000000458 .L0 
+     /tmp/ccarrZFM.s:729    .text:0000000000000458 .L0 
+     /tmp/ccarrZFM.s:734    .text:000000000000046c .L0 
+     /tmp/ccarrZFM.s:736    .text:0000000000000470 .L0 
+     /tmp/ccarrZFM.s:742    .text:0000000000000478 .L0 
+     /tmp/ccarrZFM.s:743    .text:0000000000000478 .L0 
+     /tmp/ccarrZFM.s:744    .text:0000000000000478 .L0 
+GAS LISTING /tmp/ccarrZFM.s 			page 31
+
+
+     /tmp/ccarrZFM.s:746    .text:000000000000047c .L0 
+     /tmp/ccarrZFM.s:751    .text:0000000000000490 .L0 
+     /tmp/ccarrZFM.s:754    .text:0000000000000494 .L0 
+     /tmp/ccarrZFM.s:755    .text:0000000000000494 .L0 
+     /tmp/ccarrZFM.s:763    .text:00000000000004a8 .L0 
+     /tmp/ccarrZFM.s:767    .text:00000000000004ac .L0 
+     /tmp/ccarrZFM.s:768    .text:00000000000004ac .L0 
+     /tmp/ccarrZFM.s:776    .text:00000000000004c0 .L0 
+     /tmp/ccarrZFM.s:781    .text:00000000000004c8 .L0 
+     /tmp/ccarrZFM.s:785    .text:00000000000004cc .L0 
+     /tmp/ccarrZFM.s:787    .text:00000000000004d4 .L0 
+     /tmp/ccarrZFM.s:789    .text:00000000000004d8 .L0 
+     /tmp/ccarrZFM.s:790    .text:00000000000004d8 .L0 
+     /tmp/ccarrZFM.s:792    .text:00000000000004dc .L0 
+     /tmp/ccarrZFM.s:794    .text:00000000000004e0 .L0 
+     /tmp/ccarrZFM.s:796    .text:00000000000004e4 .L0 
+     /tmp/ccarrZFM.s:813    .text:00000000000004e4 _ZN5Buddy9printListEv
+     /tmp/ccarrZFM.s:816    .text:00000000000004e4 .L0 
+     /tmp/ccarrZFM.s:817    .text:00000000000004e4 .L0 
+     /tmp/ccarrZFM.s:818    .text:00000000000004e8 .L0 
+     /tmp/ccarrZFM.s:823    .text:00000000000004f8 .L0 
+     /tmp/ccarrZFM.s:824    .text:00000000000004f8 .L0 
+     /tmp/ccarrZFM.s:825    .text:00000000000004f8 .L0 
+     /tmp/ccarrZFM.s:826    .text:00000000000004f8 .L0 
+     /tmp/ccarrZFM.s:828    .text:00000000000004fc .L0 
+     /tmp/ccarrZFM.s:832    .text:00000000000004fc .L0 
+     /tmp/ccarrZFM.s:833    .text:00000000000004fc .L0 
+     /tmp/ccarrZFM.s:839    .text:0000000000000504 .L0 
+     /tmp/ccarrZFM.s:840    .text:0000000000000504 .L0 
+     /tmp/ccarrZFM.s:845    .text:0000000000000514 .L0 
+     /tmp/ccarrZFM.s:849    .text:0000000000000518 .L0 
+     /tmp/ccarrZFM.s:853    .text:0000000000000520 .L0 
+     /tmp/ccarrZFM.s:854    .text:0000000000000520 .L0 
+     /tmp/ccarrZFM.s:860    .text:0000000000000534 .L0 
+     /tmp/ccarrZFM.s:861    .text:0000000000000534 .L0 
+     /tmp/ccarrZFM.s:865    .text:0000000000000544 .L0 
+     /tmp/ccarrZFM.s:866    .text:0000000000000544 .L0 
+     /tmp/ccarrZFM.s:873    .text:0000000000000558 .L0 
+     /tmp/ccarrZFM.s:874    .text:0000000000000558 .L0 
+     /tmp/ccarrZFM.s:876    .text:000000000000055c .L0 
+     /tmp/ccarrZFM.s:877    .text:000000000000055c .L0 
+     /tmp/ccarrZFM.s:883    .text:0000000000000570 .L0 
+     /tmp/ccarrZFM.s:884    .text:0000000000000570 .L0 
+     /tmp/ccarrZFM.s:888    .text:0000000000000580 .L0 
+     /tmp/ccarrZFM.s:889    .text:0000000000000580 .L0 
+     /tmp/ccarrZFM.s:892    .text:0000000000000584 .L0 
+     /tmp/ccarrZFM.s:898    .text:0000000000000588 .L0 
+     /tmp/ccarrZFM.s:899    .text:000000000000058c .L0 
+     /tmp/ccarrZFM.s:901    .text:0000000000000590 .L0 
+     /tmp/ccarrZFM.s:902    .text:0000000000000590 .L0 
+     /tmp/ccarrZFM.s:904    .text:0000000000000594 .L0 
+     /tmp/ccarrZFM.s:906    .text:0000000000000598 .L0 
+     /tmp/ccarrZFM.s:909    .text:000000000000059c .L0 
+     /tmp/ccarrZFM.s:911    .text:00000000000005a0 .L0 
+     /tmp/ccarrZFM.s:916    .text:00000000000005a0 _GLOBAL__sub_I__ZN5Buddy16BUDDY_START_ADDRE
+     /tmp/ccarrZFM.s:919    .text:00000000000005a0 .L0 
+     /tmp/ccarrZFM.s:920    .text:00000000000005a0 .L0 
+GAS LISTING /tmp/ccarrZFM.s 			page 32
+
+
+     /tmp/ccarrZFM.s:921    .text:00000000000005a4 .L0 
+     /tmp/ccarrZFM.s:924    .text:00000000000005ac .L0 
+     /tmp/ccarrZFM.s:925    .text:00000000000005ac .L0 
+     /tmp/ccarrZFM.s:927    .text:00000000000005b0 .L0 
+     /tmp/ccarrZFM.s:929    .text:00000000000005b0 .L0 
+     /tmp/ccarrZFM.s:935    .text:00000000000005c8 .L0 
+     /tmp/ccarrZFM.s:937    .text:00000000000005cc .L0 
+     /tmp/ccarrZFM.s:938    .text:00000000000005cc .L0 
+     /tmp/ccarrZFM.s:940    .text:00000000000005d0 .L0 
+     /tmp/ccarrZFM.s:942    .text:00000000000005d4 .L0 
+     /tmp/ccarrZFM.s:973    .bss:0000000000000010 _ZN5Buddy4tailE
+     /tmp/ccarrZFM.s:977    .bss:0000000000000078 _ZN5Buddy4headE
+     /tmp/ccarrZFM.s:958    .data:0000000000000000 _ZN5Buddy16BLOCKS_AVAILABLEE
+     /tmp/ccarrZFM.s:969    .bss:0000000000000008 _ZN5Buddy20BUDDY_META_DATA_ADDRE
+     /tmp/ccarrZFM.s:965    .bss:0000000000000000 _ZN5Buddy16BUDDY_START_ADDRE
+     /tmp/ccarrZFM.s:955    .data:0000000000000000 .LANCHOR1
+     /tmp/ccarrZFM.s:962    .bss:0000000000000000 .LANCHOR0
+     /tmp/ccarrZFM.s:984    .text:00000000000005d4 .L0 
+     /tmp/ccarrZFM.s:38     .text:000000000000002c .L0 
+     /tmp/ccarrZFM.s:44     .text:0000000000000044 .L0 
+     /tmp/ccarrZFM.s:72     .text:000000000000006c .L0 
+     /tmp/ccarrZFM.s:76     .text:0000000000000078 .L0 
+     /tmp/ccarrZFM.s:84     .text:0000000000000090 .L0 
+     /tmp/ccarrZFM.s:122    .text:00000000000000b8 .L0 
+     /tmp/ccarrZFM.s:154    .text:00000000000000e8 .L0 
+     /tmp/ccarrZFM.s:188    .text:0000000000000118 .L0 
+     /tmp/ccarrZFM.s:220    .text:0000000000000148 .L0 
+     /tmp/ccarrZFM.s:265    .text:0000000000000194 .L0 
+     /tmp/ccarrZFM.s:307    .text:00000000000001cc .L0 
+     /tmp/ccarrZFM.s:347    .text:0000000000000210 .L0 
+     /tmp/ccarrZFM.s:354    .text:0000000000000224 .L0 
+     /tmp/ccarrZFM.s:410    .text:0000000000000278 .L0 
+     /tmp/ccarrZFM.s:471    .text:00000000000002c0 .L0 
+     /tmp/ccarrZFM.s:500    .text:00000000000002ec .L0 
+     /tmp/ccarrZFM.s:538    .text:0000000000000320 .L0 
+     /tmp/ccarrZFM.s:634    .text:00000000000003ac .L0 
+     /tmp/ccarrZFM.s:659    .text:00000000000003dc .L0 
+     /tmp/ccarrZFM.s:678    .text:0000000000000408 .L0 
+     /tmp/ccarrZFM.s:730    .text:000000000000045c .L0 
+     /tmp/ccarrZFM.s:747    .text:0000000000000480 .L0 
+     /tmp/ccarrZFM.s:768    .text:00000000000004ac .L0 
+     /tmp/ccarrZFM.s:807    .rodata.str1.8:0000000000000010 .LC2
+     /tmp/ccarrZFM.s:840    .text:0000000000000504 .L0 
+     /tmp/ccarrZFM.s:801    .rodata.str1.8:0000000000000000 .LC0
+     /tmp/ccarrZFM.s:861    .text:0000000000000534 .L0 
+     /tmp/ccarrZFM.s:867    .text:0000000000000548 .L0 
+     /tmp/ccarrZFM.s:804    .rodata.str1.8:0000000000000008 .LC1
+     /tmp/ccarrZFM.s:884    .text:0000000000000570 .L0 
+     /tmp/ccarrZFM.s:31     .text:0000000000000020 .L4
+     /tmp/ccarrZFM.s:23     .text:0000000000000014 .L1
+     /tmp/ccarrZFM.s:115    .text:00000000000000b4 .L6
+     /tmp/ccarrZFM.s:100    .text:00000000000000a0 .L7
+     /tmp/ccarrZFM.s:147    .text:00000000000000e4 .L8
+     /tmp/ccarrZFM.s:132    .text:00000000000000d0 .L9
+     /tmp/ccarrZFM.s:181    .text:0000000000000114 .L10
+     /tmp/ccarrZFM.s:166    .text:0000000000000100 .L11
+     /tmp/ccarrZFM.s:209    .text:000000000000013c .L13
+GAS LISTING /tmp/ccarrZFM.s 			page 33
+
+
+     /tmp/ccarrZFM.s:200    .text:0000000000000134 .L15
+     /tmp/ccarrZFM.s:392    .text:000000000000026c .L26
+     /tmp/ccarrZFM.s:295    .text:00000000000001c0 .L23
+     /tmp/ccarrZFM.s:330    .text:00000000000001f8 .L29
+     /tmp/ccarrZFM.s:359    .text:0000000000000238 .L30
+     /tmp/ccarrZFM.s:371    .text:0000000000000250 .L16
+     /tmp/ccarrZFM.s:274    .text:00000000000001ac .L18
+     /tmp/ccarrZFM.s:279    .text:00000000000001b0 .L19
+     /tmp/ccarrZFM.s:341    .text:0000000000000208 .L21
+     /tmp/ccarrZFM.s:286    .text:00000000000001b8 .L20
+     /tmp/ccarrZFM.s:290    .text:00000000000001bc .L22
+     /tmp/ccarrZFM.s:463    .text:00000000000002c0 .L41
+     /tmp/ccarrZFM.s:487    .text:00000000000002e4 .L42
+     /tmp/ccarrZFM.s:529    .text:000000000000031c .L35
+     /tmp/ccarrZFM.s:510    .text:0000000000000308 .L43
+     /tmp/ccarrZFM.s:437    .text:00000000000002ac .L34
+     /tmp/ccarrZFM.s:555    .text:0000000000000348 .L31
+     /tmp/ccarrZFM.s:601    .text:0000000000000384 .L47
+     /tmp/ccarrZFM.s:649    .text:00000000000003d0 .L51
+     /tmp/ccarrZFM.s:687    .text:0000000000000424 .L50
+     /tmp/ccarrZFM.s:622    .text:0000000000000398 .L53
+     /tmp/ccarrZFM.s:646    .text:00000000000003cc .L54
+     /tmp/ccarrZFM.s:773    .text:00000000000004c0 .L61
+     /tmp/ccarrZFM.s:779    .text:00000000000004c8 .L62
+     /tmp/ccarrZFM.s:739    .text:0000000000000478 .L64
+     /tmp/ccarrZFM.s:722    .text:0000000000000450 .L60
+     /tmp/ccarrZFM.s:765    .text:00000000000004ac .L65
+     /tmp/ccarrZFM.s:783    .text:00000000000004cc .L56
+     /tmp/ccarrZFM.s:752    .text:0000000000000494 .L59
+     /tmp/ccarrZFM.s:847    .text:0000000000000518 .L70
+     /tmp/ccarrZFM.s:894    .text:0000000000000588 .L66
+     /tmp/ccarrZFM.s:836    .text:0000000000000504 .L68
+     /tmp/ccarrZFM.s:871    .text:0000000000000558 .L69
+     /tmp/ccarrZFM.s:2111   .debug_abbrev:0000000000000000 .Ldebug_abbrev0
+     /tmp/ccarrZFM.s:3511   .debug_str:0000000000000115 .LASF99
+     /tmp/ccarrZFM.s:3565   .debug_str:0000000000000349 .LASF100
+     /tmp/ccarrZFM.s:3685   .debug_str:00000000000006f1 .LASF101
+     /tmp/ccarrZFM.s:5      .text:0000000000000000 .Ltext0
+     /tmp/ccarrZFM.s:980    .text:00000000000005d4 .Letext0
+     /tmp/ccarrZFM.s:3471   .debug_line:0000000000000000 .Ldebug_line0
+     /tmp/ccarrZFM.s:3579   .debug_str:00000000000003c5 .LASF0
+     /tmp/ccarrZFM.s:3595   .debug_str:000000000000042c .LASF1
+     /tmp/ccarrZFM.s:3569   .debug_str:0000000000000373 .LASF2
+     /tmp/ccarrZFM.s:3547   .debug_str:00000000000002c1 .LASF4
+     /tmp/ccarrZFM.s:3641   .debug_str:00000000000005bb .LASF3
+     /tmp/ccarrZFM.s:3491   .debug_str:00000000000000ae .LASF5
+     /tmp/ccarrZFM.s:3599   .debug_str:000000000000045b .LASF6
+     /tmp/ccarrZFM.s:3577   .debug_str:00000000000003b2 .LASF7
+     /tmp/ccarrZFM.s:3663   .debug_str:000000000000065b .LASF8
+     /tmp/ccarrZFM.s:3533   .debug_str:0000000000000255 .LASF9
+     /tmp/ccarrZFM.s:3611   .debug_str:000000000000049f .LASF10
+     /tmp/ccarrZFM.s:3653   .debug_str:0000000000000619 .LASF11
+     /tmp/ccarrZFM.s:3495   .debug_str:00000000000000be .LASF12
+     /tmp/ccarrZFM.s:3477   .debug_str:0000000000000028 .LASF13
+     /tmp/ccarrZFM.s:3499   .debug_str:00000000000000da .LASF14
+     /tmp/ccarrZFM.s:3633   .debug_str:0000000000000569 .LASF15
+     /tmp/ccarrZFM.s:3503   .debug_str:00000000000000ec .LASF16
+GAS LISTING /tmp/ccarrZFM.s 			page 34
+
+
+     /tmp/ccarrZFM.s:3601   .debug_str:000000000000046e .LASF17
+     /tmp/ccarrZFM.s:3507   .debug_str:0000000000000108 .LASF18
+     /tmp/ccarrZFM.s:3621   .debug_str:00000000000004f4 .LASF19
+     /tmp/ccarrZFM.s:3625   .debug_str:000000000000050b .LASF20
+     /tmp/ccarrZFM.s:3609   .debug_str:0000000000000493 .LASF21
+     /tmp/ccarrZFM.s:3541   .debug_str:0000000000000282 .LASF22
+     /tmp/ccarrZFM.s:3505   .debug_str:0000000000000102 .LASF45
+     /tmp/ccarrZFM.s:3501   .debug_str:00000000000000e6 .LASF102
+     /tmp/ccarrZFM.s:3683   .debug_str:00000000000006ec .LASF103
+     /tmp/ccarrZFM.s:3567   .debug_str:0000000000000368 .LASF23
+     /tmp/ccarrZFM.s:3657   .debug_str:0000000000000632 .LASF25
+     /tmp/ccarrZFM.s:3581   .debug_str:00000000000003d2 .LASF27
+     /tmp/ccarrZFM.s:3687   .debug_str:0000000000000722 .LASF29
+     /tmp/ccarrZFM.s:3521   .debug_str:0000000000000223 .LASF24
+     /tmp/ccarrZFM.s:3479   .debug_str:0000000000000038 .LASF26
+     /tmp/ccarrZFM.s:3551   .debug_str:00000000000002d4 .LASF60
+     /tmp/ccarrZFM.s:3559   .debug_str:0000000000000322 .LASF62
+     /tmp/ccarrZFM.s:3667   .debug_str:0000000000000671 .LASF28
+     /tmp/ccarrZFM.s:3671   .debug_str:000000000000069b .LASF30
+     /tmp/ccarrZFM.s:3627   .debug_str:0000000000000519 .LASF31
+     /tmp/ccarrZFM.s:3629   .debug_str:000000000000052e .LASF32
+     /tmp/ccarrZFM.s:3589   .debug_str:0000000000000405 .LASF33
+     /tmp/ccarrZFM.s:3583   .debug_str:00000000000003d8 .LASF104
+     /tmp/ccarrZFM.s:3509   .debug_str:0000000000000110 .LASF34
+     /tmp/ccarrZFM.s:3561   .debug_str:0000000000000338 .LASF35
+     /tmp/ccarrZFM.s:3489   .debug_str:00000000000000a9 .LASF36
+     /tmp/ccarrZFM.s:3513   .debug_str:00000000000001e5 .LASF37
+     /tmp/ccarrZFM.s:3585   .debug_str:00000000000003df .LASF38
+     /tmp/ccarrZFM.s:3643   .debug_str:00000000000005cd .LASF39
+     /tmp/ccarrZFM.s:3665   .debug_str:000000000000066b .LASF40
+     /tmp/ccarrZFM.s:3669   .debug_str:000000000000067d .LASF42
+     /tmp/ccarrZFM.s:3617   .debug_str:00000000000004e2 .LASF41
+     /tmp/ccarrZFM.s:3637   .debug_str:000000000000059c .LASF43
+     /tmp/ccarrZFM.s:3677   .debug_str:00000000000006be .LASF105
+     /tmp/ccarrZFM.s:3481   .debug_str:000000000000004b .LASF106
+     /tmp/ccarrZFM.s:3523   .debug_str:0000000000000228 .LASF44
+     /tmp/ccarrZFM.s:3539   .debug_str:0000000000000276 .LASF46
+     /tmp/ccarrZFM.s:3497   .debug_str:00000000000000ce .LASF47
+     /tmp/ccarrZFM.s:3593   .debug_str:0000000000000420 .LASF48
+     /tmp/ccarrZFM.s:3659   .debug_str:000000000000064c .LASF49
+     /tmp/ccarrZFM.s:3535   .debug_str:0000000000000263 .LASF50
+     /tmp/ccarrZFM.s:3649   .debug_str:00000000000005f0 .LASF51
+     /tmp/ccarrZFM.s:3563   .debug_str:000000000000033d .LASF52
+     /tmp/ccarrZFM.s:3607   .debug_str:0000000000000486 .LASF53
+     /tmp/ccarrZFM.s:3591   .debug_str:0000000000000416 .LASF54
+     /tmp/ccarrZFM.s:3537   .debug_str:000000000000026c .LASF55
+     /tmp/ccarrZFM.s:3645   .debug_str:00000000000005e0 .LASF56
+     /tmp/ccarrZFM.s:3573   .debug_str:00000000000003a1 .LASF57
+     /tmp/ccarrZFM.s:3623   .debug_str:0000000000000502 .LASF58
+     /tmp/ccarrZFM.s:3597   .debug_str:000000000000043f .LASF59
+     /tmp/ccarrZFM.s:3553   .debug_str:00000000000002de .LASF61
+     /tmp/ccarrZFM.s:3475   .debug_str:000000000000000c .LASF63
+     /tmp/ccarrZFM.s:3485   .debug_str:0000000000000082 .LASF64
+     /tmp/ccarrZFM.s:3635   .debug_str:000000000000057f .LASF65
+     /tmp/ccarrZFM.s:3639   .debug_str:00000000000005b1 .LASF66
+     /tmp/ccarrZFM.s:3515   .debug_str:00000000000001f6 .LASF67
+     /tmp/ccarrZFM.s:3587   .debug_str:00000000000003e6 .LASF107
+GAS LISTING /tmp/ccarrZFM.s 			page 35
+
+
+     /tmp/ccarrZFM.s:3543   .debug_str:0000000000000290 .LASF68
+     /tmp/ccarrZFM.s:3615   .debug_str:00000000000004be .LASF69
+     /tmp/ccarrZFM.s:3527   .debug_str:000000000000023d .LASF70
+     /tmp/ccarrZFM.s:3651   .debug_str:00000000000005fb .LASF71
+     /tmp/ccarrZFM.s:3549   .debug_str:00000000000002c8 .LASF72
+     /tmp/ccarrZFM.s:3483   .debug_str:0000000000000060 .LASF73
+     /tmp/ccarrZFM.s:3575   .debug_str:00000000000003ac .LASF74
+     /tmp/ccarrZFM.s:3571   .debug_str:0000000000000381 .LASF75
+     /tmp/ccarrZFM.s:3487   .debug_str:000000000000008c .LASF76
+     /tmp/ccarrZFM.s:3545   .debug_str:00000000000002a0 .LASF77
+     /tmp/ccarrZFM.s:3679   .debug_str:00000000000006c7 .LASF78
+     /tmp/ccarrZFM.s:3525   .debug_str:000000000000022d .LASF79
+     /tmp/ccarrZFM.s:3613   .debug_str:00000000000004ae .LASF80
+     /tmp/ccarrZFM.s:3555   .debug_str:00000000000002e7 .LASF81
+     /tmp/ccarrZFM.s:917    .text:00000000000005a0 .LFB11
+     /tmp/ccarrZFM.s:943    .text:00000000000005d4 .LFE11
+     /tmp/ccarrZFM.s:933    .text:00000000000005c4 .LVL89
+     /tmp/ccarrZFM.s:3631   .debug_str:000000000000053f .LASF82
+     /tmp/ccarrZFM.s:9      .text:0000000000000000 .LFB10
+     /tmp/ccarrZFM.s:54     .text:0000000000000060 .LFE10
+     /tmp/ccarrZFM.s:3557   .debug_str:0000000000000313 .LASF83
+     /tmp/ccarrZFM.s:3619   .debug_str:00000000000004e9 .LASF84
+     /tmp/ccarrZFM.s:814    .text:00000000000004e4 .LFB9
+     /tmp/ccarrZFM.s:912    .text:00000000000005a0 .LFE9
+     /tmp/ccarrZFM.s:831    .text:00000000000004fc .LBB36
+     /tmp/ccarrZFM.s:896    .text:0000000000000588 .LBE36
+     /tmp/ccarrZFM.s:2906   .debug_loc:0000000000000000 .LLST28
+     /tmp/ccarrZFM.s:3443   .debug_ranges:0000000000000000 .Ldebug_ranges0
+     /tmp/ccarrZFM.s:2918   .debug_loc:0000000000000037 .LLST29
+     /tmp/ccarrZFM.s:842    .text:0000000000000514 .LVL79
+     /tmp/ccarrZFM.s:858    .text:0000000000000534 .LVL81
+     /tmp/ccarrZFM.s:863    .text:0000000000000544 .LVL82
+     /tmp/ccarrZFM.s:881    .text:0000000000000570 .LVL84
+     /tmp/ccarrZFM.s:886    .text:0000000000000580 .LVL85
+     /tmp/ccarrZFM.s:610    .text:0000000000000388 .LFB8
+     /tmp/ccarrZFM.s:696    .text:0000000000000430 .LFE8
+     /tmp/ccarrZFM.s:3519   .debug_str:000000000000021d .LASF85
+     /tmp/ccarrZFM.s:3603   .debug_str:0000000000000473 .LASF86
+     /tmp/ccarrZFM.s:2929   .debug_loc:000000000000006d .LLST24
+     /tmp/ccarrZFM.s:3473   .debug_str:0000000000000000 .LASF87
+     /tmp/ccarrZFM.s:239    .text:0000000000000168 .LFB7
+     /tmp/ccarrZFM.s:395    .text:0000000000000270 .LFE7
+     /tmp/ccarrZFM.s:3647   .debug_str:00000000000005eb .LASF88
+     /tmp/ccarrZFM.s:2958   .debug_loc:00000000000000e2 .LLST9
+     /tmp/ccarrZFM.s:3605   .debug_str:0000000000000481 .LASF89
+     /tmp/ccarrZFM.s:2980   .debug_loc:0000000000000141 .LLST10
+     /tmp/ccarrZFM.s:3673   .debug_str:00000000000006b4 .LASF90
+     /tmp/ccarrZFM.s:2987   .debug_loc:0000000000000164 .LLST11
+     /tmp/ccarrZFM.s:3529   .debug_str:0000000000000246 .LASF91
+     /tmp/ccarrZFM.s:2999   .debug_loc:000000000000019b .LLST12
+     /tmp/ccarrZFM.s:3517   .debug_str:0000000000000213 .LASF92
+     /tmp/ccarrZFM.s:3064   .debug_loc:0000000000000258 .LLST13
+     /tmp/ccarrZFM.s:3675   .debug_str:00000000000006b9 .LASF93
+     /tmp/ccarrZFM.s:3075   .debug_loc:000000000000028e .LLST14
+     /tmp/ccarrZFM.s:3086   .debug_loc:00000000000002c4 .LLST15
+     /tmp/ccarrZFM.s:368    .text:000000000000024c .LVL36
+     /tmp/ccarrZFM.s:401    .text:0000000000000270 .LFB6
+GAS LISTING /tmp/ccarrZFM.s 			page 36
+
+
+     /tmp/ccarrZFM.s:566    .text:0000000000000358 .LFE6
+     /tmp/ccarrZFM.s:3531   .debug_str:0000000000000250 .LASF94
+     /tmp/ccarrZFM.s:3097   .debug_loc:00000000000002fa .LLST16
+     /tmp/ccarrZFM.s:3145   .debug_loc:00000000000003be .LLST17
+     /tmp/ccarrZFM.s:492    .text:00000000000002e4 .LBB29
+     /tmp/ccarrZFM.s:511    .text:0000000000000308 .LBE29
+     /tmp/ccarrZFM.s:3681   .debug_str:00000000000006e4 .LASF95
+     /tmp/ccarrZFM.s:3185   .debug_loc:000000000000045c .LLST21
+     /tmp/ccarrZFM.s:506    .text:0000000000000304 .LVL50
+     /tmp/ccarrZFM.s:3199   .debug_loc:0000000000000495 .LLST18
+     /tmp/ccarrZFM.s:3661   .debug_str:0000000000000656 .LASF96
+     /tmp/ccarrZFM.s:3222   .debug_loc:0000000000000504 .LLST19
+     /tmp/ccarrZFM.s:514    .text:0000000000000308 .LBB26
+     /tmp/ccarrZFM.s:530    .text:000000000000031c .LBE26
+     /tmp/ccarrZFM.s:3493   .debug_str:00000000000000b5 .LASF97
+     /tmp/ccarrZFM.s:3246   .debug_loc:0000000000000574 .LLST20
+     /tmp/ccarrZFM.s:525    .text:0000000000000318 .LVL52
+     /tmp/ccarrZFM.s:554    .text:0000000000000348 .LVL55
+     /tmp/ccarrZFM.s:572    .text:0000000000000358 .LFB5
+     /tmp/ccarrZFM.s:604    .text:0000000000000388 .LFE5
+     /tmp/ccarrZFM.s:3260   .debug_loc:00000000000005ad .LLST22
+     /tmp/ccarrZFM.s:3278   .debug_loc:00000000000005f9 .LLST23
+     /tmp/ccarrZFM.s:590    .text:0000000000000374 .LVL57
+     /tmp/ccarrZFM.s:702    .text:0000000000000430 .LFB4
+     /tmp/ccarrZFM.s:797    .text:00000000000004e4 .LFE4
+     /tmp/ccarrZFM.s:3296   .debug_loc:0000000000000645 .LLST25
+     /tmp/ccarrZFM.s:3321   .debug_loc:00000000000006a7 .LLST26
+     /tmp/ccarrZFM.s:719    .text:000000000000044c .LBB35
+     /tmp/ccarrZFM.s:774    .text:00000000000004c0 .LBE35
+     /tmp/ccarrZFM.s:3328   .debug_loc:00000000000006ca .LLST27
+     /tmp/ccarrZFM.s:761    .text:00000000000004a8 .LVL72
+     /tmp/ccarrZFM.s:60     .text:0000000000000060 .LFB3
+     /tmp/ccarrZFM.s:233    .text:0000000000000168 .LFE3
+     /tmp/ccarrZFM.s:3655   .debug_str:0000000000000628 .LASF98
+     /tmp/ccarrZFM.s:3343   .debug_loc:0000000000000713 .LLST0
+     /tmp/ccarrZFM.s:87     .text:0000000000000098 .LBB10
+     /tmp/ccarrZFM.s:3357   .debug_loc:000000000000074c .LLST1
+     /tmp/ccarrZFM.s:3368   .debug_loc:0000000000000782 .LLST2
+     /tmp/ccarrZFM.s:127    .text:00000000000000cc .LBB14
+     /tmp/ccarrZFM.s:151    .text:00000000000000e4 .LBE14
+     /tmp/ccarrZFM.s:3380   .debug_loc:00000000000007b9 .LLST3
+     /tmp/ccarrZFM.s:3391   .debug_loc:00000000000007ef .LLST4
+     /tmp/ccarrZFM.s:161    .text:00000000000000fc .LBB16
+     /tmp/ccarrZFM.s:185    .text:0000000000000114 .LBE16
+     /tmp/ccarrZFM.s:3398   .debug_loc:0000000000000812 .LLST5
+     /tmp/ccarrZFM.s:3409   .debug_loc:0000000000000848 .LLST6
+     /tmp/ccarrZFM.s:194    .text:000000000000012c .LBB18
+     /tmp/ccarrZFM.s:217    .text:0000000000000144 .LBE18
+     /tmp/ccarrZFM.s:3416   .debug_loc:000000000000086b .LLST7
+     /tmp/ccarrZFM.s:3423   .debug_loc:000000000000088e .LLST8
+     /tmp/ccarrZFM.s:830    .text:00000000000004fc .LVL77
+     /tmp/ccarrZFM.s:835    .text:0000000000000504 .LVL78
+     /tmp/ccarrZFM.s:907    .text:0000000000000598 .LVL88
+     /tmp/ccarrZFM.s:846    .text:0000000000000518 .LVL80
+     /tmp/ccarrZFM.s:870    .text:0000000000000558 .LVL83
+     /tmp/ccarrZFM.s:893    .text:0000000000000588 .LVL87
+     /tmp/ccarrZFM.s:613    .text:0000000000000388 .LVL59
+GAS LISTING /tmp/ccarrZFM.s 			page 37
+
+
+     /tmp/ccarrZFM.s:621    .text:0000000000000398 .LVL60
+     /tmp/ccarrZFM.s:626    .text:000000000000039c .LVL61
+     /tmp/ccarrZFM.s:650    .text:00000000000003d0 .LVL62
+     /tmp/ccarrZFM.s:654    .text:00000000000003d4 .LVL63
+     /tmp/ccarrZFM.s:667    .text:00000000000003f4 .LVL64
+     /tmp/ccarrZFM.s:686    .text:0000000000000424 .LVL65
+     /tmp/ccarrZFM.s:242    .text:0000000000000168 .LVL22
+     /tmp/ccarrZFM.s:273    .text:00000000000001ac .LVL24
+     /tmp/ccarrZFM.s:384    .text:0000000000000260 .LVL39
+     /tmp/ccarrZFM.s:391    .text:000000000000026c .LVL41
+     /tmp/ccarrZFM.s:268    .text:00000000000001a4 .LVL23
+     /tmp/ccarrZFM.s:381    .text:000000000000025c .LVL38
+     /tmp/ccarrZFM.s:387    .text:0000000000000264 .LVL40
+     /tmp/ccarrZFM.s:278    .text:00000000000001b0 .LVL25
+     /tmp/ccarrZFM.s:285    .text:00000000000001b8 .LVL26
+     /tmp/ccarrZFM.s:313    .text:00000000000001e0 .LVL29
+     /tmp/ccarrZFM.s:327    .text:00000000000001f4 .LVL31
+     /tmp/ccarrZFM.s:329    .text:00000000000001f8 .LVL32
+     /tmp/ccarrZFM.s:338    .text:0000000000000204 .LVL33
+     /tmp/ccarrZFM.s:340    .text:0000000000000208 .LVL34
+     /tmp/ccarrZFM.s:358    .text:0000000000000238 .LVL35
+     /tmp/ccarrZFM.s:289    .text:00000000000001bc .LVL27
+     /tmp/ccarrZFM.s:319    .text:00000000000001e8 .LVL30
+     /tmp/ccarrZFM.s:294    .text:00000000000001c0 .LVL28
+     /tmp/ccarrZFM.s:370    .text:0000000000000250 .LVL37
+     /tmp/ccarrZFM.s:404    .text:0000000000000270 .LVL42
+     /tmp/ccarrZFM.s:426    .text:00000000000002a0 .LVL43
+     /tmp/ccarrZFM.s:462    .text:00000000000002c0 .LVL47
+     /tmp/ccarrZFM.s:473    .text:00000000000002cc .LVL48
+     /tmp/ccarrZFM.s:509    .text:0000000000000308 .LVL51
+     /tmp/ccarrZFM.s:528    .text:000000000000031c .LVL53
+     /tmp/ccarrZFM.s:486    .text:00000000000002e4 .LVL49
+     /tmp/ccarrZFM.s:438    .text:00000000000002ac .LVL44
+     /tmp/ccarrZFM.s:452    .text:00000000000002b4 .LVL45
+     /tmp/ccarrZFM.s:458    .text:00000000000002bc .LVL46
+     /tmp/ccarrZFM.s:539    .text:0000000000000328 .LVL54
+     /tmp/ccarrZFM.s:575    .text:0000000000000358 .LVL56
+     /tmp/ccarrZFM.s:600    .text:0000000000000384 .LVL58
+     /tmp/ccarrZFM.s:705    .text:0000000000000430 .LVL66
+     /tmp/ccarrZFM.s:759    .text:00000000000004a0 .LVL71
+     /tmp/ccarrZFM.s:764    .text:00000000000004ac .LVL73
+     /tmp/ccarrZFM.s:782    .text:00000000000004cc .LVL76
+     /tmp/ccarrZFM.s:741    .text:0000000000000478 .LVL69
+     /tmp/ccarrZFM.s:772    .text:00000000000004c0 .LVL74
+     /tmp/ccarrZFM.s:723    .text:0000000000000450 .LVL67
+     /tmp/ccarrZFM.s:757    .text:000000000000049c .LVL70
+     /tmp/ccarrZFM.s:778    .text:00000000000004c8 .LVL75
+     /tmp/ccarrZFM.s:63     .text:0000000000000060 .LVL1
+     /tmp/ccarrZFM.s:199    .text:0000000000000134 .LVL18
+     /tmp/ccarrZFM.s:86     .text:0000000000000098 .LVL2
+     /tmp/ccarrZFM.s:99     .text:00000000000000a0 .LVL3
+     /tmp/ccarrZFM.s:117    .text:00000000000000b4 .LVL6
+     /tmp/ccarrZFM.s:125    .text:00000000000000c8 .LVL7
+     /tmp/ccarrZFM.s:131    .text:00000000000000d0 .LVL8
+     /tmp/ccarrZFM.s:149    .text:00000000000000e4 .LVL11
+     /tmp/ccarrZFM.s:158    .text:00000000000000f8 .LVL12
+     /tmp/ccarrZFM.s:165    .text:0000000000000100 .LVL13
+GAS LISTING /tmp/ccarrZFM.s 			page 38
+
+
+     /tmp/ccarrZFM.s:183    .text:0000000000000114 .LVL16
+     /tmp/ccarrZFM.s:193    .text:000000000000012c .LVL17
+     /tmp/ccarrZFM.s:215    .text:0000000000000144 .LVL21
+     /tmp/ccarrZFM.s:985    .debug_info:0000000000000000 .Ldebug_info0
+     /tmp/ccarrZFM.s:92     .text:0000000000000098 .LBE10
+     /tmp/ccarrZFM.s:95     .text:000000000000009c .LBB13
+     /tmp/ccarrZFM.s:119    .text:00000000000000b4 .LBE13
+     /tmp/ccarrZFM.s:275    .text:00000000000001ac .LBB20
+     /tmp/ccarrZFM.s:296    .text:00000000000001c0 .LBE20
+     /tmp/ccarrZFM.s:304    .text:00000000000001cc .LBB21
+     /tmp/ccarrZFM.s:372    .text:0000000000000250 .LBE21
+     /tmp/ccarrZFM.s:434    .text:00000000000002a8 .LBB24
+     /tmp/ccarrZFM.s:442    .text:00000000000002b0 .LBE24
+     /tmp/ccarrZFM.s:448    .text:00000000000002b0 .LBB28
+     /tmp/ccarrZFM.s:467    .text:00000000000002c0 .LBE28
+     /tmp/ccarrZFM.s:512    .text:0000000000000308 .LBB30
+     /tmp/ccarrZFM.s:532    .text:000000000000031c .LBE30
+     /tmp/ccarrZFM.s:837    .text:0000000000000504 .LBB37
+     /tmp/ccarrZFM.s:843    .text:0000000000000514 .LBE37
+     /tmp/ccarrZFM.s:851    .text:0000000000000520 .LBB38
+     /tmp/ccarrZFM.s:895    .text:0000000000000588 .LBE38
+
+UNDEFINED SYMBOLS
+HEAP_START_ADDR
+_ZN11ConsoleUtil11printStringEPKc
+_ZN11ConsoleUtil8printIntEiii

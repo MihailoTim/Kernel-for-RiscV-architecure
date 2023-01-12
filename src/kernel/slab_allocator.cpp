@@ -1,7 +1,7 @@
 //
 // Created by os on 12/25/22.
 //
-#include "../../h/kernel/slabAllocator.hpp"
+#include "../../h/kernel/slab_allocator.hpp"
 #include "../../h/kernel/utility.hpp"
 #include "../../h/kernel/riscv.hpp"
 
@@ -29,7 +29,7 @@ void SlabAllocator::initialize(void* space, uint64 blockNum) {
     largeSlabCache->partialHead = nullptr;
     largeSlabCache->fullHead = nullptr;
     largeSlabCache->objectSize = sizeof(Slab);
-    largeSlabCache->slabSize = 4;
+    largeSlabCache->slabSize = SLAB_HEADER_DEFAULT_SLAB_SIZE;
     strcpy("Large Slab Cache", cache->name);
 
 
@@ -44,11 +44,11 @@ bool SlabAllocator::allocateSlab(Cache *cache) {
         return false;
     SlabAllocator::insertIntoList(cache->emptyHead, slab);
     slab->totalNumOfSlots = slab->numOfFreeSlots = (((1<<cache->slabSize) << BLOCK_SIZE_BITS) - sizeof(Slab)) / cache->objectSize;
-    if(slab->totalNumOfSlots > 1024*8)
-        slab->totalNumOfSlots = 1024*8;
+    if(slab->totalNumOfSlots > MAX_NUMBER_OF_SLOTS)
+        slab->totalNumOfSlots = slab->numOfFreeSlots = MAX_NUMBER_OF_SLOTS;
     slab->objectOffset = (void*)((uint64)slab + sizeof(Slab));
     slab->parent = cache;
-    for(uint64 i=0;i<slab->totalNumOfSlots/8 + 1;i++)
+    for(uint64 i=0;i<(slab->totalNumOfSlots+7)/8;i++)
         slab->allocated[i] = 0;
 
     if(cache->ctor) {
@@ -94,13 +94,13 @@ void* SlabAllocator::allocateObject(Cache *cache) {
     else{
         Slab* slab = (Slab*)SlabAllocator::allocateObject(largeSlabCache);
         slab->totalNumOfSlots = slab->numOfFreeSlots = (((1<<cache->slabSize) << BLOCK_SIZE_BITS)) / cache->objectSize;
-        if(slab->totalNumOfSlots > 1024*8)
-            slab->totalNumOfSlots = 1024*8;
+        if(slab->totalNumOfSlots > MAX_NUMBER_OF_SLOTS)
+            slab->totalNumOfSlots = slab->numOfFreeSlots = MAX_NUMBER_OF_SLOTS;
         void* slabOffset = Buddy::alloc(cache->slabSize);
         slab->objectOffset = slabOffset;
         slab->parent = cache;
         slab->next = nullptr;
-        for(uint64 i=0;i<slab->totalNumOfSlots/8 + 1;i++)
+        for(uint64 i=0;i<(slab->totalNumOfSlots+7)/8;i++)
             slab->allocated[i] = 0;
 
         if(cache->ctor) {
@@ -179,7 +179,7 @@ Cache* SlabAllocator::createCache(const char *name, size_t size, void (*ctor)(vo
     ret->objectSize = size;
     int deg = Buddy::getDeg(Buddy::ceil(size));
     if(size <= sizeof(Slab)){
-        ret->slabSize = DEFAULT_SLAB_SIZE;
+        ret->slabSize = SMALL_CACHE_DEFAULT_SLAB_SIZE;
     }
     else{
         deg-=10;
@@ -215,8 +215,8 @@ void SlabAllocator::printSlab(Slab *slab) {
         ConsoleUtil::print("Slab object size:", (uint64) sizeof(Slab), "\n",10);
         ConsoleUtil::print("Object offset:", (uint64) slab->objectOffset, "\n");
         ConsoleUtil::print("Slab allocated array address:", (uint64) (&slab->allocated), "\n");
-        ConsoleUtil::printString("Allocated status array:\n");
-        for (uint64 i = 0; i < slab->totalNumOfSlots/8 + 1; i++) {
+        ConsoleUtil::printString("Allocated status array: ");
+        for (uint64 i = 0; i < (slab->totalNumOfSlots+7)/8; i++) {
             ConsoleUtil::print("", slab->allocated[i], " ");
         }
         ConsoleUtil::printString("\n");

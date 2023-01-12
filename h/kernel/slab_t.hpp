@@ -15,7 +15,7 @@ public:
     Slab *prev, *next;
     uint64 numOfFreeSlots;
     uint64 totalNumOfSlots;
-    char allocated[1024];
+    char allocated[128];
     void* objectOffset;
     Cache* parent;
 }kmem_slab_t;

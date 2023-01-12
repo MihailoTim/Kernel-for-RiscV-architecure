@@ -4,9 +4,9 @@
 
 #include "../../h/kernel/scb.hpp"
 #include "../../h/kernel/scheduler.hpp"
-#include "../../h/kernel/memoryAllocator.hpp"
+#include "../../h/kernel/memory_allocator.hpp"
 #include "../../h/user/printing.hpp"
-#include "../../h/kernel/consoleUtil.hpp"
+#include "../../h/kernel/console_util.hpp"
 
 kmem_cache_t* SCB::scbCache = nullptr;
 

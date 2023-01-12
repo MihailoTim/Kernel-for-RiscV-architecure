@@ -1,5 +1,5 @@
-#include "../../h/kernel/buddyAllocator.hpp"
-#include "../../h/kernel/consoleUtil.hpp"
+#include "../../h/kernel/buddy_allocator.hpp"
+#include "../../h/kernel/console_util.hpp"
 
 void* Buddy::BUDDY_START_ADDR = BUDDY_START_ADDR_CONST;
 void* Buddy::BUDDY_META_DATA_ADDR = BUDDY_META_ADDR_CONST;

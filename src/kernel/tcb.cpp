@@ -3,7 +3,7 @@
 //
 
 #include "../../h/kernel/tcb.hpp"
-#include "../../h/kernel/memoryAllocator.hpp"
+#include "../../h/kernel/memory_allocator.hpp"
 #include "../../h/kernel/scheduler.hpp"
 #include "../../h/user/syscall_c.h"
 #include "../../h/user/printing.hpp"
