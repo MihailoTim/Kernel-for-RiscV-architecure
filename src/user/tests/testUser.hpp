@@ -14,7 +14,6 @@ public:
         printString("Started thread id: ");
         printInt(id,10);
         printString("\n");
-//        ConsoleUtil::print("Started thread id:",id,"\n");
 
         ForkThread* thread = new ForkThread(id + 1);
         ForkThread** threads = (ForkThread** ) mem_alloc(sizeof(ForkThread*) * id);

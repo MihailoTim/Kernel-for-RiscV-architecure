@@ -7,6 +7,7 @@
 //#include "ThreadSleep_C_API_test.hpp" // thread_sleep test C API
 #include "ConsumerProducer_CPP_API_test.hpp" // zadatak 4. CPP API i asinhrona promena konteksta
 #include "testUser.hpp"
+#include "../../../h/kernel/buddy_allocator.hpp"
 
 void userMain() {
 //    Threads_C_API_test(); // zadatak 2., niti C API i sinhrona promena konteksta

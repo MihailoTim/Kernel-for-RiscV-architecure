@@ -122,7 +122,7 @@ int thread_start(thread_t handle){
 
     asm("ecall");
 
-    uint64 status;
+    uint64 status = 0;
 
     asm("mv %[status], a0" : [status] "=r" (status));
 
