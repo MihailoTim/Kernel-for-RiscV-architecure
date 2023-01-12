@@ -34,15 +34,12 @@ void RiscV::initialize(){
 
 //get previous privilege and previous interrupt status
 void RiscV::popSppSpie() {
-    uint64 ra = 0;
     if(TCB::running->mode == TCB::Mode::SUPERVISOR)
         asm("csrw sepc, ra");
-    else
-    {
-        ra = (uint64)bodyWrapper;
+    else{
         asm("mv a0, %[iarg]" : : [iarg] "r" (TCB::running->body));
         asm("mv a1, %[iarg]" : : [iarg] "r" (TCB::running->args));
-        asm("csrw sepc, %[ra]" : : [ra] "r" (ra));
+        asm("csrw sepc, %[ra]" : : [ra] "r" ((uint64)bodyWrapper));
     }
     asm("sret");
 }
@@ -806,14 +803,15 @@ void* RiscV::getPMT(){
 }
 
 void RiscV::handlePageFault(void* PMT, uint64 addr, uint64 mask){
-    uint64 pmt2Entry = (addr >> 30) & (0x1ff);;
-    uint64 pmt1Entry = (addr >> 21) & (0x1ff);
-    uint64 pmt0Entry = (addr >> 12) & (0x1ff);
+    uint64 pmt2Entry = RiscV::getPMT2Entry(addr);
+    uint64 pmt1Entry = RiscV::getPMT1Entry(addr);
+    uint64 pmt0Entry = RiscV::getPMT0Entry(addr);
     uint64 pmt2Desc = ((uint64*)PMT)[pmt2Entry];
     void* pmt1 = nullptr;
     if(pmt2Desc == 0){
         pmt1 = RiscV::getPMT();
-        ((uint64*)PMT)[pmt2Entry] = (((uint64)pmt1 >> 12) << 10) | (uint64)1;
+        uint64 frame = (uint64)pmt1 >> 12;
+        ((uint64*)PMT)[pmt2Entry] = (frame << 10) | (uint64)1;
     }
     else
         pmt1 = (void*)((pmt2Desc >> 10) << 12);
@@ -821,16 +819,18 @@ void RiscV::handlePageFault(void* PMT, uint64 addr, uint64 mask){
     void* pmt0 = nullptr;
     if(pmt1Desc == 0){
         pmt0 = RiscV::getPMT();
-        ((uint64*)pmt1)[pmt1Entry] = (((uint64)pmt0 >> 12) << 10) | (uint64)1;
+        uint64 frame = (uint64)pmt0 >> 12;
+        ((uint64*)pmt1)[pmt1Entry] = (frame << 10) | (uint64)1;
     }
     else
         pmt0 = (void*)((pmt1Desc >> 10) << 12);
-    ((uint64 *) pmt0)[pmt0Entry] = ((addr >> 12) << 10) | mask;
+    uint64 frame = addr >> 12;
+    ((uint64 *) pmt0)[pmt0Entry] = (frame << 10) | mask;
 }
 
 void RiscV::mapConsoleRegisters(void *PMT) {
-    handlePageFault(PMT, (uint64)CONSOLE_RX_DATA,0xf);
-    handlePageFault(PMT, (uint64)CONSOLE_TX_DATA,0xf);
-    handlePageFault(PMT, (uint64)CONSOLE_STATUS,0xf);
-    handlePageFault(PMT, (uint64)0xc201004,0xf);
+    handlePageFault(PMT, (uint64)CONSOLE_STATUS,0x1f);
+    handlePageFault(PMT, (uint64)CONSOLE_TX_DATA,0x1f);
+    handlePageFault(PMT, (uint64)CONSOLE_RX_DATA,0x1f);
+    handlePageFault(PMT, (uint64)PLIC_CLAIM_PF,0x1f);
 }
