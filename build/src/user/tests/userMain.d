@@ -8,7 +8,9 @@ build/src/user/tests/userMain.o: src/user/tests/userMain.cpp \
  src/user/tests/../../../h/user/syscall_c.h \
  src/user/tests/ConsumerProducer_CPP_API_test.hpp \
  src/user/tests/../../../h/user/syscall_cpp.hpp \
- src/user/tests/buffer_CPP_API.hpp src/user/tests/testUser.hpp
+ src/user/tests/buffer_CPP_API.hpp src/user/tests/testUser.hpp \
+ src/user/tests/../../../h/kernel/buddy_allocator.hpp \
+ src/user/tests/../../../h/kernel/utility.hpp
 
 src/user/tests/Threads_C_API_test.hpp:
 
@@ -31,3 +33,7 @@ src/user/tests/../../../h/user/syscall_cpp.hpp:
 src/user/tests/buffer_CPP_API.hpp:
 
 src/user/tests/testUser.hpp:
+
+src/user/tests/../../../h/kernel/buddy_allocator.hpp:
+
+src/user/tests/../../../h/kernel/utility.hpp:

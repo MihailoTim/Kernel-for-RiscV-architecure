@@ -34,36 +34,21 @@ System::System() {
         //initialize the machine
         RiscV::initialize();
 
-        ConsoleUtil::print("",sizeof(Slab),"\n",10);
-
-        Cache* cache=kmem_cache_create("",20,nullptr, nullptr);
-        kmem_cache_alloc(cache);
-        SlabAllocator::printSlab(cache->partialHead);
-//        Cache* cache1 = kmem_cache_create("Cache size 0", 1, nullptr, nullptr);
-//        kmem_cache_alloc(cache1);
-//        SlabAllocator::printSlab(cache1->partialHead);
-//        kmem_cache_info(cache1);
-
-
-//        kmem_cache_info(SlabAllocator::largeSlabCache);
-//        SlabAllocator::printSlab(SlabAllocator::largeSlabCache->partialHead);
-//
-//        kmem_cache_t* cache1 = kmem_cache_create("Cache 1", 512, nullptr, nullptr);
-//        kmem_cache_t* cache2 = kmem_cache_create("Cache 1", 1500, nullptr, nullptr);
-//        kmem_cache_alloc(cache1);
-//        void* ret1 =kmem_cache_alloc(cache2);
-//        kmem_cache_info(cache2);
-//        kmem_cache_alloc(cache2);
-//        kmem_cache_alloc(cache2);
-//        kmem_cache_alloc(cache2);
-//        kmem_cache_alloc(cache2);
-//        kmem_cache_info(cache2);
-//        kmem_cache_free(cache2,ret1);
-//        SlabAllocator::printSlab(cache2->partialHead);
-//        SlabAllocator::printSlab(cache2->fullHead);
-//
-//        kmem_cache_info(SlabAllocator::largeSlabCache);
-//        SlabAllocator::printSlab(SlabAllocator::largeSlabCache->partialHead);
+        Cache *tmp1 = kmem_cache_create("TMP1", 2048, nullptr, nullptr);
+//        Cache *tmp2 = kmem_cache_create("TMP2", 2048, nullptr, nullptr);
+        void* ret1 = kmem_cache_alloc(tmp1);
+        void* ret2 = kmem_cache_alloc(tmp1);
+        void* ret3 = kmem_cache_alloc(tmp1);
+        if(ret1 && ret2 && ret3){
+            SlabAllocator::printSlab(tmp1->partialHead);
+            kmem_cache_free(tmp1, ret3);
+            SlabAllocator::printSlab(tmp1->partialHead);
+            kmem_cache_free(tmp1, ret2);
+            kmem_cache_free(tmp1, ret1);
+            kmem_cache_info(tmp1);
+            kmem_cache_alloc(tmp1);
+            SlabAllocator::printSlab(tmp1->partialHead);
+        }
 
         test2();
         //creating a thread that will be executing user code
