@@ -1,4 +1,4 @@
-GAS LISTING /tmp/cco8uvzs.s 			page 1
+GAS LISTING /tmp/ccVfGEPJ.s 			page 1
 
 
    1              		.file	"consoleUtil.cpp"
@@ -15,9 +15,9 @@ GAS LISTING /tmp/cco8uvzs.s 			page 1
    2:src/kernel/consoleUtil.cpp **** // Created by os on 5/29/22.
    3:src/kernel/consoleUtil.cpp **** //
    4:src/kernel/consoleUtil.cpp **** 
-   5:src/kernel/consoleUtil.cpp **** #include "../../h/consoleUtil.hpp"
-   6:src/kernel/consoleUtil.cpp **** #include "../../h/printing.hpp"
-   7:src/kernel/consoleUtil.cpp **** #include "../../h/scb.hpp"
+   5:src/kernel/consoleUtil.cpp **** #include "../../h/kernel/consoleUtil.hpp"
+   6:src/kernel/consoleUtil.cpp **** #include "../../h/user/printing.hpp"
+   7:src/kernel/consoleUtil.cpp **** #include "../../h/kernel/scb.hpp"
    8:src/kernel/consoleUtil.cpp **** 
    9:src/kernel/consoleUtil.cpp **** uint64 ConsoleUtil::inputHead = 0;
   10:src/kernel/consoleUtil.cpp **** uint64 ConsoleUtil::inputTail = 0;
@@ -30,10 +30,10 @@ GAS LISTING /tmp/cco8uvzs.s 			page 1
   17:src/kernel/consoleUtil.cpp **** SCB* ConsoleUtil::outputSem = nullptr;
   18:src/kernel/consoleUtil.cpp **** SCB* ConsoleUtil::inputSem = nullptr;
   19:src/kernel/consoleUtil.cpp **** 
-  20:src/kernel/consoleUtil.cpp **** //char* ConsoleUtil::inputBuffer = nullptr;
-  21:src/kernel/consoleUtil.cpp **** //char* ConsoleUtil::outputBuffer = nullptr;
-  22:src/kernel/consoleUtil.cpp **** char ConsoleUtil::inputBuffer[8192];
-  23:src/kernel/consoleUtil.cpp **** char ConsoleUtil::outputBuffer[8192];
+  20:src/kernel/consoleUtil.cpp **** char* ConsoleUtil::inputBuffer = nullptr;
+  21:src/kernel/consoleUtil.cpp **** char* ConsoleUtil::outputBuffer = nullptr;
+  22:src/kernel/consoleUtil.cpp **** //char ConsoleUtil::inputBuffer[8192];
+  23:src/kernel/consoleUtil.cpp **** //char ConsoleUtil::outputBuffer[8192];
   24:src/kernel/consoleUtil.cpp **** 
   25:src/kernel/consoleUtil.cpp **** uint64 ConsoleUtil::bufferSize = 8192;
   26:src/kernel/consoleUtil.cpp **** 
@@ -58,7 +58,7 @@ GAS LISTING /tmp/cco8uvzs.s 			page 1
   28              		.loc 1 28 5
   29              		.loc 1 28 25 is_stmt 0
   30 0018 13058001 		li	a0,24
-GAS LISTING /tmp/cco8uvzs.s 			page 2
+GAS LISTING /tmp/ccVfGEPJ.s 			page 2
 
 
   31              	.LEHB0:
@@ -99,1501 +99,1553 @@ GAS LISTING /tmp/cco8uvzs.s 			page 1
   60              	.LEHE3:
   61              	.L3:
   62              		.loc 1 29 15 discriminator 6
-  63 0060 97070000 		sd	s1,.LANCHOR0+8,a5
-  63      23B09700 
-  30:src/kernel/consoleUtil.cpp **** //    inputBuffer = (char*)kmalloc(ConsoleUtil::bufferSize);
-  31:src/kernel/consoleUtil.cpp **** //    outputBuffer = (char*)kmalloc(ConsoleUtil::bufferSize);
+  63 0060 17090000 		lla	s2,.LANCHOR0
+  63      13090900 
+  64 0068 23349900 		sd	s1,8(s2)
+  30:src/kernel/consoleUtil.cpp ****     inputBuffer = (char*)kmalloc(ConsoleUtil::bufferSize);
+  65              		.loc 1 30 5 is_stmt 1 discriminator 6
+  66              		.loc 1 30 33 is_stmt 0 discriminator 6
+  67 006c 97040000 		lla	s1,.LANCHOR1
+  67      93840400 
+  68 0074 03B50400 		ld	a0,0(s1)
+  69              	.LEHB4:
+  70 0078 97000000 		call	_Z7kmallocm@plt
+  70      E7800000 
+  71              	.LVL4:
+  72              		.loc 1 30 17 discriminator 6
+  73 0080 2338A900 		sd	a0,16(s2)
+  31:src/kernel/consoleUtil.cpp ****     outputBuffer = (char*)kmalloc(ConsoleUtil::bufferSize);
+  74              		.loc 1 31 5 is_stmt 1 discriminator 6
+  75              		.loc 1 31 34 is_stmt 0 discriminator 6
+  76 0084 03B50400 		ld	a0,0(s1)
+GAS LISTING /tmp/ccVfGEPJ.s 			page 3
+
+
+  77 0088 97000000 		call	_Z7kmallocm@plt
+  77      E7800000 
+  78              	.LVL5:
+  79              	.LEHE4:
+  80              		.loc 1 31 18 discriminator 6
+  81 0090 233CA900 		sd	a0,24(s2)
   32:src/kernel/consoleUtil.cpp **** }
-  64              		.loc 1 32 1 discriminator 6
-  65 0068 83308101 		ld	ra,24(sp)
-  66              		.cfi_remember_state
-  67              		.cfi_restore 1
-  68 006c 03340101 		ld	s0,16(sp)
-  69              		.cfi_restore 8
-  70              		.cfi_def_cfa 2, 32
-  71 0070 83348100 		ld	s1,8(sp)
-  72              		.cfi_restore 9
-  73 0074 03390100 		ld	s2,0(sp)
-  74              		.cfi_restore 18
-  75 0078 13010102 		addi	sp,sp,32
-  76              		.cfi_def_cfa_offset 0
-  77 007c 67800000 		jr	ra
-GAS LISTING /tmp/cco8uvzs.s 			page 3
-
-
-  78              	.L6:
-  79              		.cfi_restore_state
-  80 0080 13090500 		mv	s2,a0
+  82              		.loc 1 32 1 discriminator 6
+  83 0094 83308101 		ld	ra,24(sp)
+  84              		.cfi_remember_state
+  85              		.cfi_restore 1
+  86 0098 03340101 		ld	s0,16(sp)
+  87              		.cfi_restore 8
+  88              		.cfi_def_cfa 2, 32
+  89 009c 83348100 		ld	s1,8(sp)
+  90              		.cfi_restore 9
+  91 00a0 03390100 		ld	s2,0(sp)
+  92              		.cfi_restore 18
+  93 00a4 13010102 		addi	sp,sp,32
+  94              		.cfi_def_cfa_offset 0
+  95 00a8 67800000 		jr	ra
+  96              	.L6:
+  97              		.cfi_restore_state
+  98 00ac 13090500 		mv	s2,a0
   28:src/kernel/consoleUtil.cpp ****     outputSem = new SCB(0);
-  81              		.loc 1 28 25
-  82 0084 13850400 		mv	a0,s1
-  83 0088 97000000 		call	_ZN3SCBdlEPv@plt
-  83      E7800000 
-  84              	.LVL4:
-  85 0090 13050900 		mv	a0,s2
-  86              	.LEHB4:
-  87 0094 97000000 		call	_Unwind_Resume@plt
-  87      E7800000 
-  88              	.LVL5:
-  89              	.LEHE4:
-  90              	.L7:
-  91 009c 13090500 		mv	s2,a0
-  29:src/kernel/consoleUtil.cpp ****     outputSem = new SCB(0);
-  92              		.loc 1 29 26
-  93 00a0 13850400 		mv	a0,s1
-  94 00a4 97000000 		call	_ZN3SCBdlEPv@plt
-  94      E7800000 
-  95              	.LVL6:
-  96 00ac 13050900 		mv	a0,s2
-  97              	.LEHB5:
-  98 00b0 97000000 		call	_Unwind_Resume@plt
-  98      E7800000 
-  99              	.LVL7:
- 100              	.LEHE5:
- 101              		.cfi_endproc
- 102              	.LFE22:
- 103              		.globl	__gxx_personality_v0
- 104              		.section	.gcc_except_table,"a",@progbits
- 105              	.LLSDA22:
- 106 0000 FF       		.byte	0xff
- 107 0001 FF       		.byte	0xff
- 108 0002 03       		.byte	0x3
- 109 0003 4E       		.byte	0x4e
- 110 0004 00000000 		.4byte	.LEHB0-.LFB22
- 111 0008 00000000 		.4byte	.LEHE0-.LEHB0
- 112 000c 00000000 		.4byte	0
- 113 0010 00       		.byte	0
- 114 0011 00000000 		.4byte	.LEHB1-.LFB22
- 115 0015 00000000 		.4byte	.LEHE1-.LEHB1
- 116 0019 00000000 		.4byte	.L6-.LFB22
- 117 001d 00       		.byte	0
- 118 001e 00000000 		.4byte	.LEHB2-.LFB22
- 119 0022 00000000 		.4byte	.LEHE2-.LEHB2
- 120 0026 00000000 		.4byte	0
- 121 002a 00       		.byte	0
- 122 002b 00000000 		.4byte	.LEHB3-.LFB22
- 123 002f 00000000 		.4byte	.LEHE3-.LEHB3
- 124 0033 00000000 		.4byte	.L7-.LFB22
- 125 0037 00       		.byte	0
- 126 0038 00000000 		.4byte	.LEHB4-.LFB22
- 127 003c 00000000 		.4byte	.LEHE4-.LEHB4
- 128 0040 00000000 		.4byte	0
-GAS LISTING /tmp/cco8uvzs.s 			page 4
+  99              		.loc 1 28 25
+ 100 00b0 13850400 		mv	a0,s1
+ 101 00b4 97000000 		call	_ZN3SCBdlEPv@plt
+ 101      E7800000 
+ 102              	.LVL6:
+ 103 00bc 13050900 		mv	a0,s2
+ 104              	.LEHB5:
+ 105 00c0 97000000 		call	_Unwind_Resume@plt
+ 105      E7800000 
+ 106              	.LVL7:
+ 107              	.LEHE5:
+ 108              	.L7:
+ 109 00c8 13090500 		mv	s2,a0
+  29:src/kernel/consoleUtil.cpp ****     inputBuffer = (char*)kmalloc(ConsoleUtil::bufferSize);
+ 110              		.loc 1 29 26
+ 111 00cc 13850400 		mv	a0,s1
+ 112 00d0 97000000 		call	_ZN3SCBdlEPv@plt
+ 112      E7800000 
+ 113              	.LVL8:
+ 114 00d8 13050900 		mv	a0,s2
+ 115              	.LEHB6:
+ 116 00dc 97000000 		call	_Unwind_Resume@plt
+ 116      E7800000 
+ 117              	.LVL9:
+ 118              	.LEHE6:
+ 119              		.cfi_endproc
+ 120              	.LFE22:
+ 121              		.globl	__gxx_personality_v0
+ 122              		.section	.gcc_except_table,"a",@progbits
+ 123              	.LLSDA22:
+ 124 0000 FF       		.byte	0xff
+ 125 0001 FF       		.byte	0xff
+GAS LISTING /tmp/ccVfGEPJ.s 			page 4
 
 
- 129 0044 00       		.byte	0
- 130 0045 00000000 		.4byte	.LEHB5-.LFB22
- 131 0049 00000000 		.4byte	.LEHE5-.LEHB5
- 132 004d 00000000 		.4byte	0
- 133 0051 00       		.byte	0
- 134              		.text
- 136              		.align	2
- 137              		.globl	_ZN11ConsoleUtil8putInputEc
- 139              	_ZN11ConsoleUtil8putInputEc:
- 140              	.LFB23:
+ 126 0002 03       		.byte	0x3
+ 127 0003 5B       		.byte	0x5b
+ 128 0004 00000000 		.4byte	.LEHB0-.LFB22
+ 129 0008 00000000 		.4byte	.LEHE0-.LEHB0
+ 130 000c 00000000 		.4byte	0
+ 131 0010 00       		.byte	0
+ 132 0011 00000000 		.4byte	.LEHB1-.LFB22
+ 133 0015 00000000 		.4byte	.LEHE1-.LEHB1
+ 134 0019 00000000 		.4byte	.L6-.LFB22
+ 135 001d 00       		.byte	0
+ 136 001e 00000000 		.4byte	.LEHB2-.LFB22
+ 137 0022 00000000 		.4byte	.LEHE2-.LEHB2
+ 138 0026 00000000 		.4byte	0
+ 139 002a 00       		.byte	0
+ 140 002b 00000000 		.4byte	.LEHB3-.LFB22
+ 141 002f 00000000 		.4byte	.LEHE3-.LEHB3
+ 142 0033 00000000 		.4byte	.L7-.LFB22
+ 143 0037 00       		.byte	0
+ 144 0038 00000000 		.4byte	.LEHB4-.LFB22
+ 145 003c 00000000 		.4byte	.LEHE4-.LEHB4
+ 146 0040 00000000 		.4byte	0
+ 147 0044 00       		.byte	0
+ 148 0045 00000000 		.4byte	.LEHB5-.LFB22
+ 149 0049 00000000 		.4byte	.LEHE5-.LEHB5
+ 150 004d 00000000 		.4byte	0
+ 151 0051 00       		.byte	0
+ 152 0052 00000000 		.4byte	.LEHB6-.LFB22
+ 153 0056 00000000 		.4byte	.LEHE6-.LEHB6
+ 154 005a 00000000 		.4byte	0
+ 155 005e 00       		.byte	0
+ 156              		.text
+ 158              		.align	2
+ 159              		.globl	_ZN11ConsoleUtil8putInputEc
+ 161              	_ZN11ConsoleUtil8putInputEc:
+ 162              	.LFB23:
   33:src/kernel/consoleUtil.cpp **** 
   34:src/kernel/consoleUtil.cpp **** void ConsoleUtil::putInput(char c) {
- 141              		.loc 1 34 36 is_stmt 1
- 142              		.cfi_startproc
- 143              	.LVL8:
+ 163              		.loc 1 34 36 is_stmt 1
+ 164              		.cfi_startproc
+ 165              	.LVL10:
   35:src/kernel/consoleUtil.cpp ****     if((inputTail+1)%bufferSize == inputHead)
- 144              		.loc 1 35 5
- 145              		.loc 1 35 18 is_stmt 0
- 146 00b8 17070000 		lla	a4,.LANCHOR0
- 146      13070700 
- 147 00c0 83360701 		ld	a3,16(a4)
- 148 00c4 93871600 		addi	a5,a3,1
- 149              		.loc 1 35 21
- 150 00c8 17060000 		ld	a2,.LANCHOR1
- 150      03360600 
- 151 00d0 B3F7C702 		remu	a5,a5,a2
- 152              		.loc 1 35 33
- 153 00d4 03378701 		ld	a4,24(a4)
- 154              		.loc 1 35 5
- 155 00d8 6386E704 		beq	a5,a4,.L13
+ 166              		.loc 1 35 5
+ 167              		.loc 1 35 18 is_stmt 0
+ 168 00e4 17070000 		lla	a4,.LANCHOR0
+ 168      13070700 
+ 169 00ec 83360702 		ld	a3,32(a4)
+ 170 00f0 93871600 		addi	a5,a3,1
+ 171              		.loc 1 35 21
+ 172 00f4 17060000 		ld	a2,.LANCHOR1
+ 172      03360600 
+ 173 00fc B3F7C702 		remu	a5,a5,a2
+ 174              		.loc 1 35 33
+ 175 0100 03378702 		ld	a4,40(a4)
+ 176              		.loc 1 35 5
+ 177 0104 638EE704 		beq	a5,a4,.L13
   34:src/kernel/consoleUtil.cpp ****     if((inputTail+1)%bufferSize == inputHead)
- 156              		.loc 1 34 36
- 157 00dc 130101FF 		addi	sp,sp,-16
- 158              		.cfi_def_cfa_offset 16
- 159 00e0 23341100 		sd	ra,8(sp)
- 160 00e4 23308100 		sd	s0,0(sp)
- 161              		.cfi_offset 1, -8
- 162              		.cfi_offset 8, -16
- 163 00e8 13040101 		addi	s0,sp,16
- 164              		.cfi_def_cfa 8, 0
+ 178              		.loc 1 34 36
+GAS LISTING /tmp/ccVfGEPJ.s 			page 5
+
+
+ 179 0108 130101FF 		addi	sp,sp,-16
+ 180              		.cfi_def_cfa_offset 16
+ 181 010c 23341100 		sd	ra,8(sp)
+ 182 0110 23308100 		sd	s0,0(sp)
+ 183              		.cfi_offset 1, -8
+ 184              		.cfi_offset 8, -16
+ 185 0114 13040101 		addi	s0,sp,16
+ 186              		.cfi_def_cfa 8, 0
   36:src/kernel/consoleUtil.cpp ****         return;
   37:src/kernel/consoleUtil.cpp ****     inputBuffer[inputTail] = c;
- 165              		.loc 1 37 5 is_stmt 1
- 166              		.loc 1 37 28 is_stmt 0
- 167 00ec 17070000 		lla	a4,_ZN11ConsoleUtil11inputBufferE
- 167      13070700 
- 168 00f4 B306D700 		add	a3,a4,a3
- 169 00f8 2380A600 		sb	a0,0(a3)
+ 187              		.loc 1 37 5 is_stmt 1
+ 188              		.loc 1 37 26 is_stmt 0
+ 189 0118 17070000 		lla	a4,.LANCHOR0
+ 189      13070700 
+ 190 0120 83370701 		ld	a5,16(a4)
+ 191 0124 B386D700 		add	a3,a5,a3
+ 192              		.loc 1 37 28
+ 193 0128 2380A600 		sb	a0,0(a3)
   38:src/kernel/consoleUtil.cpp ****     inputTail = (inputTail+1)%bufferSize;
- 170              		.loc 1 38 5 is_stmt 1
- 171              		.loc 1 38 15 is_stmt 0
- 172 00fc 17070000 		lla	a4,.LANCHOR0
- 172      13070700 
- 173 0104 2338F700 		sd	a5,16(a4)
+ 194              		.loc 1 38 5 is_stmt 1
+ 195              		.loc 1 38 27 is_stmt 0
+ 196 012c 83370702 		ld	a5,32(a4)
+ 197 0130 93871700 		addi	a5,a5,1
+ 198              		.loc 1 38 30
+ 199 0134 97060000 		ld	a3,.LANCHOR1
+ 199      83B60600 
+ 200 013c B3F7D702 		remu	a5,a5,a3
+ 201              		.loc 1 38 15
+ 202 0140 2330F702 		sd	a5,32(a4)
   39:src/kernel/consoleUtil.cpp ****     inputSem->signal();
- 174              		.loc 1 39 5 is_stmt 1
- 175              		.loc 1 39 21 is_stmt 0
-GAS LISTING /tmp/cco8uvzs.s 			page 5
-
-
- 176 0108 03350700 		ld	a0,0(a4)
- 177              	.LVL9:
- 178 010c 97000000 		call	_ZN3SCB6signalEv@plt
- 178      E7800000 
- 179              	.LVL10:
+ 203              		.loc 1 39 5 is_stmt 1
+ 204              		.loc 1 39 21 is_stmt 0
+ 205 0144 03350700 		ld	a0,0(a4)
+ 206              	.LVL11:
+ 207 0148 97000000 		call	_ZN3SCB6signalEv@plt
+ 207      E7800000 
+ 208              	.LVL12:
   40:src/kernel/consoleUtil.cpp **** }
- 180              		.loc 1 40 1
- 181 0114 83308100 		ld	ra,8(sp)
- 182              		.cfi_restore 1
- 183 0118 03340100 		ld	s0,0(sp)
- 184              		.cfi_restore 8
- 185              		.cfi_def_cfa 2, 16
- 186 011c 13010101 		addi	sp,sp,16
- 187              		.cfi_def_cfa_offset 0
- 188 0120 67800000 		jr	ra
- 189              	.LVL11:
- 190              	.L13:
- 191 0124 67800000 		ret
- 192              		.cfi_endproc
- 193              	.LFE23:
- 195              		.align	2
- 196              		.globl	_ZN11ConsoleUtil8getInputEv
- 198              	_ZN11ConsoleUtil8getInputEv:
- 199              	.LFB24:
+ 209              		.loc 1 40 1
+ 210 0150 83308100 		ld	ra,8(sp)
+ 211              		.cfi_restore 1
+ 212 0154 03340100 		ld	s0,0(sp)
+ 213              		.cfi_restore 8
+ 214              		.cfi_def_cfa 2, 16
+ 215 0158 13010101 		addi	sp,sp,16
+ 216              		.cfi_def_cfa_offset 0
+ 217 015c 67800000 		jr	ra
+ 218              	.LVL13:
+ 219              	.L13:
+ 220 0160 67800000 		ret
+ 221              		.cfi_endproc
+ 222              	.LFE23:
+ 224              		.align	2
+ 225              		.globl	_ZN11ConsoleUtil8getInputEv
+ 227              	_ZN11ConsoleUtil8getInputEv:
+ 228              	.LFB24:
   41:src/kernel/consoleUtil.cpp **** 
+GAS LISTING /tmp/ccVfGEPJ.s 			page 6
+
+
   42:src/kernel/consoleUtil.cpp **** char ConsoleUtil::getInput() {
- 200              		.loc 1 42 30 is_stmt 1
- 201              		.cfi_startproc
- 202 0128 130101FE 		addi	sp,sp,-32
- 203              		.cfi_def_cfa_offset 32
- 204 012c 233C1100 		sd	ra,24(sp)
- 205 0130 23388100 		sd	s0,16(sp)
- 206 0134 23349100 		sd	s1,8(sp)
- 207              		.cfi_offset 1, -8
- 208              		.cfi_offset 8, -16
- 209              		.cfi_offset 9, -24
- 210 0138 13040102 		addi	s0,sp,32
- 211              		.cfi_def_cfa 8, 0
+ 229              		.loc 1 42 30 is_stmt 1
+ 230              		.cfi_startproc
+ 231 0164 130101FE 		addi	sp,sp,-32
+ 232              		.cfi_def_cfa_offset 32
+ 233 0168 233C1100 		sd	ra,24(sp)
+ 234 016c 23388100 		sd	s0,16(sp)
+ 235 0170 23349100 		sd	s1,8(sp)
+ 236              		.cfi_offset 1, -8
+ 237              		.cfi_offset 8, -16
+ 238              		.cfi_offset 9, -24
+ 239 0174 13040102 		addi	s0,sp,32
+ 240              		.cfi_def_cfa 8, 0
   43:src/kernel/consoleUtil.cpp ****     inputSem->wait();
- 212              		.loc 1 43 5
- 213              		.loc 1 43 19 is_stmt 0
- 214 013c 97040000 		lla	s1,.LANCHOR0
- 214      93840400 
- 215 0144 03B50400 		ld	a0,0(s1)
- 216 0148 97000000 		call	_ZN3SCB4waitEv@plt
- 216      E7800000 
- 217              	.LVL12:
+ 241              		.loc 1 43 5
+ 242              		.loc 1 43 19 is_stmt 0
+ 243 0178 97040000 		lla	s1,.LANCHOR0
+ 243      93840400 
+ 244 0180 03B50400 		ld	a0,0(s1)
+ 245 0184 97000000 		call	_ZN3SCB4waitEv@plt
+ 245      E7800000 
+ 246              	.LVL14:
   44:src/kernel/consoleUtil.cpp **** 
   45:src/kernel/consoleUtil.cpp ****     if(inputHead == inputTail)
- 218              		.loc 1 45 5 is_stmt 1
- 219              		.loc 1 45 18 is_stmt 0
- 220 0150 83B78401 		ld	a5,24(s1)
- 221 0154 03B70401 		ld	a4,16(s1)
- 222              		.loc 1 45 5
- 223 0158 6380E704 		beq	a5,a4,.L18
+ 247              		.loc 1 45 5 is_stmt 1
+ 248              		.loc 1 45 18 is_stmt 0
+ 249 018c 83B78402 		ld	a5,40(s1)
+ 250 0190 03B70402 		ld	a4,32(s1)
+ 251              		.loc 1 45 5
+ 252 0194 638CE702 		beq	a5,a4,.L18
   46:src/kernel/consoleUtil.cpp ****         return -1;
   47:src/kernel/consoleUtil.cpp ****     char c = inputBuffer[inputHead];
-GAS LISTING /tmp/cco8uvzs.s 			page 6
-
-
- 224              		.loc 1 47 5 is_stmt 1
- 225              		.loc 1 47 10 is_stmt 0
- 226 015c 17070000 		lla	a4,_ZN11ConsoleUtil11inputBufferE
- 226      13070700 
- 227 0164 3307F700 		add	a4,a4,a5
- 228 0168 03450700 		lbu	a0,0(a4)
- 229              	.LVL13:
+ 253              		.loc 1 47 5 is_stmt 1
+ 254              		.loc 1 47 35 is_stmt 0
+ 255 0198 03B70401 		ld	a4,16(s1)
+ 256 019c 3307F700 		add	a4,a4,a5
+ 257              		.loc 1 47 10
+ 258 01a0 03450700 		lbu	a0,0(a4)
+ 259              	.LVL15:
   48:src/kernel/consoleUtil.cpp **** 
   49:src/kernel/consoleUtil.cpp ****     inputHead = (inputHead+1)%bufferSize;
- 230              		.loc 1 49 5 is_stmt 1
- 231              		.loc 1 49 27 is_stmt 0
- 232 016c 93871700 		addi	a5,a5,1
- 233              		.loc 1 49 30
- 234 0170 17070000 		ld	a4,.LANCHOR1
- 234      03370700 
- 235 0178 B3F7E702 		remu	a5,a5,a4
- 236              		.loc 1 49 15
- 237 017c 17070000 		sd	a5,.LANCHOR0+24,a4
- 237      2330F700 
+ 260              		.loc 1 49 5 is_stmt 1
+ 261              		.loc 1 49 27 is_stmt 0
+ 262 01a4 93871700 		addi	a5,a5,1
+ 263              		.loc 1 49 30
+ 264 01a8 17070000 		ld	a4,.LANCHOR1
+ 264      03370700 
+ 265 01b0 B3F7E702 		remu	a5,a5,a4
+ 266              		.loc 1 49 15
+ 267 01b4 23B4F402 		sd	a5,40(s1)
   50:src/kernel/consoleUtil.cpp **** 
   51:src/kernel/consoleUtil.cpp ****     return c;
- 238              		.loc 1 51 5 is_stmt 1
- 239              	.LVL14:
- 240              	.L17:
+ 268              		.loc 1 51 5 is_stmt 1
+ 269              	.LVL16:
+ 270              	.L17:
   52:src/kernel/consoleUtil.cpp **** }
- 241              		.loc 1 52 1 is_stmt 0
- 242 0184 83308101 		ld	ra,24(sp)
- 243              		.cfi_remember_state
- 244              		.cfi_restore 1
- 245 0188 03340101 		ld	s0,16(sp)
- 246              		.cfi_restore 8
- 247              		.cfi_def_cfa 2, 32
- 248 018c 83348100 		ld	s1,8(sp)
- 249              		.cfi_restore 9
- 250 0190 13010102 		addi	sp,sp,32
- 251              		.cfi_def_cfa_offset 0
- 252 0194 67800000 		jr	ra
- 253              	.L18:
- 254              		.cfi_restore_state
+ 271              		.loc 1 52 1 is_stmt 0
+GAS LISTING /tmp/ccVfGEPJ.s 			page 7
+
+
+ 272 01b8 83308101 		ld	ra,24(sp)
+ 273              		.cfi_remember_state
+ 274              		.cfi_restore 1
+ 275 01bc 03340101 		ld	s0,16(sp)
+ 276              		.cfi_restore 8
+ 277              		.cfi_def_cfa 2, 32
+ 278 01c0 83348100 		ld	s1,8(sp)
+ 279              		.cfi_restore 9
+ 280 01c4 13010102 		addi	sp,sp,32
+ 281              		.cfi_def_cfa_offset 0
+ 282 01c8 67800000 		jr	ra
+ 283              	.L18:
+ 284              		.cfi_restore_state
   46:src/kernel/consoleUtil.cpp ****     char c = inputBuffer[inputHead];
- 255              		.loc 1 46 17
- 256 0198 1305F00F 		li	a0,255
- 257 019c 6FF09FFE 		j	.L17
- 258              		.cfi_endproc
- 259              	.LFE24:
- 261              		.align	2
- 262              		.globl	_ZN11ConsoleUtil9putOutputEc
- 264              	_ZN11ConsoleUtil9putOutputEc:
- 265              	.LFB25:
+ 285              		.loc 1 46 17
+ 286 01cc 1305F00F 		li	a0,255
+ 287 01d0 6FF09FFE 		j	.L17
+ 288              		.cfi_endproc
+ 289              	.LFE24:
+ 291              		.align	2
+ 292              		.globl	_ZN11ConsoleUtil9putOutputEc
+ 294              	_ZN11ConsoleUtil9putOutputEc:
+ 295              	.LFB25:
   53:src/kernel/consoleUtil.cpp **** 
   54:src/kernel/consoleUtil.cpp **** void ConsoleUtil::putOutput(char c) {
- 266              		.loc 1 54 37 is_stmt 1
- 267              		.cfi_startproc
- 268              	.LVL15:
+ 296              		.loc 1 54 37 is_stmt 1
+ 297              		.cfi_startproc
+ 298              	.LVL17:
   55:src/kernel/consoleUtil.cpp ****     pendingPutc++;
- 269              		.loc 1 55 5
- 270              		.loc 1 55 16 is_stmt 0
-GAS LISTING /tmp/cco8uvzs.s 			page 7
-
-
- 271 01a0 97070000 		lla	a5,.LANCHOR0
- 271      93870700 
- 272 01a8 83B60702 		ld	a3,32(a5)
- 273 01ac 13871600 		addi	a4,a3,1
- 274 01b0 23B0E702 		sd	a4,32(a5)
+ 299              		.loc 1 55 5
+ 300              		.loc 1 55 16 is_stmt 0
+ 301 01d4 97070000 		lla	a5,.LANCHOR0
+ 301      93870700 
+ 302 01dc 03B70703 		ld	a4,48(a5)
+ 303 01e0 13071700 		addi	a4,a4,1
+ 304 01e4 23B8E702 		sd	a4,48(a5)
   56:src/kernel/consoleUtil.cpp **** 
   57:src/kernel/consoleUtil.cpp ****     if((outputTail+1)%bufferSize == outputHead)
- 275              		.loc 1 57 5 is_stmt 1
- 276              		.loc 1 57 19 is_stmt 0
- 277 01b4 03B68702 		ld	a2,40(a5)
- 278 01b8 13071600 		addi	a4,a2,1
- 279              		.loc 1 57 22
- 280 01bc 97050000 		ld	a1,.LANCHOR1
- 280      83B50500 
- 281 01c4 3377B702 		remu	a4,a4,a1
- 282              		.loc 1 57 34
- 283 01c8 83B70703 		ld	a5,48(a5)
- 284              		.loc 1 57 5
- 285 01cc 6308F704 		beq	a4,a5,.L23
+ 305              		.loc 1 57 5 is_stmt 1
+ 306              		.loc 1 57 19 is_stmt 0
+ 307 01e8 83B68703 		ld	a3,56(a5)
+ 308 01ec 13871600 		addi	a4,a3,1
+ 309              		.loc 1 57 22
+ 310 01f0 17060000 		ld	a2,.LANCHOR1
+ 310      03360600 
+ 311 01f8 3377C702 		remu	a4,a4,a2
+ 312              		.loc 1 57 34
+ 313 01fc 83B70704 		ld	a5,64(a5)
+ 314              		.loc 1 57 5
+ 315 0200 6304F706 		beq	a4,a5,.L23
   54:src/kernel/consoleUtil.cpp ****     pendingPutc++;
- 286              		.loc 1 54 37
- 287 01d0 130101FF 		addi	sp,sp,-16
- 288              		.cfi_def_cfa_offset 16
- 289 01d4 23341100 		sd	ra,8(sp)
- 290 01d8 23308100 		sd	s0,0(sp)
- 291              		.cfi_offset 1, -8
- 292              		.cfi_offset 8, -16
- 293 01dc 13040101 		addi	s0,sp,16
- 294              		.cfi_def_cfa 8, 0
+ 316              		.loc 1 54 37
+ 317 0204 130101FF 		addi	sp,sp,-16
+ 318              		.cfi_def_cfa_offset 16
+ 319 0208 23341100 		sd	ra,8(sp)
+ 320 020c 23308100 		sd	s0,0(sp)
+ 321              		.cfi_offset 1, -8
+GAS LISTING /tmp/ccVfGEPJ.s 			page 8
+
+
+ 322              		.cfi_offset 8, -16
+ 323 0210 13040101 		addi	s0,sp,16
+ 324              		.cfi_def_cfa 8, 0
   58:src/kernel/consoleUtil.cpp ****         return;
   59:src/kernel/consoleUtil.cpp **** 
   60:src/kernel/consoleUtil.cpp ****     outputBuffer[outputTail] = c;
- 295              		.loc 1 60 5 is_stmt 1
- 296              		.loc 1 60 30 is_stmt 0
- 297 01e0 97070000 		lla	a5,_ZN11ConsoleUtil12outputBufferE
- 297      93870700 
- 298 01e8 3386C700 		add	a2,a5,a2
- 299 01ec 2300A600 		sb	a0,0(a2)
+ 325              		.loc 1 60 5 is_stmt 1
+ 326              		.loc 1 60 28 is_stmt 0
+ 327 0214 97070000 		lla	a5,.LANCHOR0
+ 327      93870700 
+ 328 021c 03B78701 		ld	a4,24(a5)
+ 329 0220 B306D700 		add	a3,a4,a3
+ 330              		.loc 1 60 30
+ 331 0224 2380A600 		sb	a0,0(a3)
   61:src/kernel/consoleUtil.cpp **** 
   62:src/kernel/consoleUtil.cpp ****     outputTail = (outputTail+1)%bufferSize;
- 300              		.loc 1 62 5 is_stmt 1
- 301              		.loc 1 62 16 is_stmt 0
- 302 01f0 97070000 		lla	a5,.LANCHOR0
- 302      93870700 
- 303 01f8 23B4E702 		sd	a4,40(a5)
+ 332              		.loc 1 62 5 is_stmt 1
+ 333              		.loc 1 62 29 is_stmt 0
+ 334 0228 03B78703 		ld	a4,56(a5)
+ 335 022c 13071700 		addi	a4,a4,1
+ 336              		.loc 1 62 32
+ 337 0230 97060000 		ld	a3,.LANCHOR1
+ 337      83B60600 
+ 338 0238 3377D702 		remu	a4,a4,a3
+ 339              		.loc 1 62 16
+ 340 023c 23BCE702 		sd	a4,56(a5)
   63:src/kernel/consoleUtil.cpp **** 
   64:src/kernel/consoleUtil.cpp ****     pendingPutc--;
- 304              		.loc 1 64 5 is_stmt 1
- 305              		.loc 1 64 16 is_stmt 0
- 306 01fc 23B0D702 		sd	a3,32(a5)
+ 341              		.loc 1 64 5 is_stmt 1
+ 342              		.loc 1 64 16 is_stmt 0
+ 343 0240 03B70703 		ld	a4,48(a5)
+ 344 0244 1307F7FF 		addi	a4,a4,-1
+ 345 0248 23B8E702 		sd	a4,48(a5)
   65:src/kernel/consoleUtil.cpp **** 
   66:src/kernel/consoleUtil.cpp ****     outputSem->signal();
- 307              		.loc 1 66 5 is_stmt 1
- 308              		.loc 1 66 22 is_stmt 0
- 309 0200 03B58700 		ld	a0,8(a5)
- 310              	.LVL16:
- 311 0204 97000000 		call	_ZN3SCB6signalEv@plt
-GAS LISTING /tmp/cco8uvzs.s 			page 8
-
-
- 311      E7800000 
- 312              	.LVL17:
+ 346              		.loc 1 66 5 is_stmt 1
+ 347              		.loc 1 66 22 is_stmt 0
+ 348 024c 03B58700 		ld	a0,8(a5)
+ 349              	.LVL18:
+ 350 0250 97000000 		call	_ZN3SCB6signalEv@plt
+ 350      E7800000 
+ 351              	.LVL19:
   67:src/kernel/consoleUtil.cpp **** }
- 313              		.loc 1 67 1
- 314 020c 83308100 		ld	ra,8(sp)
- 315              		.cfi_restore 1
- 316 0210 03340100 		ld	s0,0(sp)
- 317              		.cfi_restore 8
- 318              		.cfi_def_cfa 2, 16
- 319 0214 13010101 		addi	sp,sp,16
- 320              		.cfi_def_cfa_offset 0
- 321 0218 67800000 		jr	ra
- 322              	.LVL18:
- 323              	.L23:
- 324 021c 67800000 		ret
- 325              		.cfi_endproc
- 326              	.LFE25:
- 328              		.align	2
- 329              		.globl	_ZN11ConsoleUtil9getOutputEv
- 331              	_ZN11ConsoleUtil9getOutputEv:
- 332              	.LFB26:
+ 352              		.loc 1 67 1
+ 353 0258 83308100 		ld	ra,8(sp)
+ 354              		.cfi_restore 1
+ 355 025c 03340100 		ld	s0,0(sp)
+ 356              		.cfi_restore 8
+ 357              		.cfi_def_cfa 2, 16
+ 358 0260 13010101 		addi	sp,sp,16
+ 359              		.cfi_def_cfa_offset 0
+ 360 0264 67800000 		jr	ra
+ 361              	.LVL20:
+ 362              	.L23:
+ 363 0268 67800000 		ret
+ 364              		.cfi_endproc
+ 365              	.LFE25:
+GAS LISTING /tmp/ccVfGEPJ.s 			page 9
+
+
+ 367              		.align	2
+ 368              		.globl	_ZN11ConsoleUtil9getOutputEv
+ 370              	_ZN11ConsoleUtil9getOutputEv:
+ 371              	.LFB26:
   68:src/kernel/consoleUtil.cpp **** 
   69:src/kernel/consoleUtil.cpp **** char ConsoleUtil::getOutput() {
- 333              		.loc 1 69 31 is_stmt 1
- 334              		.cfi_startproc
- 335 0220 130101FE 		addi	sp,sp,-32
- 336              		.cfi_def_cfa_offset 32
- 337 0224 233C1100 		sd	ra,24(sp)
- 338 0228 23388100 		sd	s0,16(sp)
- 339 022c 23349100 		sd	s1,8(sp)
- 340              		.cfi_offset 1, -8
- 341              		.cfi_offset 8, -16
- 342              		.cfi_offset 9, -24
- 343 0230 13040102 		addi	s0,sp,32
- 344              		.cfi_def_cfa 8, 0
+ 372              		.loc 1 69 31 is_stmt 1
+ 373              		.cfi_startproc
+ 374 026c 130101FE 		addi	sp,sp,-32
+ 375              		.cfi_def_cfa_offset 32
+ 376 0270 233C1100 		sd	ra,24(sp)
+ 377 0274 23388100 		sd	s0,16(sp)
+ 378 0278 23349100 		sd	s1,8(sp)
+ 379              		.cfi_offset 1, -8
+ 380              		.cfi_offset 8, -16
+ 381              		.cfi_offset 9, -24
+ 382 027c 13040102 		addi	s0,sp,32
+ 383              		.cfi_def_cfa 8, 0
   70:src/kernel/consoleUtil.cpp ****     outputSem->wait();
- 345              		.loc 1 70 5
- 346              		.loc 1 70 20 is_stmt 0
- 347 0234 97040000 		lla	s1,.LANCHOR0
- 347      93840400 
- 348 023c 03B58400 		ld	a0,8(s1)
- 349 0240 97000000 		call	_ZN3SCB4waitEv@plt
- 349      E7800000 
- 350              	.LVL19:
+ 384              		.loc 1 70 5
+ 385              		.loc 1 70 20 is_stmt 0
+ 386 0280 97040000 		lla	s1,.LANCHOR0
+ 386      93840400 
+ 387 0288 03B58400 		ld	a0,8(s1)
+ 388 028c 97000000 		call	_ZN3SCB4waitEv@plt
+ 388      E7800000 
+ 389              	.LVL21:
   71:src/kernel/consoleUtil.cpp ****     if(outputHead == outputTail)
- 351              		.loc 1 71 5 is_stmt 1
- 352              		.loc 1 71 19 is_stmt 0
- 353 0248 83B70403 		ld	a5,48(s1)
- 354 024c 03B78402 		ld	a4,40(s1)
- 355              		.loc 1 71 5
- 356 0250 6380E704 		beq	a5,a4,.L28
+ 390              		.loc 1 71 5 is_stmt 1
+ 391              		.loc 1 71 19 is_stmt 0
+ 392 0294 83B70404 		ld	a5,64(s1)
+ 393 0298 03B78403 		ld	a4,56(s1)
+ 394              		.loc 1 71 5
+ 395 029c 638CE702 		beq	a5,a4,.L28
   72:src/kernel/consoleUtil.cpp ****         return -1;
   73:src/kernel/consoleUtil.cpp **** 
   74:src/kernel/consoleUtil.cpp ****     char c = outputBuffer[outputHead];
- 357              		.loc 1 74 5 is_stmt 1
- 358              		.loc 1 74 10 is_stmt 0
- 359 0254 17070000 		lla	a4,_ZN11ConsoleUtil12outputBufferE
-GAS LISTING /tmp/cco8uvzs.s 			page 9
-
-
- 359      13070700 
- 360 025c 3307F700 		add	a4,a4,a5
- 361 0260 03450700 		lbu	a0,0(a4)
- 362              	.LVL20:
+ 396              		.loc 1 74 5 is_stmt 1
+ 397              		.loc 1 74 37 is_stmt 0
+ 398 02a0 03B78401 		ld	a4,24(s1)
+ 399 02a4 3307F700 		add	a4,a4,a5
+ 400              		.loc 1 74 10
+ 401 02a8 03450700 		lbu	a0,0(a4)
+ 402              	.LVL22:
   75:src/kernel/consoleUtil.cpp **** 
   76:src/kernel/consoleUtil.cpp ****     outputHead = (outputHead+1)%bufferSize;
- 363              		.loc 1 76 5 is_stmt 1
- 364              		.loc 1 76 29 is_stmt 0
- 365 0264 93871700 		addi	a5,a5,1
- 366              		.loc 1 76 32
- 367 0268 17070000 		ld	a4,.LANCHOR1
- 367      03370700 
- 368 0270 B3F7E702 		remu	a5,a5,a4
- 369              		.loc 1 76 16
- 370 0274 17070000 		sd	a5,.LANCHOR0+48,a4
- 370      2330F700 
+ 403              		.loc 1 76 5 is_stmt 1
+ 404              		.loc 1 76 29 is_stmt 0
+ 405 02ac 93871700 		addi	a5,a5,1
+ 406              		.loc 1 76 32
+ 407 02b0 17070000 		ld	a4,.LANCHOR1
+ 407      03370700 
+ 408 02b8 B3F7E702 		remu	a5,a5,a4
+ 409              		.loc 1 76 16
+ 410 02bc 23B0F404 		sd	a5,64(s1)
   77:src/kernel/consoleUtil.cpp **** 
   78:src/kernel/consoleUtil.cpp ****     return c;
- 371              		.loc 1 78 5 is_stmt 1
- 372              	.LVL21:
- 373              	.L27:
+GAS LISTING /tmp/ccVfGEPJ.s 			page 10
+
+
+ 411              		.loc 1 78 5 is_stmt 1
+ 412              	.LVL23:
+ 413              	.L27:
   79:src/kernel/consoleUtil.cpp **** }
- 374              		.loc 1 79 1 is_stmt 0
- 375 027c 83308101 		ld	ra,24(sp)
- 376              		.cfi_remember_state
- 377              		.cfi_restore 1
- 378 0280 03340101 		ld	s0,16(sp)
- 379              		.cfi_restore 8
- 380              		.cfi_def_cfa 2, 32
- 381 0284 83348100 		ld	s1,8(sp)
- 382              		.cfi_restore 9
- 383 0288 13010102 		addi	sp,sp,32
- 384              		.cfi_def_cfa_offset 0
- 385 028c 67800000 		jr	ra
- 386              	.L28:
- 387              		.cfi_restore_state
+ 414              		.loc 1 79 1 is_stmt 0
+ 415 02c0 83308101 		ld	ra,24(sp)
+ 416              		.cfi_remember_state
+ 417              		.cfi_restore 1
+ 418 02c4 03340101 		ld	s0,16(sp)
+ 419              		.cfi_restore 8
+ 420              		.cfi_def_cfa 2, 32
+ 421 02c8 83348100 		ld	s1,8(sp)
+ 422              		.cfi_restore 9
+ 423 02cc 13010102 		addi	sp,sp,32
+ 424              		.cfi_def_cfa_offset 0
+ 425 02d0 67800000 		jr	ra
+ 426              	.L28:
+ 427              		.cfi_restore_state
   72:src/kernel/consoleUtil.cpp **** 
- 388              		.loc 1 72 17
- 389 0290 1305F00F 		li	a0,255
- 390 0294 6FF09FFE 		j	.L27
- 391              		.cfi_endproc
- 392              	.LFE26:
- 394              		.align	2
- 395              		.globl	_ZN11ConsoleUtil11printStringEPKc
- 397              	_ZN11ConsoleUtil11printStringEPKc:
- 398              	.LFB27:
+ 428              		.loc 1 72 17
+ 429 02d4 1305F00F 		li	a0,255
+ 430 02d8 6FF09FFE 		j	.L27
+ 431              		.cfi_endproc
+ 432              	.LFE26:
+ 434              		.align	2
+ 435              		.globl	_ZN11ConsoleUtil11printStringEPKc
+ 437              	_ZN11ConsoleUtil11printStringEPKc:
+ 438              	.LFB27:
   80:src/kernel/consoleUtil.cpp **** 
   81:src/kernel/consoleUtil.cpp **** void ConsoleUtil::printString(const char *string) {
- 399              		.loc 1 81 51 is_stmt 1
- 400              		.cfi_startproc
- 401              	.LVL22:
- 402 0298 130101FE 		addi	sp,sp,-32
- 403              		.cfi_def_cfa_offset 32
- 404 029c 233C1100 		sd	ra,24(sp)
- 405 02a0 23388100 		sd	s0,16(sp)
- 406 02a4 23349100 		sd	s1,8(sp)
- 407              		.cfi_offset 1, -8
-GAS LISTING /tmp/cco8uvzs.s 			page 10
-
-
- 408              		.cfi_offset 8, -16
- 409              		.cfi_offset 9, -24
- 410 02a8 13040102 		addi	s0,sp,32
- 411              		.cfi_def_cfa 8, 0
- 412 02ac 93040500 		mv	s1,a0
- 413              	.LVL23:
- 414              	.L32:
+ 439              		.loc 1 81 51 is_stmt 1
+ 440              		.cfi_startproc
+ 441              	.LVL24:
+ 442 02dc 130101FE 		addi	sp,sp,-32
+ 443              		.cfi_def_cfa_offset 32
+ 444 02e0 233C1100 		sd	ra,24(sp)
+ 445 02e4 23388100 		sd	s0,16(sp)
+ 446 02e8 23349100 		sd	s1,8(sp)
+ 447              		.cfi_offset 1, -8
+ 448              		.cfi_offset 8, -16
+ 449              		.cfi_offset 9, -24
+ 450 02ec 13040102 		addi	s0,sp,32
+ 451              		.cfi_def_cfa 8, 0
+ 452 02f0 93040500 		mv	s1,a0
+ 453              	.LVL25:
+ 454              	.L32:
   82:src/kernel/consoleUtil.cpp ****     while (*string != '\0')
- 415              		.loc 1 82 5
- 416              		.loc 1 82 20
- 417              		.loc 1 82 12 is_stmt 0
- 418 02b0 03C50400 		lbu	a0,0(s1)
- 419              		.loc 1 82 20
- 420 02b4 630A0500 		beqz	a0,.L30
+ 455              		.loc 1 82 5
+ 456              		.loc 1 82 20
+ 457              		.loc 1 82 12 is_stmt 0
+ 458 02f4 03C50400 		lbu	a0,0(s1)
+ 459              		.loc 1 82 20
+ 460 02f8 630A0500 		beqz	a0,.L30
   83:src/kernel/consoleUtil.cpp ****     {
   84:src/kernel/consoleUtil.cpp ****         ConsoleUtil::putOutput(*string);
- 421              		.loc 1 84 9 is_stmt 1
- 422              		.loc 1 84 31 is_stmt 0
- 423 02b8 97000000 		call	_ZN11ConsoleUtil9putOutputEc
- 423      E7800000 
- 424              	.LVL24:
+ 461              		.loc 1 84 9 is_stmt 1
+ 462              		.loc 1 84 31 is_stmt 0
+GAS LISTING /tmp/ccVfGEPJ.s 			page 11
+
+
+ 463 02fc 97000000 		call	_ZN11ConsoleUtil9putOutputEc
+ 463      E7800000 
+ 464              	.LVL26:
   85:src/kernel/consoleUtil.cpp ****         string++;
- 425              		.loc 1 85 9 is_stmt 1
- 426              		.loc 1 85 15 is_stmt 0
- 427 02c0 93841400 		addi	s1,s1,1
- 428              	.LVL25:
+ 465              		.loc 1 85 9 is_stmt 1
+ 466              		.loc 1 85 15 is_stmt 0
+ 467 0304 93841400 		addi	s1,s1,1
+ 468              	.LVL27:
   82:src/kernel/consoleUtil.cpp ****     while (*string != '\0')
- 429              		.loc 1 82 5
- 430 02c4 6FF0DFFE 		j	.L32
- 431              	.L30:
+ 469              		.loc 1 82 5
+ 470 0308 6FF0DFFE 		j	.L32
+ 471              	.L30:
   86:src/kernel/consoleUtil.cpp ****     }
   87:src/kernel/consoleUtil.cpp **** }
- 432              		.loc 1 87 1
- 433 02c8 83308101 		ld	ra,24(sp)
- 434              		.cfi_restore 1
- 435 02cc 03340101 		ld	s0,16(sp)
- 436              		.cfi_restore 8
- 437              		.cfi_def_cfa 2, 32
- 438 02d0 83348100 		ld	s1,8(sp)
- 439              		.cfi_restore 9
- 440              	.LVL26:
- 441 02d4 13010102 		addi	sp,sp,32
- 442              		.cfi_def_cfa_offset 0
- 443 02d8 67800000 		jr	ra
- 444              		.cfi_endproc
- 445              	.LFE27:
- 447              		.section	.rodata.str1.8,"aMS",@progbits,1
- 448              		.align	3
- 449              	.LC0:
- 450 0000 30313233 		.string	"0123456789ABCDEF"
- 450      34353637 
- 450      38394142 
- 450      43444546 
- 450      00
- 451              		.text
- 452              		.align	2
- 453              		.globl	_ZN11ConsoleUtil8printIntEiii
-GAS LISTING /tmp/cco8uvzs.s 			page 11
-
-
- 455              	_ZN11ConsoleUtil8printIntEiii:
- 456              	.LFB28:
+ 472              		.loc 1 87 1
+ 473 030c 83308101 		ld	ra,24(sp)
+ 474              		.cfi_restore 1
+ 475 0310 03340101 		ld	s0,16(sp)
+ 476              		.cfi_restore 8
+ 477              		.cfi_def_cfa 2, 32
+ 478 0314 83348100 		ld	s1,8(sp)
+ 479              		.cfi_restore 9
+ 480              	.LVL28:
+ 481 0318 13010102 		addi	sp,sp,32
+ 482              		.cfi_def_cfa_offset 0
+ 483 031c 67800000 		jr	ra
+ 484              		.cfi_endproc
+ 485              	.LFE27:
+ 487              		.section	.rodata.str1.8,"aMS",@progbits,1
+ 488              		.align	3
+ 489              	.LC0:
+ 490 0000 30313233 		.string	"0123456789ABCDEF"
+ 490      34353637 
+ 490      38394142 
+ 490      43444546 
+ 490      00
+ 491              		.text
+ 492              		.align	2
+ 493              		.globl	_ZN11ConsoleUtil8printIntEiii
+ 495              	_ZN11ConsoleUtil8printIntEiii:
+ 496              	.LFB28:
   88:src/kernel/consoleUtil.cpp **** 
   89:src/kernel/consoleUtil.cpp **** void ConsoleUtil::printInt(int xx, int base, int sgn)
   90:src/kernel/consoleUtil.cpp **** {
- 457              		.loc 1 90 1 is_stmt 1
- 458              		.cfi_startproc
- 459              	.LVL27:
- 460 02dc 130101FB 		addi	sp,sp,-80
- 461              		.cfi_def_cfa_offset 80
- 462 02e0 23341104 		sd	ra,72(sp)
- 463 02e4 23308104 		sd	s0,64(sp)
- 464 02e8 233C9102 		sd	s1,56(sp)
- 465              		.cfi_offset 1, -8
- 466              		.cfi_offset 8, -16
- 467              		.cfi_offset 9, -24
- 468 02ec 13040105 		addi	s0,sp,80
- 469              		.cfi_def_cfa 8, 0
+ 497              		.loc 1 90 1 is_stmt 1
+ 498              		.cfi_startproc
+ 499              	.LVL29:
+ 500 0320 130101FB 		addi	sp,sp,-80
+ 501              		.cfi_def_cfa_offset 80
+ 502 0324 23341104 		sd	ra,72(sp)
+ 503 0328 23308104 		sd	s0,64(sp)
+ 504 032c 233C9102 		sd	s1,56(sp)
+ 505              		.cfi_offset 1, -8
+ 506              		.cfi_offset 8, -16
+ 507              		.cfi_offset 9, -24
+ 508 0330 13040105 		addi	s0,sp,80
+ 509              		.cfi_def_cfa 8, 0
+GAS LISTING /tmp/ccVfGEPJ.s 			page 12
+
+
   91:src/kernel/consoleUtil.cpp ****     char digits[] = "0123456789ABCDEF";
- 470              		.loc 1 91 5
- 471              		.loc 1 91 10 is_stmt 0
- 472 02f0 97070000 		lla	a5,.LC0
- 472      93870700 
- 473 02f8 03B70700 		ld	a4,0(a5)
- 474 02fc 2334E4FC 		sd	a4,-56(s0)
- 475 0300 03B78700 		ld	a4,8(a5)
- 476 0304 2338E4FC 		sd	a4,-48(s0)
- 477 0308 83C70701 		lbu	a5,16(a5)
- 478 030c 230CF4FC 		sb	a5,-40(s0)
+ 510              		.loc 1 91 5
+ 511              		.loc 1 91 10 is_stmt 0
+ 512 0334 97070000 		lla	a5,.LC0
+ 512      93870700 
+ 513 033c 03B70700 		ld	a4,0(a5)
+ 514 0340 2334E4FC 		sd	a4,-56(s0)
+ 515 0344 03B78700 		ld	a4,8(a5)
+ 516 0348 2338E4FC 		sd	a4,-48(s0)
+ 517 034c 83C70701 		lbu	a5,16(a5)
+ 518 0350 230CF4FC 		sb	a5,-40(s0)
   92:src/kernel/consoleUtil.cpp ****     char buf[16];
- 479              		.loc 1 92 5 is_stmt 1
+ 519              		.loc 1 92 5 is_stmt 1
   93:src/kernel/consoleUtil.cpp ****     int i, neg;
- 480              		.loc 1 93 5
+ 520              		.loc 1 93 5
   94:src/kernel/consoleUtil.cpp ****     uint x;
- 481              		.loc 1 94 5
+ 521              		.loc 1 94 5
   95:src/kernel/consoleUtil.cpp **** 
   96:src/kernel/consoleUtil.cpp ****     neg = 0;
- 482              		.loc 1 96 5
- 483              	.LVL28:
+ 522              		.loc 1 96 5
+ 523              	.LVL30:
   97:src/kernel/consoleUtil.cpp ****     if(sgn && xx < 0){
- 484              		.loc 1 97 5
- 485 0310 63040600 		beqz	a2,.L35
- 486              		.loc 1 97 12 is_stmt 0 discriminator 1
- 487 0314 63420508 		bltz	a0,.L42
- 488              	.L35:
+ 524              		.loc 1 97 5
+ 525 0354 63040600 		beqz	a2,.L35
+ 526              		.loc 1 97 12 is_stmt 0 discriminator 1
+ 527 0358 63420508 		bltz	a0,.L42
+ 528              	.L35:
   98:src/kernel/consoleUtil.cpp ****         neg = 1;
   99:src/kernel/consoleUtil.cpp ****         x = -xx;
  100:src/kernel/consoleUtil.cpp ****     } else {
  101:src/kernel/consoleUtil.cpp ****         x = xx;
- 489              		.loc 1 101 9 is_stmt 1
- 490              		.loc 1 101 11 is_stmt 0
- 491 0318 1B050500 		sext.w	a0,a0
- 492              	.LVL29:
+ 529              		.loc 1 101 9 is_stmt 1
+ 530              		.loc 1 101 11 is_stmt 0
+ 531 035c 1B050500 		sext.w	a0,a0
+ 532              	.LVL31:
   96:src/kernel/consoleUtil.cpp ****     if(sgn && xx < 0){
- 493              		.loc 1 96 9
- 494 031c 13080000 		li	a6,0
- 495              	.LVL30:
-GAS LISTING /tmp/cco8uvzs.s 			page 12
-
-
- 496              	.L36:
+ 533              		.loc 1 96 9
+ 534 0360 13080000 		li	a6,0
+ 535              	.LVL32:
+ 536              	.L36:
  102:src/kernel/consoleUtil.cpp ****     }
  103:src/kernel/consoleUtil.cpp **** 
  104:src/kernel/consoleUtil.cpp ****     i = 0;
- 497              		.loc 1 104 5 is_stmt 1
- 498              		.loc 1 104 7 is_stmt 0
- 499 0320 93040000 		li	s1,0
- 500              	.LVL31:
- 501              	.L37:
+ 537              		.loc 1 104 5 is_stmt 1
+ 538              		.loc 1 104 7 is_stmt 0
+ 539 0364 93040000 		li	s1,0
+ 540              	.LVL33:
+ 541              	.L37:
  105:src/kernel/consoleUtil.cpp ****     do{
- 502              		.loc 1 105 5 is_stmt 1
+ 542              		.loc 1 105 5 is_stmt 1
  106:src/kernel/consoleUtil.cpp ****         buf[i++] = digits[x % base];
- 503              		.loc 1 106 9
- 504              		.loc 1 106 31 is_stmt 0
- 505 0324 1B870500 		sext.w	a4,a1
- 506              		.loc 1 106 29
- 507 0328 BB77B502 		remuw	a5,a0,a1
- 508 032c 93860400 		mv	a3,s1
- 509              		.loc 1 106 14
- 510 0330 9B841400 		addiw	s1,s1,1
- 511              	.LVL32:
- 512              		.loc 1 106 35
- 513 0334 93970702 		slli	a5,a5,32
- 514 0338 93D70702 		srli	a5,a5,32
- 515 033c 130604FE 		addi	a2,s0,-32
- 516 0340 B307F600 		add	a5,a2,a5
- 517 0344 03C687FE 		lbu	a2,-24(a5)
- 518              		.loc 1 106 18
- 519 0348 930704FE 		addi	a5,s0,-32
- 520 034c B387D700 		add	a5,a5,a3
- 521 0350 238CC7FC 		sb	a2,-40(a5)
+ 543              		.loc 1 106 9
+ 544              		.loc 1 106 31 is_stmt 0
+ 545 0368 1B870500 		sext.w	a4,a1
+ 546              		.loc 1 106 29
+ 547 036c BB77B502 		remuw	a5,a0,a1
+ 548 0370 93860400 		mv	a3,s1
+GAS LISTING /tmp/ccVfGEPJ.s 			page 13
+
+
+ 549              		.loc 1 106 14
+ 550 0374 9B841400 		addiw	s1,s1,1
+ 551              	.LVL34:
+ 552              		.loc 1 106 35
+ 553 0378 93970702 		slli	a5,a5,32
+ 554 037c 93D70702 		srli	a5,a5,32
+ 555 0380 130604FE 		addi	a2,s0,-32
+ 556 0384 B307F600 		add	a5,a2,a5
+ 557 0388 03C687FE 		lbu	a2,-24(a5)
+ 558              		.loc 1 106 18
+ 559 038c 930704FE 		addi	a5,s0,-32
+ 560 0390 B387D700 		add	a5,a5,a3
+ 561 0394 238CC7FC 		sb	a2,-40(a5)
  107:src/kernel/consoleUtil.cpp ****     }while((x /= base) != 0);
- 522              		.loc 1 107 24 is_stmt 1
- 523 0354 1B060500 		sext.w	a2,a0
- 524              		.loc 1 107 15 is_stmt 0
- 525 0358 3B55B502 		divuw	a0,a0,a1
- 526              	.LVL33:
- 527              		.loc 1 107 24
- 528 035c E374E6FC 		bleu	a4,a2,.L37
+ 562              		.loc 1 107 24 is_stmt 1
+ 563 0398 1B060500 		sext.w	a2,a0
+ 564              		.loc 1 107 15 is_stmt 0
+ 565 039c 3B55B502 		divuw	a0,a0,a1
+ 566              	.LVL35:
+ 567              		.loc 1 107 24
+ 568 03a0 E374E6FC 		bleu	a4,a2,.L37
  108:src/kernel/consoleUtil.cpp ****     if(neg)
- 529              		.loc 1 108 5 is_stmt 1
- 530 0360 630C0800 		beqz	a6,.L40
+ 569              		.loc 1 108 5 is_stmt 1
+ 570 03a4 630C0800 		beqz	a6,.L40
  109:src/kernel/consoleUtil.cpp ****         buf[i++] = '-';
- 531              		.loc 1 109 9
- 532              	.LVL34:
- 533              		.loc 1 109 18 is_stmt 0
- 534 0364 930704FE 		addi	a5,s0,-32
- 535 0368 B3849700 		add	s1,a5,s1
- 536 036c 9307D002 		li	a5,45
- 537 0370 238CF4FC 		sb	a5,-40(s1)
- 538              		.loc 1 109 14
- 539 0374 9B842600 		addiw	s1,a3,2
- 540              	.LVL35:
- 541              	.L40:
+ 571              		.loc 1 109 9
+ 572              	.LVL36:
+ 573              		.loc 1 109 18 is_stmt 0
+ 574 03a8 930704FE 		addi	a5,s0,-32
+ 575 03ac B3849700 		add	s1,a5,s1
+ 576 03b0 9307D002 		li	a5,45
+ 577 03b4 238CF4FC 		sb	a5,-40(s1)
+ 578              		.loc 1 109 14
+ 579 03b8 9B842600 		addiw	s1,a3,2
+ 580              	.LVL37:
+ 581              	.L40:
  110:src/kernel/consoleUtil.cpp **** 
  111:src/kernel/consoleUtil.cpp ****     while(--i >= 0)
- 542              		.loc 1 111 5 is_stmt 1
-GAS LISTING /tmp/cco8uvzs.s 			page 13
-
-
- 543              		.loc 1 111 15
- 544 0378 9B84F4FF 		addiw	s1,s1,-1
- 545              	.LVL36:
- 546 037c 63C40402 		bltz	s1,.L34
+ 582              		.loc 1 111 5 is_stmt 1
+ 583              		.loc 1 111 15
+ 584 03bc 9B84F4FF 		addiw	s1,s1,-1
+ 585              	.LVL38:
+ 586 03c0 63C40402 		bltz	s1,.L34
  112:src/kernel/consoleUtil.cpp ****         ConsoleUtil::putOutput(buf[i]);
- 547              		.loc 1 112 9
- 548              		.loc 1 112 31 is_stmt 0
- 549 0380 930704FE 		addi	a5,s0,-32
- 550 0384 B3879700 		add	a5,a5,s1
- 551 0388 03C587FD 		lbu	a0,-40(a5)
- 552 038c 97000000 		call	_ZN11ConsoleUtil9putOutputEc
- 552      E7800000 
- 553              	.LVL37:
- 554 0394 6FF05FFE 		j	.L40
- 555              	.LVL38:
- 556              	.L42:
+ 587              		.loc 1 112 9
+ 588              		.loc 1 112 31 is_stmt 0
+ 589 03c4 930704FE 		addi	a5,s0,-32
+ 590 03c8 B3879700 		add	a5,a5,s1
+ 591 03cc 03C587FD 		lbu	a0,-40(a5)
+ 592 03d0 97000000 		call	_ZN11ConsoleUtil9putOutputEc
+ 592      E7800000 
+ 593              	.LVL39:
+ 594 03d8 6FF05FFE 		j	.L40
+ 595              	.LVL40:
+ 596              	.L42:
   98:src/kernel/consoleUtil.cpp ****         x = -xx;
- 557              		.loc 1 98 9 is_stmt 1
+ 597              		.loc 1 98 9 is_stmt 1
+GAS LISTING /tmp/ccVfGEPJ.s 			page 14
+
+
   99:src/kernel/consoleUtil.cpp ****     } else {
- 558              		.loc 1 99 9
+ 598              		.loc 1 99 9
   99:src/kernel/consoleUtil.cpp ****     } else {
- 559              		.loc 1 99 11 is_stmt 0
- 560 0398 3B05A040 		negw	a0,a0
- 561              	.LVL39:
+ 599              		.loc 1 99 11 is_stmt 0
+ 600 03dc 3B05A040 		negw	a0,a0
+ 601              	.LVL41:
   98:src/kernel/consoleUtil.cpp ****         x = -xx;
- 562              		.loc 1 98 13
- 563 039c 13081000 		li	a6,1
+ 602              		.loc 1 98 13
+ 603 03e0 13081000 		li	a6,1
   99:src/kernel/consoleUtil.cpp ****     } else {
- 564              		.loc 1 99 11
- 565 03a0 6FF01FF8 		j	.L36
- 566              	.LVL40:
- 567              	.L34:
+ 604              		.loc 1 99 11
+ 605 03e4 6FF01FF8 		j	.L36
+ 606              	.LVL42:
+ 607              	.L34:
  113:src/kernel/consoleUtil.cpp **** 
  114:src/kernel/consoleUtil.cpp **** }
- 568              		.loc 1 114 1
- 569 03a4 83308104 		ld	ra,72(sp)
- 570              		.cfi_restore 1
- 571 03a8 03340104 		ld	s0,64(sp)
- 572              		.cfi_restore 8
- 573              		.cfi_def_cfa 2, 80
- 574 03ac 83348103 		ld	s1,56(sp)
- 575              		.cfi_restore 9
- 576 03b0 13010105 		addi	sp,sp,80
- 577              		.cfi_def_cfa_offset 0
- 578 03b4 67800000 		jr	ra
- 579              		.cfi_endproc
- 580              	.LFE28:
- 582              		.align	2
- 583              		.globl	_ZN11ConsoleUtil5printEPKciS1_i
- 585              	_ZN11ConsoleUtil5printEPKciS1_i:
- 586              	.LFB29:
+ 608              		.loc 1 114 1
+ 609 03e8 83308104 		ld	ra,72(sp)
+ 610              		.cfi_restore 1
+ 611 03ec 03340104 		ld	s0,64(sp)
+ 612              		.cfi_restore 8
+ 613              		.cfi_def_cfa 2, 80
+ 614 03f0 83348103 		ld	s1,56(sp)
+ 615              		.cfi_restore 9
+ 616 03f4 13010105 		addi	sp,sp,80
+ 617              		.cfi_def_cfa_offset 0
+ 618 03f8 67800000 		jr	ra
+ 619              		.cfi_endproc
+ 620              	.LFE28:
+ 622              		.align	2
+ 623              		.globl	_ZN11ConsoleUtil5printEPKciS1_i
+ 625              	_ZN11ConsoleUtil5printEPKciS1_i:
+ 626              	.LFB29:
  115:src/kernel/consoleUtil.cpp **** 
  116:src/kernel/consoleUtil.cpp **** void ConsoleUtil::print(const char *string, int xx, const char *sep, int base) {
- 587              		.loc 1 116 80 is_stmt 1
- 588              		.cfi_startproc
- 589              	.LVL41:
- 590 03b8 130101FD 		addi	sp,sp,-48
-GAS LISTING /tmp/cco8uvzs.s 			page 14
-
-
- 591              		.cfi_def_cfa_offset 48
- 592 03bc 23341102 		sd	ra,40(sp)
- 593 03c0 23308102 		sd	s0,32(sp)
- 594 03c4 233C9100 		sd	s1,24(sp)
- 595 03c8 23382101 		sd	s2,16(sp)
- 596 03cc 23343101 		sd	s3,8(sp)
- 597              		.cfi_offset 1, -8
- 598              		.cfi_offset 8, -16
- 599              		.cfi_offset 9, -24
- 600              		.cfi_offset 18, -32
- 601              		.cfi_offset 19, -40
- 602 03d0 13040103 		addi	s0,sp,48
- 603              		.cfi_def_cfa 8, 0
- 604 03d4 13890500 		mv	s2,a1
- 605 03d8 93040600 		mv	s1,a2
- 606 03dc 93890600 		mv	s3,a3
+ 627              		.loc 1 116 80 is_stmt 1
+ 628              		.cfi_startproc
+ 629              	.LVL43:
+ 630 03fc 130101FD 		addi	sp,sp,-48
+ 631              		.cfi_def_cfa_offset 48
+ 632 0400 23341102 		sd	ra,40(sp)
+ 633 0404 23308102 		sd	s0,32(sp)
+ 634 0408 233C9100 		sd	s1,24(sp)
+ 635 040c 23382101 		sd	s2,16(sp)
+ 636 0410 23343101 		sd	s3,8(sp)
+ 637              		.cfi_offset 1, -8
+ 638              		.cfi_offset 8, -16
+ 639              		.cfi_offset 9, -24
+ 640              		.cfi_offset 18, -32
+ 641              		.cfi_offset 19, -40
+ 642 0414 13040103 		addi	s0,sp,48
+ 643              		.cfi_def_cfa 8, 0
+ 644 0418 13890500 		mv	s2,a1
+ 645 041c 93040600 		mv	s1,a2
+ 646 0420 93890600 		mv	s3,a3
  117:src/kernel/consoleUtil.cpp ****     ConsoleUtil::printString(string);
- 607              		.loc 1 117 5
- 608              		.loc 1 117 29 is_stmt 0
- 609 03e0 97000000 		call	_ZN11ConsoleUtil11printStringEPKc
- 609      E7800000 
- 610              	.LVL42:
+ 647              		.loc 1 117 5
+GAS LISTING /tmp/ccVfGEPJ.s 			page 15
+
+
+ 648              		.loc 1 117 29 is_stmt 0
+ 649 0424 97000000 		call	_ZN11ConsoleUtil11printStringEPKc
+ 649      E7800000 
+ 650              	.LVL44:
  118:src/kernel/consoleUtil.cpp ****     ConsoleUtil::printInt(xx, base);
- 611              		.loc 1 118 5 is_stmt 1
- 612              		.loc 1 118 26 is_stmt 0
- 613 03e8 13060000 		li	a2,0
- 614 03ec 93850900 		mv	a1,s3
- 615 03f0 13050900 		mv	a0,s2
- 616 03f4 97000000 		call	_ZN11ConsoleUtil8printIntEiii
- 616      E7800000 
- 617              	.LVL43:
+ 651              		.loc 1 118 5 is_stmt 1
+ 652              		.loc 1 118 26 is_stmt 0
+ 653 042c 13060000 		li	a2,0
+ 654 0430 93850900 		mv	a1,s3
+ 655 0434 13050900 		mv	a0,s2
+ 656 0438 97000000 		call	_ZN11ConsoleUtil8printIntEiii
+ 656      E7800000 
+ 657              	.LVL45:
  119:src/kernel/consoleUtil.cpp ****     ConsoleUtil::printString(sep);
- 618              		.loc 1 119 5 is_stmt 1
- 619              		.loc 1 119 29 is_stmt 0
- 620 03fc 13850400 		mv	a0,s1
- 621 0400 97000000 		call	_ZN11ConsoleUtil11printStringEPKc
- 621      E7800000 
- 622              	.LVL44:
+ 658              		.loc 1 119 5 is_stmt 1
+ 659              		.loc 1 119 29 is_stmt 0
+ 660 0440 13850400 		mv	a0,s1
+ 661 0444 97000000 		call	_ZN11ConsoleUtil11printStringEPKc
+ 661      E7800000 
+ 662              	.LVL46:
  120:src/kernel/consoleUtil.cpp **** }
- 623              		.loc 1 120 1
- 624 0408 83308102 		ld	ra,40(sp)
- 625              		.cfi_restore 1
- 626 040c 03340102 		ld	s0,32(sp)
- 627              		.cfi_restore 8
- 628              		.cfi_def_cfa 2, 48
- 629 0410 83348101 		ld	s1,24(sp)
- 630              		.cfi_restore 9
- 631              	.LVL45:
- 632 0414 03390101 		ld	s2,16(sp)
- 633              		.cfi_restore 18
- 634 0418 83398100 		ld	s3,8(sp)
- 635              		.cfi_restore 19
- 636 041c 13010103 		addi	sp,sp,48
- 637              		.cfi_def_cfa_offset 0
- 638 0420 67800000 		jr	ra
- 639              		.cfi_endproc
- 640              	.LFE29:
-GAS LISTING /tmp/cco8uvzs.s 			page 15
-
-
- 642              		.align	2
- 643              		.globl	_ZN11ConsoleUtil15putcUtilSyscallEv
- 645              	_ZN11ConsoleUtil15putcUtilSyscallEv:
- 646              	.LFB30:
+ 663              		.loc 1 120 1
+ 664 044c 83308102 		ld	ra,40(sp)
+ 665              		.cfi_restore 1
+ 666 0450 03340102 		ld	s0,32(sp)
+ 667              		.cfi_restore 8
+ 668              		.cfi_def_cfa 2, 48
+ 669 0454 83348101 		ld	s1,24(sp)
+ 670              		.cfi_restore 9
+ 671              	.LVL47:
+ 672 0458 03390101 		ld	s2,16(sp)
+ 673              		.cfi_restore 18
+ 674 045c 83398100 		ld	s3,8(sp)
+ 675              		.cfi_restore 19
+ 676 0460 13010103 		addi	sp,sp,48
+ 677              		.cfi_def_cfa_offset 0
+ 678 0464 67800000 		jr	ra
+ 679              		.cfi_endproc
+ 680              	.LFE29:
+ 682              		.align	2
+ 683              		.globl	_ZN11ConsoleUtil15putcUtilSyscallEv
+ 685              	_ZN11ConsoleUtil15putcUtilSyscallEv:
+ 686              	.LFB30:
  121:src/kernel/consoleUtil.cpp **** 
  122:src/kernel/consoleUtil.cpp **** char ConsoleUtil::putcUtilSyscall()
  123:src/kernel/consoleUtil.cpp **** {
- 647              		.loc 1 123 1 is_stmt 1
- 648              		.cfi_startproc
- 649 0424 130101FF 		addi	sp,sp,-16
- 650              		.cfi_def_cfa_offset 16
- 651 0428 23348100 		sd	s0,8(sp)
- 652              		.cfi_offset 8, -8
- 653 042c 13040101 		addi	s0,sp,16
- 654              		.cfi_def_cfa 8, 0
+ 687              		.loc 1 123 1 is_stmt 1
+ 688              		.cfi_startproc
+ 689 0468 130101FF 		addi	sp,sp,-16
+ 690              		.cfi_def_cfa_offset 16
+ 691 046c 23348100 		sd	s0,8(sp)
+ 692              		.cfi_offset 8, -8
+ 693 0470 13040101 		addi	s0,sp,16
+ 694              		.cfi_def_cfa 8, 0
  124:src/kernel/consoleUtil.cpp ****     asm("li a0, 0x43");
- 655              		.loc 1 124 5
- 656              		.loc 1 124 23 is_stmt 0
- 657              	#APP
- 658              	# 124 "src/kernel/consoleUtil.cpp" 1
+ 695              		.loc 1 124 5
+ 696              		.loc 1 124 23 is_stmt 0
+GAS LISTING /tmp/ccVfGEPJ.s 			page 16
+
+
+ 697              	#APP
+ 698              	# 124 "src/kernel/consoleUtil.cpp" 1
  125              	
  126:src/kernel/consoleUtil.cpp ****     asm("ecall");
- 659              		li a0, 0x43
- 660              	# 0 "" 2
- 661              		.loc 1 126 5 is_stmt 1
- 662              		.loc 1 126 17 is_stmt 0
- 663              	# 126 "src/kernel/consoleUtil.cpp" 1
+ 699              		li a0, 0x43
+ 700              	# 0 "" 2
+ 701              		.loc 1 126 5 is_stmt 1
+ 702              		.loc 1 126 17 is_stmt 0
+ 703              	# 126 "src/kernel/consoleUtil.cpp" 1
  127              	
  128:src/kernel/consoleUtil.cpp ****     uint64 status;
- 664              		ecall
- 665              	# 0 "" 2
- 666              		.loc 1 128 5 is_stmt 1
+ 704              		ecall
+ 705              	# 0 "" 2
+ 706              		.loc 1 128 5 is_stmt 1
  129:src/kernel/consoleUtil.cpp **** 
  130:src/kernel/consoleUtil.cpp ****     asm("mv %0, a0" : [status] "=r" (status));
- 667              		.loc 1 130 5
- 668              		.loc 1 130 46 is_stmt 0
- 669              	# 130 "src/kernel/consoleUtil.cpp" 1
+ 707              		.loc 1 130 5
+ 708              		.loc 1 130 46 is_stmt 0
+ 709              	# 130 "src/kernel/consoleUtil.cpp" 1
  131              	
- 670              		mv a0, a0
- 671              	# 0 "" 2
- 672              	.LVL46:
+ 710              		mv a0, a0
+ 711              	# 0 "" 2
+ 712              	.LVL48:
  132:src/kernel/consoleUtil.cpp ****     return (char)status;
- 673              		.loc 1 132 5 is_stmt 1
+ 713              		.loc 1 132 5 is_stmt 1
  133:src/kernel/consoleUtil.cpp **** }
- 674              		.loc 1 133 1 is_stmt 0
- 675              	#NO_APP
- 676 043c 1375F50F 		andi	a0,a0,0xff
- 677              	.LVL47:
- 678 0440 03348100 		ld	s0,8(sp)
- 679              		.cfi_restore 8
- 680              		.cfi_def_cfa 2, 16
- 681 0444 13010101 		addi	sp,sp,16
- 682              		.cfi_def_cfa_offset 0
- 683 0448 67800000 		jr	ra
- 684              		.cfi_endproc
- 685              	.LFE30:
- 687              		.globl	_ZN11ConsoleUtil10bufferSizeE
-GAS LISTING /tmp/cco8uvzs.s 			page 16
+ 714              		.loc 1 133 1 is_stmt 0
+ 715              	#NO_APP
+ 716 0480 1375F50F 		andi	a0,a0,0xff
+ 717              	.LVL49:
+ 718 0484 03348100 		ld	s0,8(sp)
+ 719              		.cfi_restore 8
+ 720              		.cfi_def_cfa 2, 16
+ 721 0488 13010101 		addi	sp,sp,16
+ 722              		.cfi_def_cfa_offset 0
+ 723 048c 67800000 		jr	ra
+ 724              		.cfi_endproc
+ 725              	.LFE30:
+ 727              		.globl	_ZN11ConsoleUtil10bufferSizeE
+ 728              		.globl	_ZN11ConsoleUtil12outputBufferE
+ 729              		.globl	_ZN11ConsoleUtil11inputBufferE
+ 730              		.globl	_ZN11ConsoleUtil8inputSemE
+ 731              		.globl	_ZN11ConsoleUtil9outputSemE
+ 732              		.globl	_ZN11ConsoleUtil11pendingPutcE
+ 733              		.globl	_ZN11ConsoleUtil11pendingGetcE
+ 734              		.globl	_ZN11ConsoleUtil10outputTailE
+ 735              		.globl	_ZN11ConsoleUtil10outputHeadE
+ 736              		.globl	_ZN11ConsoleUtil9inputTailE
+ 737              		.globl	_ZN11ConsoleUtil9inputHeadE
+ 738              		.data
+ 739              		.align	3
+ 740              		.set	.LANCHOR1,. + 0
+ 743              	_ZN11ConsoleUtil10bufferSizeE:
+ 744 0000 00200000 		.dword	8192
+ 744      00000000 
+ 745              		.bss
+ 746              		.align	3
+GAS LISTING /tmp/ccVfGEPJ.s 			page 17
 
 
- 688              		.globl	_ZN11ConsoleUtil12outputBufferE
- 689              		.globl	_ZN11ConsoleUtil11inputBufferE
- 690              		.globl	_ZN11ConsoleUtil8inputSemE
- 691              		.globl	_ZN11ConsoleUtil9outputSemE
- 692              		.globl	_ZN11ConsoleUtil11pendingPutcE
- 693              		.globl	_ZN11ConsoleUtil11pendingGetcE
- 694              		.globl	_ZN11ConsoleUtil10outputTailE
- 695              		.globl	_ZN11ConsoleUtil10outputHeadE
- 696              		.globl	_ZN11ConsoleUtil9inputTailE
- 697              		.globl	_ZN11ConsoleUtil9inputHeadE
- 698              		.data
- 699              		.align	3
- 700              		.set	.LANCHOR1,. + 0
- 703              	_ZN11ConsoleUtil10bufferSizeE:
- 704 0000 00200000 		.dword	8192
- 704      00000000 
- 705              		.bss
- 706              		.align	3
- 707              		.set	.LANCHOR0,. + 0
- 710              	_ZN11ConsoleUtil8inputSemE:
- 711 0000 00000000 		.zero	8
- 711      00000000 
- 714              	_ZN11ConsoleUtil9outputSemE:
- 715 0008 00000000 		.zero	8
- 715      00000000 
- 718              	_ZN11ConsoleUtil9inputTailE:
- 719 0010 00000000 		.zero	8
- 719      00000000 
- 722              	_ZN11ConsoleUtil9inputHeadE:
- 723 0018 00000000 		.zero	8
- 723      00000000 
- 726              	_ZN11ConsoleUtil11pendingPutcE:
- 727 0020 00000000 		.zero	8
- 727      00000000 
- 730              	_ZN11ConsoleUtil10outputTailE:
- 731 0028 00000000 		.zero	8
- 731      00000000 
- 734              	_ZN11ConsoleUtil10outputHeadE:
- 735 0030 00000000 		.zero	8
- 735      00000000 
- 738              	_ZN11ConsoleUtil12outputBufferE:
- 739 0038 00000000 		.zero	8192
- 739      00000000 
- 739      00000000 
- 739      00000000 
- 739      00000000 
- 742              	_ZN11ConsoleUtil11inputBufferE:
- 743 2038 00000000 		.zero	8192
- 743      00000000 
- 743      00000000 
- 743      00000000 
- 743      00000000 
- 746              	_ZN11ConsoleUtil11pendingGetcE:
- 747 4038 00000000 		.zero	8
- 747      00000000 
- 748              		.text
- 749              	.Letext0:
-GAS LISTING /tmp/cco8uvzs.s 			page 17
-
-
- 750              		.file 2 "src/kernel/../../h/../lib/hw.h"
- 751              		.file 3 "src/kernel/../../h/consoleUtil.hpp"
- 752              		.file 4 "src/kernel/../../h/scb.hpp"
- 753              		.file 5 "src/kernel/../../h/../h/../h/../h/utility.hpp"
- 754              		.file 6 "src/kernel/../../h/../h/../h/../h/../h/slab_t.hpp"
- 755              		.file 7 "src/kernel/../../h/../h/../h/../h/cache_t.hpp"
- 756              		.file 8 "src/kernel/../../h/tcb.hpp"
- 3788              		.align	3
- 3791              	DW.ref.__gxx_personality_v0:
- 3792 0000 00000000 		.dword	__gxx_personality_v0
- 3792      00000000 
- 3793              		.ident	"GCC: (Ubuntu 9.4.0-1ubuntu1~20.04) 9.4.0"
- 3794              		.section	.note.GNU-stack,"",@progbits
-GAS LISTING /tmp/cco8uvzs.s 			page 18
+ 747              		.set	.LANCHOR0,. + 0
+ 750              	_ZN11ConsoleUtil8inputSemE:
+ 751 0000 00000000 		.zero	8
+ 751      00000000 
+ 754              	_ZN11ConsoleUtil9outputSemE:
+ 755 0008 00000000 		.zero	8
+ 755      00000000 
+ 758              	_ZN11ConsoleUtil11inputBufferE:
+ 759 0010 00000000 		.zero	8
+ 759      00000000 
+ 762              	_ZN11ConsoleUtil12outputBufferE:
+ 763 0018 00000000 		.zero	8
+ 763      00000000 
+ 766              	_ZN11ConsoleUtil9inputTailE:
+ 767 0020 00000000 		.zero	8
+ 767      00000000 
+ 770              	_ZN11ConsoleUtil9inputHeadE:
+ 771 0028 00000000 		.zero	8
+ 771      00000000 
+ 774              	_ZN11ConsoleUtil11pendingPutcE:
+ 775 0030 00000000 		.zero	8
+ 775      00000000 
+ 778              	_ZN11ConsoleUtil10outputTailE:
+ 779 0038 00000000 		.zero	8
+ 779      00000000 
+ 782              	_ZN11ConsoleUtil10outputHeadE:
+ 783 0040 00000000 		.zero	8
+ 783      00000000 
+ 786              	_ZN11ConsoleUtil11pendingGetcE:
+ 787 0048 00000000 		.zero	8
+ 787      00000000 
+ 788              		.text
+ 789              	.Letext0:
+ 790              		.file 2 "src/kernel/../../h/kernel/../../lib/hw.h"
+ 791              		.file 3 "src/kernel/../../h/kernel/consoleUtil.hpp"
+ 792              		.file 4 "src/kernel/../../h/kernel/scb.hpp"
+ 793              		.file 5 "src/kernel/../../h/kernel/utility.hpp"
+ 794              		.file 6 "src/kernel/../../h/kernel/slab_t.hpp"
+ 795              		.file 7 "src/kernel/../../h/kernel/cache_t.hpp"
+ 796              		.file 8 "src/kernel/../../h/kernel/tcb.hpp"
+ 797              		.file 9 "src/kernel/../../h/kernel/slab.hpp"
+ 3847              		.align	3
+ 3850              	DW.ref.__gxx_personality_v0:
+ 3851 0000 00000000 		.dword	__gxx_personality_v0
+ 3851      00000000 
+ 3852              		.ident	"GCC: (Ubuntu 9.4.0-1ubuntu1~20.04) 9.4.0"
+ 3853              		.section	.note.GNU-stack,"",@progbits
+GAS LISTING /tmp/ccVfGEPJ.s 			page 18
 
 
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 consoleUtil.cpp
-     /tmp/cco8uvzs.s:9      .text:0000000000000000 _ZN11ConsoleUtil10initializeEv
-     /tmp/cco8uvzs.s:13     .text:0000000000000000 .L0 
-     /tmp/cco8uvzs.s:3791   .data.rel.local.DW.ref.__gxx_personality_v0:0000000000000000 DW.ref.__gxx_personality_v0
-     /tmp/cco8uvzs.s:16     .text:0000000000000000 .L0 
-     /tmp/cco8uvzs.s:17     .text:0000000000000004 .L0 
-     /tmp/cco8uvzs.s:22     .text:0000000000000014 .L0 
-     /tmp/cco8uvzs.s:23     .text:0000000000000014 .L0 
-     /tmp/cco8uvzs.s:24     .text:0000000000000014 .L0 
-     /tmp/cco8uvzs.s:25     .text:0000000000000014 .L0 
-     /tmp/cco8uvzs.s:27     .text:0000000000000018 .L0 
-     /tmp/cco8uvzs.s:29     .text:0000000000000018 .L0 
-     /tmp/cco8uvzs.s:30     .text:0000000000000018 .L0 
-     /tmp/cco8uvzs.s:38     .text:000000000000002c .L0 
-     /tmp/cco8uvzs.s:45     .text:0000000000000038 .L0 
-     /tmp/cco8uvzs.s:47     .text:0000000000000040 .L0 
-     /tmp/cco8uvzs.s:48     .text:0000000000000040 .L0 
-     /tmp/cco8uvzs.s:56     .text:0000000000000054 .L0 
-     /tmp/cco8uvzs.s:63     .text:0000000000000060 .L0 
-     /tmp/cco8uvzs.s:65     .text:0000000000000068 .L0 
-     /tmp/cco8uvzs.s:66     .text:000000000000006c .L0 
-     /tmp/cco8uvzs.s:67     .text:000000000000006c .L0 
-     /tmp/cco8uvzs.s:69     .text:0000000000000070 .L0 
-     /tmp/cco8uvzs.s:70     .text:0000000000000070 .L0 
-     /tmp/cco8uvzs.s:72     .text:0000000000000074 .L0 
-     /tmp/cco8uvzs.s:74     .text:0000000000000078 .L0 
-     /tmp/cco8uvzs.s:76     .text:000000000000007c .L0 
-     /tmp/cco8uvzs.s:79     .text:0000000000000080 .L0 
-     /tmp/cco8uvzs.s:82     .text:0000000000000084 .L0 
-     /tmp/cco8uvzs.s:93     .text:00000000000000a0 .L0 
-     /tmp/cco8uvzs.s:101    .text:00000000000000b8 .L0 
-     /tmp/cco8uvzs.s:139    .text:00000000000000b8 _ZN11ConsoleUtil8putInputEc
-     /tmp/cco8uvzs.s:142    .text:00000000000000b8 .L0 
-     /tmp/cco8uvzs.s:144    .text:00000000000000b8 .L0 
-     /tmp/cco8uvzs.s:145    .text:00000000000000b8 .L0 
-     /tmp/cco8uvzs.s:146    .text:00000000000000b8 .L0 
-     /tmp/cco8uvzs.s:150    .text:00000000000000c8 .L0 
-     /tmp/cco8uvzs.s:153    .text:00000000000000d4 .L0 
-     /tmp/cco8uvzs.s:155    .text:00000000000000d8 .L0 
-     /tmp/cco8uvzs.s:157    .text:00000000000000dc .L0 
-     /tmp/cco8uvzs.s:158    .text:00000000000000e0 .L0 
-     /tmp/cco8uvzs.s:161    .text:00000000000000e8 .L0 
-     /tmp/cco8uvzs.s:162    .text:00000000000000e8 .L0 
-     /tmp/cco8uvzs.s:164    .text:00000000000000ec .L0 
-     /tmp/cco8uvzs.s:166    .text:00000000000000ec .L0 
-     /tmp/cco8uvzs.s:742    .bss:0000000000002038 _ZN11ConsoleUtil11inputBufferE
-     /tmp/cco8uvzs.s:167    .text:00000000000000ec .L0 
-     /tmp/cco8uvzs.s:171    .text:00000000000000fc .L0 
-     /tmp/cco8uvzs.s:172    .text:00000000000000fc .L0 
-     /tmp/cco8uvzs.s:175    .text:0000000000000108 .L0 
-     /tmp/cco8uvzs.s:176    .text:0000000000000108 .L0 
-     /tmp/cco8uvzs.s:181    .text:0000000000000114 .L0 
-     /tmp/cco8uvzs.s:182    .text:0000000000000118 .L0 
-     /tmp/cco8uvzs.s:184    .text:000000000000011c .L0 
-     /tmp/cco8uvzs.s:185    .text:000000000000011c .L0 
-     /tmp/cco8uvzs.s:187    .text:0000000000000120 .L0 
-GAS LISTING /tmp/cco8uvzs.s 			page 19
+     /tmp/ccVfGEPJ.s:9      .text:0000000000000000 _ZN11ConsoleUtil10initializeEv
+     /tmp/ccVfGEPJ.s:13     .text:0000000000000000 .L0 
+     /tmp/ccVfGEPJ.s:3850   .data.rel.local.DW.ref.__gxx_personality_v0:0000000000000000 DW.ref.__gxx_personality_v0
+     /tmp/ccVfGEPJ.s:16     .text:0000000000000000 .L0 
+     /tmp/ccVfGEPJ.s:17     .text:0000000000000004 .L0 
+     /tmp/ccVfGEPJ.s:22     .text:0000000000000014 .L0 
+     /tmp/ccVfGEPJ.s:23     .text:0000000000000014 .L0 
+     /tmp/ccVfGEPJ.s:24     .text:0000000000000014 .L0 
+     /tmp/ccVfGEPJ.s:25     .text:0000000000000014 .L0 
+     /tmp/ccVfGEPJ.s:27     .text:0000000000000018 .L0 
+     /tmp/ccVfGEPJ.s:29     .text:0000000000000018 .L0 
+     /tmp/ccVfGEPJ.s:30     .text:0000000000000018 .L0 
+     /tmp/ccVfGEPJ.s:38     .text:000000000000002c .L0 
+     /tmp/ccVfGEPJ.s:45     .text:0000000000000038 .L0 
+     /tmp/ccVfGEPJ.s:47     .text:0000000000000040 .L0 
+     /tmp/ccVfGEPJ.s:48     .text:0000000000000040 .L0 
+     /tmp/ccVfGEPJ.s:56     .text:0000000000000054 .L0 
+     /tmp/ccVfGEPJ.s:63     .text:0000000000000060 .L0 
+     /tmp/ccVfGEPJ.s:66     .text:000000000000006c .L0 
+     /tmp/ccVfGEPJ.s:67     .text:000000000000006c .L0 
+     /tmp/ccVfGEPJ.s:73     .text:0000000000000080 .L0 
+     /tmp/ccVfGEPJ.s:75     .text:0000000000000084 .L0 
+     /tmp/ccVfGEPJ.s:76     .text:0000000000000084 .L0 
+     /tmp/ccVfGEPJ.s:81     .text:0000000000000090 .L0 
+     /tmp/ccVfGEPJ.s:83     .text:0000000000000094 .L0 
+     /tmp/ccVfGEPJ.s:84     .text:0000000000000098 .L0 
+     /tmp/ccVfGEPJ.s:85     .text:0000000000000098 .L0 
+     /tmp/ccVfGEPJ.s:87     .text:000000000000009c .L0 
+     /tmp/ccVfGEPJ.s:88     .text:000000000000009c .L0 
+     /tmp/ccVfGEPJ.s:90     .text:00000000000000a0 .L0 
+     /tmp/ccVfGEPJ.s:92     .text:00000000000000a4 .L0 
+     /tmp/ccVfGEPJ.s:94     .text:00000000000000a8 .L0 
+     /tmp/ccVfGEPJ.s:97     .text:00000000000000ac .L0 
+     /tmp/ccVfGEPJ.s:100    .text:00000000000000b0 .L0 
+     /tmp/ccVfGEPJ.s:111    .text:00000000000000cc .L0 
+     /tmp/ccVfGEPJ.s:119    .text:00000000000000e4 .L0 
+     /tmp/ccVfGEPJ.s:161    .text:00000000000000e4 _ZN11ConsoleUtil8putInputEc
+     /tmp/ccVfGEPJ.s:164    .text:00000000000000e4 .L0 
+     /tmp/ccVfGEPJ.s:166    .text:00000000000000e4 .L0 
+     /tmp/ccVfGEPJ.s:167    .text:00000000000000e4 .L0 
+     /tmp/ccVfGEPJ.s:168    .text:00000000000000e4 .L0 
+     /tmp/ccVfGEPJ.s:172    .text:00000000000000f4 .L0 
+     /tmp/ccVfGEPJ.s:175    .text:0000000000000100 .L0 
+     /tmp/ccVfGEPJ.s:177    .text:0000000000000104 .L0 
+     /tmp/ccVfGEPJ.s:179    .text:0000000000000108 .L0 
+     /tmp/ccVfGEPJ.s:180    .text:000000000000010c .L0 
+     /tmp/ccVfGEPJ.s:183    .text:0000000000000114 .L0 
+     /tmp/ccVfGEPJ.s:184    .text:0000000000000114 .L0 
+     /tmp/ccVfGEPJ.s:186    .text:0000000000000118 .L0 
+     /tmp/ccVfGEPJ.s:188    .text:0000000000000118 .L0 
+     /tmp/ccVfGEPJ.s:189    .text:0000000000000118 .L0 
+     /tmp/ccVfGEPJ.s:193    .text:0000000000000128 .L0 
+     /tmp/ccVfGEPJ.s:195    .text:000000000000012c .L0 
+     /tmp/ccVfGEPJ.s:196    .text:000000000000012c .L0 
+     /tmp/ccVfGEPJ.s:199    .text:0000000000000134 .L0 
+GAS LISTING /tmp/ccVfGEPJ.s 			page 19
 
 
-     /tmp/cco8uvzs.s:192    .text:0000000000000128 .L0 
-     /tmp/cco8uvzs.s:198    .text:0000000000000128 _ZN11ConsoleUtil8getInputEv
-     /tmp/cco8uvzs.s:201    .text:0000000000000128 .L0 
-     /tmp/cco8uvzs.s:202    .text:0000000000000128 .L0 
-     /tmp/cco8uvzs.s:203    .text:000000000000012c .L0 
-     /tmp/cco8uvzs.s:207    .text:0000000000000138 .L0 
-     /tmp/cco8uvzs.s:208    .text:0000000000000138 .L0 
-     /tmp/cco8uvzs.s:209    .text:0000000000000138 .L0 
-     /tmp/cco8uvzs.s:211    .text:000000000000013c .L0 
-     /tmp/cco8uvzs.s:213    .text:000000000000013c .L0 
-     /tmp/cco8uvzs.s:214    .text:000000000000013c .L0 
-     /tmp/cco8uvzs.s:219    .text:0000000000000150 .L0 
-     /tmp/cco8uvzs.s:220    .text:0000000000000150 .L0 
-     /tmp/cco8uvzs.s:223    .text:0000000000000158 .L0 
-     /tmp/cco8uvzs.s:225    .text:000000000000015c .L0 
-     /tmp/cco8uvzs.s:226    .text:000000000000015c .L0 
-     /tmp/cco8uvzs.s:231    .text:000000000000016c .L0 
-     /tmp/cco8uvzs.s:232    .text:000000000000016c .L0 
-     /tmp/cco8uvzs.s:234    .text:0000000000000170 .L0 
-     /tmp/cco8uvzs.s:237    .text:000000000000017c .L0 
-     /tmp/cco8uvzs.s:241    .text:0000000000000184 .L0 
-     /tmp/cco8uvzs.s:242    .text:0000000000000184 .L0 
-     /tmp/cco8uvzs.s:243    .text:0000000000000188 .L0 
-     /tmp/cco8uvzs.s:244    .text:0000000000000188 .L0 
-     /tmp/cco8uvzs.s:246    .text:000000000000018c .L0 
-     /tmp/cco8uvzs.s:247    .text:000000000000018c .L0 
-     /tmp/cco8uvzs.s:249    .text:0000000000000190 .L0 
-     /tmp/cco8uvzs.s:251    .text:0000000000000194 .L0 
-     /tmp/cco8uvzs.s:254    .text:0000000000000198 .L0 
-     /tmp/cco8uvzs.s:256    .text:0000000000000198 .L0 
-     /tmp/cco8uvzs.s:258    .text:00000000000001a0 .L0 
-     /tmp/cco8uvzs.s:264    .text:00000000000001a0 _ZN11ConsoleUtil9putOutputEc
-     /tmp/cco8uvzs.s:267    .text:00000000000001a0 .L0 
-     /tmp/cco8uvzs.s:269    .text:00000000000001a0 .L0 
-     /tmp/cco8uvzs.s:270    .text:00000000000001a0 .L0 
-     /tmp/cco8uvzs.s:271    .text:00000000000001a0 .L0 
-     /tmp/cco8uvzs.s:276    .text:00000000000001b4 .L0 
-     /tmp/cco8uvzs.s:277    .text:00000000000001b4 .L0 
-     /tmp/cco8uvzs.s:280    .text:00000000000001bc .L0 
-     /tmp/cco8uvzs.s:283    .text:00000000000001c8 .L0 
-     /tmp/cco8uvzs.s:285    .text:00000000000001cc .L0 
-     /tmp/cco8uvzs.s:287    .text:00000000000001d0 .L0 
-     /tmp/cco8uvzs.s:288    .text:00000000000001d4 .L0 
-     /tmp/cco8uvzs.s:291    .text:00000000000001dc .L0 
-     /tmp/cco8uvzs.s:292    .text:00000000000001dc .L0 
-     /tmp/cco8uvzs.s:294    .text:00000000000001e0 .L0 
-     /tmp/cco8uvzs.s:296    .text:00000000000001e0 .L0 
-     /tmp/cco8uvzs.s:738    .bss:0000000000000038 _ZN11ConsoleUtil12outputBufferE
-     /tmp/cco8uvzs.s:297    .text:00000000000001e0 .L0 
-     /tmp/cco8uvzs.s:301    .text:00000000000001f0 .L0 
-     /tmp/cco8uvzs.s:302    .text:00000000000001f0 .L0 
-     /tmp/cco8uvzs.s:305    .text:00000000000001fc .L0 
-     /tmp/cco8uvzs.s:306    .text:00000000000001fc .L0 
-     /tmp/cco8uvzs.s:308    .text:0000000000000200 .L0 
-     /tmp/cco8uvzs.s:309    .text:0000000000000200 .L0 
-     /tmp/cco8uvzs.s:314    .text:000000000000020c .L0 
-     /tmp/cco8uvzs.s:315    .text:0000000000000210 .L0 
-GAS LISTING /tmp/cco8uvzs.s 			page 20
+     /tmp/ccVfGEPJ.s:202    .text:0000000000000140 .L0 
+     /tmp/ccVfGEPJ.s:204    .text:0000000000000144 .L0 
+     /tmp/ccVfGEPJ.s:205    .text:0000000000000144 .L0 
+     /tmp/ccVfGEPJ.s:210    .text:0000000000000150 .L0 
+     /tmp/ccVfGEPJ.s:211    .text:0000000000000154 .L0 
+     /tmp/ccVfGEPJ.s:213    .text:0000000000000158 .L0 
+     /tmp/ccVfGEPJ.s:214    .text:0000000000000158 .L0 
+     /tmp/ccVfGEPJ.s:216    .text:000000000000015c .L0 
+     /tmp/ccVfGEPJ.s:221    .text:0000000000000164 .L0 
+     /tmp/ccVfGEPJ.s:227    .text:0000000000000164 _ZN11ConsoleUtil8getInputEv
+     /tmp/ccVfGEPJ.s:230    .text:0000000000000164 .L0 
+     /tmp/ccVfGEPJ.s:231    .text:0000000000000164 .L0 
+     /tmp/ccVfGEPJ.s:232    .text:0000000000000168 .L0 
+     /tmp/ccVfGEPJ.s:236    .text:0000000000000174 .L0 
+     /tmp/ccVfGEPJ.s:237    .text:0000000000000174 .L0 
+     /tmp/ccVfGEPJ.s:238    .text:0000000000000174 .L0 
+     /tmp/ccVfGEPJ.s:240    .text:0000000000000178 .L0 
+     /tmp/ccVfGEPJ.s:242    .text:0000000000000178 .L0 
+     /tmp/ccVfGEPJ.s:243    .text:0000000000000178 .L0 
+     /tmp/ccVfGEPJ.s:248    .text:000000000000018c .L0 
+     /tmp/ccVfGEPJ.s:249    .text:000000000000018c .L0 
+     /tmp/ccVfGEPJ.s:252    .text:0000000000000194 .L0 
+     /tmp/ccVfGEPJ.s:254    .text:0000000000000198 .L0 
+     /tmp/ccVfGEPJ.s:255    .text:0000000000000198 .L0 
+     /tmp/ccVfGEPJ.s:258    .text:00000000000001a0 .L0 
+     /tmp/ccVfGEPJ.s:261    .text:00000000000001a4 .L0 
+     /tmp/ccVfGEPJ.s:262    .text:00000000000001a4 .L0 
+     /tmp/ccVfGEPJ.s:264    .text:00000000000001a8 .L0 
+     /tmp/ccVfGEPJ.s:267    .text:00000000000001b4 .L0 
+     /tmp/ccVfGEPJ.s:271    .text:00000000000001b8 .L0 
+     /tmp/ccVfGEPJ.s:272    .text:00000000000001b8 .L0 
+     /tmp/ccVfGEPJ.s:273    .text:00000000000001bc .L0 
+     /tmp/ccVfGEPJ.s:274    .text:00000000000001bc .L0 
+     /tmp/ccVfGEPJ.s:276    .text:00000000000001c0 .L0 
+     /tmp/ccVfGEPJ.s:277    .text:00000000000001c0 .L0 
+     /tmp/ccVfGEPJ.s:279    .text:00000000000001c4 .L0 
+     /tmp/ccVfGEPJ.s:281    .text:00000000000001c8 .L0 
+     /tmp/ccVfGEPJ.s:284    .text:00000000000001cc .L0 
+     /tmp/ccVfGEPJ.s:286    .text:00000000000001cc .L0 
+     /tmp/ccVfGEPJ.s:288    .text:00000000000001d4 .L0 
+     /tmp/ccVfGEPJ.s:294    .text:00000000000001d4 _ZN11ConsoleUtil9putOutputEc
+     /tmp/ccVfGEPJ.s:297    .text:00000000000001d4 .L0 
+     /tmp/ccVfGEPJ.s:299    .text:00000000000001d4 .L0 
+     /tmp/ccVfGEPJ.s:300    .text:00000000000001d4 .L0 
+     /tmp/ccVfGEPJ.s:301    .text:00000000000001d4 .L0 
+     /tmp/ccVfGEPJ.s:306    .text:00000000000001e8 .L0 
+     /tmp/ccVfGEPJ.s:307    .text:00000000000001e8 .L0 
+     /tmp/ccVfGEPJ.s:310    .text:00000000000001f0 .L0 
+     /tmp/ccVfGEPJ.s:313    .text:00000000000001fc .L0 
+     /tmp/ccVfGEPJ.s:315    .text:0000000000000200 .L0 
+     /tmp/ccVfGEPJ.s:317    .text:0000000000000204 .L0 
+     /tmp/ccVfGEPJ.s:318    .text:0000000000000208 .L0 
+     /tmp/ccVfGEPJ.s:321    .text:0000000000000210 .L0 
+     /tmp/ccVfGEPJ.s:322    .text:0000000000000210 .L0 
+     /tmp/ccVfGEPJ.s:324    .text:0000000000000214 .L0 
+     /tmp/ccVfGEPJ.s:326    .text:0000000000000214 .L0 
+     /tmp/ccVfGEPJ.s:327    .text:0000000000000214 .L0 
+GAS LISTING /tmp/ccVfGEPJ.s 			page 20
 
 
-     /tmp/cco8uvzs.s:317    .text:0000000000000214 .L0 
-     /tmp/cco8uvzs.s:318    .text:0000000000000214 .L0 
-     /tmp/cco8uvzs.s:320    .text:0000000000000218 .L0 
-     /tmp/cco8uvzs.s:325    .text:0000000000000220 .L0 
-     /tmp/cco8uvzs.s:331    .text:0000000000000220 _ZN11ConsoleUtil9getOutputEv
-     /tmp/cco8uvzs.s:334    .text:0000000000000220 .L0 
-     /tmp/cco8uvzs.s:335    .text:0000000000000220 .L0 
-     /tmp/cco8uvzs.s:336    .text:0000000000000224 .L0 
-     /tmp/cco8uvzs.s:340    .text:0000000000000230 .L0 
-     /tmp/cco8uvzs.s:341    .text:0000000000000230 .L0 
-     /tmp/cco8uvzs.s:342    .text:0000000000000230 .L0 
-     /tmp/cco8uvzs.s:344    .text:0000000000000234 .L0 
-     /tmp/cco8uvzs.s:346    .text:0000000000000234 .L0 
-     /tmp/cco8uvzs.s:347    .text:0000000000000234 .L0 
-     /tmp/cco8uvzs.s:352    .text:0000000000000248 .L0 
-     /tmp/cco8uvzs.s:353    .text:0000000000000248 .L0 
-     /tmp/cco8uvzs.s:356    .text:0000000000000250 .L0 
-     /tmp/cco8uvzs.s:358    .text:0000000000000254 .L0 
-     /tmp/cco8uvzs.s:359    .text:0000000000000254 .L0 
-     /tmp/cco8uvzs.s:364    .text:0000000000000264 .L0 
-     /tmp/cco8uvzs.s:365    .text:0000000000000264 .L0 
-     /tmp/cco8uvzs.s:367    .text:0000000000000268 .L0 
-     /tmp/cco8uvzs.s:370    .text:0000000000000274 .L0 
-     /tmp/cco8uvzs.s:374    .text:000000000000027c .L0 
-     /tmp/cco8uvzs.s:375    .text:000000000000027c .L0 
-     /tmp/cco8uvzs.s:376    .text:0000000000000280 .L0 
-     /tmp/cco8uvzs.s:377    .text:0000000000000280 .L0 
-     /tmp/cco8uvzs.s:379    .text:0000000000000284 .L0 
-     /tmp/cco8uvzs.s:380    .text:0000000000000284 .L0 
-     /tmp/cco8uvzs.s:382    .text:0000000000000288 .L0 
-     /tmp/cco8uvzs.s:384    .text:000000000000028c .L0 
-     /tmp/cco8uvzs.s:387    .text:0000000000000290 .L0 
-     /tmp/cco8uvzs.s:389    .text:0000000000000290 .L0 
-     /tmp/cco8uvzs.s:391    .text:0000000000000298 .L0 
-     /tmp/cco8uvzs.s:397    .text:0000000000000298 _ZN11ConsoleUtil11printStringEPKc
-     /tmp/cco8uvzs.s:400    .text:0000000000000298 .L0 
-     /tmp/cco8uvzs.s:402    .text:0000000000000298 .L0 
-     /tmp/cco8uvzs.s:403    .text:000000000000029c .L0 
-     /tmp/cco8uvzs.s:407    .text:00000000000002a8 .L0 
-     /tmp/cco8uvzs.s:408    .text:00000000000002a8 .L0 
-     /tmp/cco8uvzs.s:409    .text:00000000000002a8 .L0 
-     /tmp/cco8uvzs.s:411    .text:00000000000002ac .L0 
-     /tmp/cco8uvzs.s:416    .text:00000000000002b0 .L0 
-     /tmp/cco8uvzs.s:417    .text:00000000000002b0 .L0 
-     /tmp/cco8uvzs.s:418    .text:00000000000002b0 .L0 
-     /tmp/cco8uvzs.s:420    .text:00000000000002b4 .L0 
-     /tmp/cco8uvzs.s:422    .text:00000000000002b8 .L0 
-     /tmp/cco8uvzs.s:423    .text:00000000000002b8 .L0 
-     /tmp/cco8uvzs.s:426    .text:00000000000002c0 .L0 
-     /tmp/cco8uvzs.s:427    .text:00000000000002c0 .L0 
-     /tmp/cco8uvzs.s:430    .text:00000000000002c4 .L0 
-     /tmp/cco8uvzs.s:433    .text:00000000000002c8 .L0 
-     /tmp/cco8uvzs.s:434    .text:00000000000002cc .L0 
-     /tmp/cco8uvzs.s:436    .text:00000000000002d0 .L0 
-     /tmp/cco8uvzs.s:437    .text:00000000000002d0 .L0 
-     /tmp/cco8uvzs.s:439    .text:00000000000002d4 .L0 
-     /tmp/cco8uvzs.s:442    .text:00000000000002d8 .L0 
-GAS LISTING /tmp/cco8uvzs.s 			page 21
+     /tmp/ccVfGEPJ.s:331    .text:0000000000000224 .L0 
+     /tmp/ccVfGEPJ.s:333    .text:0000000000000228 .L0 
+     /tmp/ccVfGEPJ.s:334    .text:0000000000000228 .L0 
+     /tmp/ccVfGEPJ.s:337    .text:0000000000000230 .L0 
+     /tmp/ccVfGEPJ.s:340    .text:000000000000023c .L0 
+     /tmp/ccVfGEPJ.s:342    .text:0000000000000240 .L0 
+     /tmp/ccVfGEPJ.s:343    .text:0000000000000240 .L0 
+     /tmp/ccVfGEPJ.s:347    .text:000000000000024c .L0 
+     /tmp/ccVfGEPJ.s:348    .text:000000000000024c .L0 
+     /tmp/ccVfGEPJ.s:353    .text:0000000000000258 .L0 
+     /tmp/ccVfGEPJ.s:354    .text:000000000000025c .L0 
+     /tmp/ccVfGEPJ.s:356    .text:0000000000000260 .L0 
+     /tmp/ccVfGEPJ.s:357    .text:0000000000000260 .L0 
+     /tmp/ccVfGEPJ.s:359    .text:0000000000000264 .L0 
+     /tmp/ccVfGEPJ.s:364    .text:000000000000026c .L0 
+     /tmp/ccVfGEPJ.s:370    .text:000000000000026c _ZN11ConsoleUtil9getOutputEv
+     /tmp/ccVfGEPJ.s:373    .text:000000000000026c .L0 
+     /tmp/ccVfGEPJ.s:374    .text:000000000000026c .L0 
+     /tmp/ccVfGEPJ.s:375    .text:0000000000000270 .L0 
+     /tmp/ccVfGEPJ.s:379    .text:000000000000027c .L0 
+     /tmp/ccVfGEPJ.s:380    .text:000000000000027c .L0 
+     /tmp/ccVfGEPJ.s:381    .text:000000000000027c .L0 
+     /tmp/ccVfGEPJ.s:383    .text:0000000000000280 .L0 
+     /tmp/ccVfGEPJ.s:385    .text:0000000000000280 .L0 
+     /tmp/ccVfGEPJ.s:386    .text:0000000000000280 .L0 
+     /tmp/ccVfGEPJ.s:391    .text:0000000000000294 .L0 
+     /tmp/ccVfGEPJ.s:392    .text:0000000000000294 .L0 
+     /tmp/ccVfGEPJ.s:395    .text:000000000000029c .L0 
+     /tmp/ccVfGEPJ.s:397    .text:00000000000002a0 .L0 
+     /tmp/ccVfGEPJ.s:398    .text:00000000000002a0 .L0 
+     /tmp/ccVfGEPJ.s:401    .text:00000000000002a8 .L0 
+     /tmp/ccVfGEPJ.s:404    .text:00000000000002ac .L0 
+     /tmp/ccVfGEPJ.s:405    .text:00000000000002ac .L0 
+     /tmp/ccVfGEPJ.s:407    .text:00000000000002b0 .L0 
+     /tmp/ccVfGEPJ.s:410    .text:00000000000002bc .L0 
+     /tmp/ccVfGEPJ.s:414    .text:00000000000002c0 .L0 
+     /tmp/ccVfGEPJ.s:415    .text:00000000000002c0 .L0 
+     /tmp/ccVfGEPJ.s:416    .text:00000000000002c4 .L0 
+     /tmp/ccVfGEPJ.s:417    .text:00000000000002c4 .L0 
+     /tmp/ccVfGEPJ.s:419    .text:00000000000002c8 .L0 
+     /tmp/ccVfGEPJ.s:420    .text:00000000000002c8 .L0 
+     /tmp/ccVfGEPJ.s:422    .text:00000000000002cc .L0 
+     /tmp/ccVfGEPJ.s:424    .text:00000000000002d0 .L0 
+     /tmp/ccVfGEPJ.s:427    .text:00000000000002d4 .L0 
+     /tmp/ccVfGEPJ.s:429    .text:00000000000002d4 .L0 
+     /tmp/ccVfGEPJ.s:431    .text:00000000000002dc .L0 
+     /tmp/ccVfGEPJ.s:437    .text:00000000000002dc _ZN11ConsoleUtil11printStringEPKc
+     /tmp/ccVfGEPJ.s:440    .text:00000000000002dc .L0 
+     /tmp/ccVfGEPJ.s:442    .text:00000000000002dc .L0 
+     /tmp/ccVfGEPJ.s:443    .text:00000000000002e0 .L0 
+     /tmp/ccVfGEPJ.s:447    .text:00000000000002ec .L0 
+     /tmp/ccVfGEPJ.s:448    .text:00000000000002ec .L0 
+     /tmp/ccVfGEPJ.s:449    .text:00000000000002ec .L0 
+     /tmp/ccVfGEPJ.s:451    .text:00000000000002f0 .L0 
+     /tmp/ccVfGEPJ.s:456    .text:00000000000002f4 .L0 
+     /tmp/ccVfGEPJ.s:457    .text:00000000000002f4 .L0 
+     /tmp/ccVfGEPJ.s:458    .text:00000000000002f4 .L0 
+GAS LISTING /tmp/ccVfGEPJ.s 			page 21
 
 
-     /tmp/cco8uvzs.s:444    .text:00000000000002dc .L0 
-     /tmp/cco8uvzs.s:455    .text:00000000000002dc _ZN11ConsoleUtil8printIntEiii
-     /tmp/cco8uvzs.s:458    .text:00000000000002dc .L0 
-     /tmp/cco8uvzs.s:460    .text:00000000000002dc .L0 
-     /tmp/cco8uvzs.s:461    .text:00000000000002e0 .L0 
-     /tmp/cco8uvzs.s:465    .text:00000000000002ec .L0 
-     /tmp/cco8uvzs.s:466    .text:00000000000002ec .L0 
-     /tmp/cco8uvzs.s:467    .text:00000000000002ec .L0 
-     /tmp/cco8uvzs.s:469    .text:00000000000002f0 .L0 
-     /tmp/cco8uvzs.s:471    .text:00000000000002f0 .L0 
-     /tmp/cco8uvzs.s:472    .text:00000000000002f0 .L0 
-     /tmp/cco8uvzs.s:480    .text:0000000000000310 .L0 
-     /tmp/cco8uvzs.s:481    .text:0000000000000310 .L0 
-     /tmp/cco8uvzs.s:482    .text:0000000000000310 .L0 
-     /tmp/cco8uvzs.s:484    .text:0000000000000310 .L0 
-     /tmp/cco8uvzs.s:485    .text:0000000000000310 .L0 
-     /tmp/cco8uvzs.s:487    .text:0000000000000314 .L0 
-     /tmp/cco8uvzs.s:490    .text:0000000000000318 .L0 
-     /tmp/cco8uvzs.s:491    .text:0000000000000318 .L0 
-     /tmp/cco8uvzs.s:494    .text:000000000000031c .L0 
-     /tmp/cco8uvzs.s:498    .text:0000000000000320 .L0 
-     /tmp/cco8uvzs.s:499    .text:0000000000000320 .L0 
-     /tmp/cco8uvzs.s:503    .text:0000000000000324 .L0 
-     /tmp/cco8uvzs.s:504    .text:0000000000000324 .L0 
-     /tmp/cco8uvzs.s:505    .text:0000000000000324 .L0 
-     /tmp/cco8uvzs.s:507    .text:0000000000000328 .L0 
-     /tmp/cco8uvzs.s:510    .text:0000000000000330 .L0 
-     /tmp/cco8uvzs.s:513    .text:0000000000000334 .L0 
-     /tmp/cco8uvzs.s:519    .text:0000000000000348 .L0 
-     /tmp/cco8uvzs.s:523    .text:0000000000000354 .L0 
-     /tmp/cco8uvzs.s:525    .text:0000000000000358 .L0 
-     /tmp/cco8uvzs.s:528    .text:000000000000035c .L0 
-     /tmp/cco8uvzs.s:530    .text:0000000000000360 .L0 
-     /tmp/cco8uvzs.s:533    .text:0000000000000364 .L0 
-     /tmp/cco8uvzs.s:534    .text:0000000000000364 .L0 
-     /tmp/cco8uvzs.s:539    .text:0000000000000374 .L0 
-     /tmp/cco8uvzs.s:543    .text:0000000000000378 .L0 
-     /tmp/cco8uvzs.s:544    .text:0000000000000378 .L0 
-     /tmp/cco8uvzs.s:548    .text:0000000000000380 .L0 
-     /tmp/cco8uvzs.s:549    .text:0000000000000380 .L0 
-     /tmp/cco8uvzs.s:558    .text:0000000000000398 .L0 
-     /tmp/cco8uvzs.s:559    .text:0000000000000398 .L0 
-     /tmp/cco8uvzs.s:560    .text:0000000000000398 .L0 
-     /tmp/cco8uvzs.s:563    .text:000000000000039c .L0 
-     /tmp/cco8uvzs.s:565    .text:00000000000003a0 .L0 
-     /tmp/cco8uvzs.s:569    .text:00000000000003a4 .L0 
-     /tmp/cco8uvzs.s:570    .text:00000000000003a8 .L0 
-     /tmp/cco8uvzs.s:572    .text:00000000000003ac .L0 
-     /tmp/cco8uvzs.s:573    .text:00000000000003ac .L0 
-     /tmp/cco8uvzs.s:575    .text:00000000000003b0 .L0 
-     /tmp/cco8uvzs.s:577    .text:00000000000003b4 .L0 
-     /tmp/cco8uvzs.s:579    .text:00000000000003b8 .L0 
-     /tmp/cco8uvzs.s:585    .text:00000000000003b8 _ZN11ConsoleUtil5printEPKciS1_i
-     /tmp/cco8uvzs.s:588    .text:00000000000003b8 .L0 
-     /tmp/cco8uvzs.s:590    .text:00000000000003b8 .L0 
-     /tmp/cco8uvzs.s:591    .text:00000000000003bc .L0 
-     /tmp/cco8uvzs.s:597    .text:00000000000003d0 .L0 
-GAS LISTING /tmp/cco8uvzs.s 			page 22
+     /tmp/ccVfGEPJ.s:460    .text:00000000000002f8 .L0 
+     /tmp/ccVfGEPJ.s:462    .text:00000000000002fc .L0 
+     /tmp/ccVfGEPJ.s:463    .text:00000000000002fc .L0 
+     /tmp/ccVfGEPJ.s:466    .text:0000000000000304 .L0 
+     /tmp/ccVfGEPJ.s:467    .text:0000000000000304 .L0 
+     /tmp/ccVfGEPJ.s:470    .text:0000000000000308 .L0 
+     /tmp/ccVfGEPJ.s:473    .text:000000000000030c .L0 
+     /tmp/ccVfGEPJ.s:474    .text:0000000000000310 .L0 
+     /tmp/ccVfGEPJ.s:476    .text:0000000000000314 .L0 
+     /tmp/ccVfGEPJ.s:477    .text:0000000000000314 .L0 
+     /tmp/ccVfGEPJ.s:479    .text:0000000000000318 .L0 
+     /tmp/ccVfGEPJ.s:482    .text:000000000000031c .L0 
+     /tmp/ccVfGEPJ.s:484    .text:0000000000000320 .L0 
+     /tmp/ccVfGEPJ.s:495    .text:0000000000000320 _ZN11ConsoleUtil8printIntEiii
+     /tmp/ccVfGEPJ.s:498    .text:0000000000000320 .L0 
+     /tmp/ccVfGEPJ.s:500    .text:0000000000000320 .L0 
+     /tmp/ccVfGEPJ.s:501    .text:0000000000000324 .L0 
+     /tmp/ccVfGEPJ.s:505    .text:0000000000000330 .L0 
+     /tmp/ccVfGEPJ.s:506    .text:0000000000000330 .L0 
+     /tmp/ccVfGEPJ.s:507    .text:0000000000000330 .L0 
+     /tmp/ccVfGEPJ.s:509    .text:0000000000000334 .L0 
+     /tmp/ccVfGEPJ.s:511    .text:0000000000000334 .L0 
+     /tmp/ccVfGEPJ.s:512    .text:0000000000000334 .L0 
+     /tmp/ccVfGEPJ.s:520    .text:0000000000000354 .L0 
+     /tmp/ccVfGEPJ.s:521    .text:0000000000000354 .L0 
+     /tmp/ccVfGEPJ.s:522    .text:0000000000000354 .L0 
+     /tmp/ccVfGEPJ.s:524    .text:0000000000000354 .L0 
+     /tmp/ccVfGEPJ.s:525    .text:0000000000000354 .L0 
+     /tmp/ccVfGEPJ.s:527    .text:0000000000000358 .L0 
+     /tmp/ccVfGEPJ.s:530    .text:000000000000035c .L0 
+     /tmp/ccVfGEPJ.s:531    .text:000000000000035c .L0 
+     /tmp/ccVfGEPJ.s:534    .text:0000000000000360 .L0 
+     /tmp/ccVfGEPJ.s:538    .text:0000000000000364 .L0 
+     /tmp/ccVfGEPJ.s:539    .text:0000000000000364 .L0 
+     /tmp/ccVfGEPJ.s:543    .text:0000000000000368 .L0 
+     /tmp/ccVfGEPJ.s:544    .text:0000000000000368 .L0 
+     /tmp/ccVfGEPJ.s:545    .text:0000000000000368 .L0 
+     /tmp/ccVfGEPJ.s:547    .text:000000000000036c .L0 
+     /tmp/ccVfGEPJ.s:550    .text:0000000000000374 .L0 
+     /tmp/ccVfGEPJ.s:553    .text:0000000000000378 .L0 
+     /tmp/ccVfGEPJ.s:559    .text:000000000000038c .L0 
+     /tmp/ccVfGEPJ.s:563    .text:0000000000000398 .L0 
+     /tmp/ccVfGEPJ.s:565    .text:000000000000039c .L0 
+     /tmp/ccVfGEPJ.s:568    .text:00000000000003a0 .L0 
+     /tmp/ccVfGEPJ.s:570    .text:00000000000003a4 .L0 
+     /tmp/ccVfGEPJ.s:573    .text:00000000000003a8 .L0 
+     /tmp/ccVfGEPJ.s:574    .text:00000000000003a8 .L0 
+     /tmp/ccVfGEPJ.s:579    .text:00000000000003b8 .L0 
+     /tmp/ccVfGEPJ.s:583    .text:00000000000003bc .L0 
+     /tmp/ccVfGEPJ.s:584    .text:00000000000003bc .L0 
+     /tmp/ccVfGEPJ.s:588    .text:00000000000003c4 .L0 
+     /tmp/ccVfGEPJ.s:589    .text:00000000000003c4 .L0 
+     /tmp/ccVfGEPJ.s:598    .text:00000000000003dc .L0 
+     /tmp/ccVfGEPJ.s:599    .text:00000000000003dc .L0 
+     /tmp/ccVfGEPJ.s:600    .text:00000000000003dc .L0 
+     /tmp/ccVfGEPJ.s:603    .text:00000000000003e0 .L0 
+     /tmp/ccVfGEPJ.s:605    .text:00000000000003e4 .L0 
+GAS LISTING /tmp/ccVfGEPJ.s 			page 22
 
 
-     /tmp/cco8uvzs.s:598    .text:00000000000003d0 .L0 
-     /tmp/cco8uvzs.s:599    .text:00000000000003d0 .L0 
-     /tmp/cco8uvzs.s:600    .text:00000000000003d0 .L0 
-     /tmp/cco8uvzs.s:601    .text:00000000000003d0 .L0 
-     /tmp/cco8uvzs.s:603    .text:00000000000003d4 .L0 
-     /tmp/cco8uvzs.s:608    .text:00000000000003e0 .L0 
-     /tmp/cco8uvzs.s:609    .text:00000000000003e0 .L0 
-     /tmp/cco8uvzs.s:612    .text:00000000000003e8 .L0 
-     /tmp/cco8uvzs.s:613    .text:00000000000003e8 .L0 
-     /tmp/cco8uvzs.s:619    .text:00000000000003fc .L0 
-     /tmp/cco8uvzs.s:620    .text:00000000000003fc .L0 
-     /tmp/cco8uvzs.s:624    .text:0000000000000408 .L0 
-     /tmp/cco8uvzs.s:625    .text:000000000000040c .L0 
-     /tmp/cco8uvzs.s:627    .text:0000000000000410 .L0 
-     /tmp/cco8uvzs.s:628    .text:0000000000000410 .L0 
-     /tmp/cco8uvzs.s:630    .text:0000000000000414 .L0 
-     /tmp/cco8uvzs.s:633    .text:0000000000000418 .L0 
-     /tmp/cco8uvzs.s:635    .text:000000000000041c .L0 
-     /tmp/cco8uvzs.s:637    .text:0000000000000420 .L0 
-     /tmp/cco8uvzs.s:639    .text:0000000000000424 .L0 
-     /tmp/cco8uvzs.s:645    .text:0000000000000424 _ZN11ConsoleUtil15putcUtilSyscallEv
-     /tmp/cco8uvzs.s:648    .text:0000000000000424 .L0 
-     /tmp/cco8uvzs.s:649    .text:0000000000000424 .L0 
-     /tmp/cco8uvzs.s:650    .text:0000000000000428 .L0 
-     /tmp/cco8uvzs.s:652    .text:000000000000042c .L0 
-     /tmp/cco8uvzs.s:654    .text:0000000000000430 .L0 
-     /tmp/cco8uvzs.s:656    .text:0000000000000430 .L0 
-src/kernel/consoleUtil.cpp:124    .text:0000000000000430 .L0 
-     /tmp/cco8uvzs.s:662    .text:0000000000000434 .L0 
-src/kernel/consoleUtil.cpp:126    .text:0000000000000434 .L0 
-     /tmp/cco8uvzs.s:667    .text:0000000000000438 .L0 
-     /tmp/cco8uvzs.s:668    .text:0000000000000438 .L0 
-src/kernel/consoleUtil.cpp:130    .text:0000000000000438 .L0 
-     /tmp/cco8uvzs.s:674    .text:000000000000043c .L0 
-     /tmp/cco8uvzs.s:676    .text:000000000000043c .L0 
-     /tmp/cco8uvzs.s:679    .text:0000000000000444 .L0 
-     /tmp/cco8uvzs.s:680    .text:0000000000000444 .L0 
-     /tmp/cco8uvzs.s:682    .text:0000000000000448 .L0 
-     /tmp/cco8uvzs.s:684    .text:000000000000044c .L0 
-     /tmp/cco8uvzs.s:703    .data:0000000000000000 _ZN11ConsoleUtil10bufferSizeE
-     /tmp/cco8uvzs.s:710    .bss:0000000000000000 _ZN11ConsoleUtil8inputSemE
-     /tmp/cco8uvzs.s:714    .bss:0000000000000008 _ZN11ConsoleUtil9outputSemE
-     /tmp/cco8uvzs.s:726    .bss:0000000000000020 _ZN11ConsoleUtil11pendingPutcE
-     /tmp/cco8uvzs.s:746    .bss:0000000000004038 _ZN11ConsoleUtil11pendingGetcE
-     /tmp/cco8uvzs.s:730    .bss:0000000000000028 _ZN11ConsoleUtil10outputTailE
-     /tmp/cco8uvzs.s:734    .bss:0000000000000030 _ZN11ConsoleUtil10outputHeadE
-     /tmp/cco8uvzs.s:718    .bss:0000000000000010 _ZN11ConsoleUtil9inputTailE
-     /tmp/cco8uvzs.s:722    .bss:0000000000000018 _ZN11ConsoleUtil9inputHeadE
-     /tmp/cco8uvzs.s:700    .data:0000000000000000 .LANCHOR1
-     /tmp/cco8uvzs.s:707    .bss:0000000000000000 .LANCHOR0
-     /tmp/cco8uvzs.s:757    .text:000000000000044c .L0 
-     /tmp/cco8uvzs.s:45     .text:0000000000000038 .L0 
-     /tmp/cco8uvzs.s:63     .text:0000000000000060 .L0 
-     /tmp/cco8uvzs.s:146    .text:00000000000000b8 .L0 
-     /tmp/cco8uvzs.s:150    .text:00000000000000c8 .L0 
-     /tmp/cco8uvzs.s:167    .text:00000000000000ec .L0 
-     /tmp/cco8uvzs.s:172    .text:00000000000000fc .L0 
-GAS LISTING /tmp/cco8uvzs.s 			page 23
+     /tmp/ccVfGEPJ.s:609    .text:00000000000003e8 .L0 
+     /tmp/ccVfGEPJ.s:610    .text:00000000000003ec .L0 
+     /tmp/ccVfGEPJ.s:612    .text:00000000000003f0 .L0 
+     /tmp/ccVfGEPJ.s:613    .text:00000000000003f0 .L0 
+     /tmp/ccVfGEPJ.s:615    .text:00000000000003f4 .L0 
+     /tmp/ccVfGEPJ.s:617    .text:00000000000003f8 .L0 
+     /tmp/ccVfGEPJ.s:619    .text:00000000000003fc .L0 
+     /tmp/ccVfGEPJ.s:625    .text:00000000000003fc _ZN11ConsoleUtil5printEPKciS1_i
+     /tmp/ccVfGEPJ.s:628    .text:00000000000003fc .L0 
+     /tmp/ccVfGEPJ.s:630    .text:00000000000003fc .L0 
+     /tmp/ccVfGEPJ.s:631    .text:0000000000000400 .L0 
+     /tmp/ccVfGEPJ.s:637    .text:0000000000000414 .L0 
+     /tmp/ccVfGEPJ.s:638    .text:0000000000000414 .L0 
+     /tmp/ccVfGEPJ.s:639    .text:0000000000000414 .L0 
+     /tmp/ccVfGEPJ.s:640    .text:0000000000000414 .L0 
+     /tmp/ccVfGEPJ.s:641    .text:0000000000000414 .L0 
+     /tmp/ccVfGEPJ.s:643    .text:0000000000000418 .L0 
+     /tmp/ccVfGEPJ.s:648    .text:0000000000000424 .L0 
+     /tmp/ccVfGEPJ.s:649    .text:0000000000000424 .L0 
+     /tmp/ccVfGEPJ.s:652    .text:000000000000042c .L0 
+     /tmp/ccVfGEPJ.s:653    .text:000000000000042c .L0 
+     /tmp/ccVfGEPJ.s:659    .text:0000000000000440 .L0 
+     /tmp/ccVfGEPJ.s:660    .text:0000000000000440 .L0 
+     /tmp/ccVfGEPJ.s:664    .text:000000000000044c .L0 
+     /tmp/ccVfGEPJ.s:665    .text:0000000000000450 .L0 
+     /tmp/ccVfGEPJ.s:667    .text:0000000000000454 .L0 
+     /tmp/ccVfGEPJ.s:668    .text:0000000000000454 .L0 
+     /tmp/ccVfGEPJ.s:670    .text:0000000000000458 .L0 
+     /tmp/ccVfGEPJ.s:673    .text:000000000000045c .L0 
+     /tmp/ccVfGEPJ.s:675    .text:0000000000000460 .L0 
+     /tmp/ccVfGEPJ.s:677    .text:0000000000000464 .L0 
+     /tmp/ccVfGEPJ.s:679    .text:0000000000000468 .L0 
+     /tmp/ccVfGEPJ.s:685    .text:0000000000000468 _ZN11ConsoleUtil15putcUtilSyscallEv
+     /tmp/ccVfGEPJ.s:688    .text:0000000000000468 .L0 
+     /tmp/ccVfGEPJ.s:689    .text:0000000000000468 .L0 
+     /tmp/ccVfGEPJ.s:690    .text:000000000000046c .L0 
+     /tmp/ccVfGEPJ.s:692    .text:0000000000000470 .L0 
+     /tmp/ccVfGEPJ.s:694    .text:0000000000000474 .L0 
+     /tmp/ccVfGEPJ.s:696    .text:0000000000000474 .L0 
+src/kernel/consoleUtil.cpp:124    .text:0000000000000474 .L0 
+     /tmp/ccVfGEPJ.s:702    .text:0000000000000478 .L0 
+src/kernel/consoleUtil.cpp:126    .text:0000000000000478 .L0 
+     /tmp/ccVfGEPJ.s:707    .text:000000000000047c .L0 
+     /tmp/ccVfGEPJ.s:708    .text:000000000000047c .L0 
+src/kernel/consoleUtil.cpp:130    .text:000000000000047c .L0 
+     /tmp/ccVfGEPJ.s:714    .text:0000000000000480 .L0 
+     /tmp/ccVfGEPJ.s:716    .text:0000000000000480 .L0 
+     /tmp/ccVfGEPJ.s:719    .text:0000000000000488 .L0 
+     /tmp/ccVfGEPJ.s:720    .text:0000000000000488 .L0 
+     /tmp/ccVfGEPJ.s:722    .text:000000000000048c .L0 
+     /tmp/ccVfGEPJ.s:724    .text:0000000000000490 .L0 
+     /tmp/ccVfGEPJ.s:743    .data:0000000000000000 _ZN11ConsoleUtil10bufferSizeE
+     /tmp/ccVfGEPJ.s:762    .bss:0000000000000018 _ZN11ConsoleUtil12outputBufferE
+     /tmp/ccVfGEPJ.s:758    .bss:0000000000000010 _ZN11ConsoleUtil11inputBufferE
+     /tmp/ccVfGEPJ.s:750    .bss:0000000000000000 _ZN11ConsoleUtil8inputSemE
+     /tmp/ccVfGEPJ.s:754    .bss:0000000000000008 _ZN11ConsoleUtil9outputSemE
+     /tmp/ccVfGEPJ.s:774    .bss:0000000000000030 _ZN11ConsoleUtil11pendingPutcE
+GAS LISTING /tmp/ccVfGEPJ.s 			page 23
 
 
-     /tmp/cco8uvzs.s:214    .text:000000000000013c .L0 
-     /tmp/cco8uvzs.s:226    .text:000000000000015c .L0 
-     /tmp/cco8uvzs.s:234    .text:0000000000000170 .L0 
-     /tmp/cco8uvzs.s:237    .text:000000000000017c .L0 
-     /tmp/cco8uvzs.s:271    .text:00000000000001a0 .L0 
-     /tmp/cco8uvzs.s:280    .text:00000000000001bc .L0 
-     /tmp/cco8uvzs.s:297    .text:00000000000001e0 .L0 
-     /tmp/cco8uvzs.s:302    .text:00000000000001f0 .L0 
-     /tmp/cco8uvzs.s:347    .text:0000000000000234 .L0 
-     /tmp/cco8uvzs.s:359    .text:0000000000000254 .L0 
-     /tmp/cco8uvzs.s:367    .text:0000000000000268 .L0 
-     /tmp/cco8uvzs.s:370    .text:0000000000000274 .L0 
-     /tmp/cco8uvzs.s:449    .rodata.str1.8:0000000000000000 .LC0
-     /tmp/cco8uvzs.s:472    .text:00000000000002f0 .L0 
-     /tmp/cco8uvzs.s:43     .text:0000000000000038 .L2
-     /tmp/cco8uvzs.s:61     .text:0000000000000060 .L3
-     /tmp/cco8uvzs.s:190    .text:0000000000000124 .L13
-     /tmp/cco8uvzs.s:253    .text:0000000000000198 .L18
-     /tmp/cco8uvzs.s:240    .text:0000000000000184 .L17
-     /tmp/cco8uvzs.s:323    .text:000000000000021c .L23
-     /tmp/cco8uvzs.s:386    .text:0000000000000290 .L28
-     /tmp/cco8uvzs.s:373    .text:000000000000027c .L27
-     /tmp/cco8uvzs.s:431    .text:00000000000002c8 .L30
-     /tmp/cco8uvzs.s:414    .text:00000000000002b0 .L32
-     /tmp/cco8uvzs.s:488    .text:0000000000000318 .L35
-     /tmp/cco8uvzs.s:556    .text:0000000000000398 .L42
-     /tmp/cco8uvzs.s:501    .text:0000000000000324 .L37
-     /tmp/cco8uvzs.s:541    .text:0000000000000378 .L40
-     /tmp/cco8uvzs.s:567    .text:00000000000003a4 .L34
-     /tmp/cco8uvzs.s:496    .text:0000000000000320 .L36
-     /tmp/cco8uvzs.s:31     .text:000000000000001c .LEHB0
-     /tmp/cco8uvzs.s:10     .text:0000000000000000 .LFB22
-     /tmp/cco8uvzs.s:34     .text:0000000000000024 .LEHE0
-     /tmp/cco8uvzs.s:39     .text:0000000000000030 .LEHB1
-     /tmp/cco8uvzs.s:42     .text:0000000000000038 .LEHE1
-     /tmp/cco8uvzs.s:78     .text:0000000000000080 .L6
-     /tmp/cco8uvzs.s:49     .text:0000000000000044 .LEHB2
-     /tmp/cco8uvzs.s:52     .text:000000000000004c .LEHE2
-     /tmp/cco8uvzs.s:57     .text:0000000000000058 .LEHB3
-     /tmp/cco8uvzs.s:60     .text:0000000000000060 .LEHE3
-     /tmp/cco8uvzs.s:90     .text:000000000000009c .L7
-     /tmp/cco8uvzs.s:86     .text:0000000000000094 .LEHB4
-     /tmp/cco8uvzs.s:89     .text:000000000000009c .LEHE4
-     /tmp/cco8uvzs.s:97     .text:00000000000000b0 .LEHB5
-     /tmp/cco8uvzs.s:100    .text:00000000000000b8 .LEHE5
-     /tmp/cco8uvzs.s:2352   .debug_abbrev:0000000000000000 .Ldebug_abbrev0
-     /tmp/cco8uvzs.s:3471   .debug_str:000000000000008e .LASF160
-     /tmp/cco8uvzs.s:3605   .debug_str:0000000000000501 .LASF161
-     /tmp/cco8uvzs.s:3477   .debug_str:000000000000016e .LASF162
-     /tmp/cco8uvzs.s:5      .text:0000000000000000 .Ltext0
-     /tmp/cco8uvzs.s:749    .text:000000000000044c .Letext0
-     /tmp/cco8uvzs.s:3449   .debug_line:0000000000000000 .Ldebug_line0
-     /tmp/cco8uvzs.s:3541   .debug_str:0000000000000351 .LASF0
-     /tmp/cco8uvzs.s:3635   .debug_str:00000000000005ef .LASF3
-     /tmp/cco8uvzs.s:3563   .debug_str:00000000000003e5 .LASF1
-     /tmp/cco8uvzs.s:3647   .debug_str:000000000000063e .LASF2
-     /tmp/cco8uvzs.s:3653   .debug_str:0000000000000668 .LASF4
-GAS LISTING /tmp/cco8uvzs.s 			page 24
+     /tmp/ccVfGEPJ.s:786    .bss:0000000000000048 _ZN11ConsoleUtil11pendingGetcE
+     /tmp/ccVfGEPJ.s:778    .bss:0000000000000038 _ZN11ConsoleUtil10outputTailE
+     /tmp/ccVfGEPJ.s:782    .bss:0000000000000040 _ZN11ConsoleUtil10outputHeadE
+     /tmp/ccVfGEPJ.s:766    .bss:0000000000000020 _ZN11ConsoleUtil9inputTailE
+     /tmp/ccVfGEPJ.s:770    .bss:0000000000000028 _ZN11ConsoleUtil9inputHeadE
+     /tmp/ccVfGEPJ.s:740    .data:0000000000000000 .LANCHOR1
+     /tmp/ccVfGEPJ.s:747    .bss:0000000000000000 .LANCHOR0
+     /tmp/ccVfGEPJ.s:798    .text:0000000000000490 .L0 
+     /tmp/ccVfGEPJ.s:45     .text:0000000000000038 .L0 
+     /tmp/ccVfGEPJ.s:63     .text:0000000000000060 .L0 
+     /tmp/ccVfGEPJ.s:67     .text:000000000000006c .L0 
+     /tmp/ccVfGEPJ.s:168    .text:00000000000000e4 .L0 
+     /tmp/ccVfGEPJ.s:172    .text:00000000000000f4 .L0 
+     /tmp/ccVfGEPJ.s:189    .text:0000000000000118 .L0 
+     /tmp/ccVfGEPJ.s:199    .text:0000000000000134 .L0 
+     /tmp/ccVfGEPJ.s:243    .text:0000000000000178 .L0 
+     /tmp/ccVfGEPJ.s:264    .text:00000000000001a8 .L0 
+     /tmp/ccVfGEPJ.s:301    .text:00000000000001d4 .L0 
+     /tmp/ccVfGEPJ.s:310    .text:00000000000001f0 .L0 
+     /tmp/ccVfGEPJ.s:327    .text:0000000000000214 .L0 
+     /tmp/ccVfGEPJ.s:337    .text:0000000000000230 .L0 
+     /tmp/ccVfGEPJ.s:386    .text:0000000000000280 .L0 
+     /tmp/ccVfGEPJ.s:407    .text:00000000000002b0 .L0 
+     /tmp/ccVfGEPJ.s:489    .rodata.str1.8:0000000000000000 .LC0
+     /tmp/ccVfGEPJ.s:512    .text:0000000000000334 .L0 
+     /tmp/ccVfGEPJ.s:43     .text:0000000000000038 .L2
+     /tmp/ccVfGEPJ.s:61     .text:0000000000000060 .L3
+     /tmp/ccVfGEPJ.s:219    .text:0000000000000160 .L13
+     /tmp/ccVfGEPJ.s:283    .text:00000000000001cc .L18
+     /tmp/ccVfGEPJ.s:270    .text:00000000000001b8 .L17
+     /tmp/ccVfGEPJ.s:362    .text:0000000000000268 .L23
+     /tmp/ccVfGEPJ.s:426    .text:00000000000002d4 .L28
+     /tmp/ccVfGEPJ.s:413    .text:00000000000002c0 .L27
+     /tmp/ccVfGEPJ.s:471    .text:000000000000030c .L30
+     /tmp/ccVfGEPJ.s:454    .text:00000000000002f4 .L32
+     /tmp/ccVfGEPJ.s:528    .text:000000000000035c .L35
+     /tmp/ccVfGEPJ.s:596    .text:00000000000003dc .L42
+     /tmp/ccVfGEPJ.s:541    .text:0000000000000368 .L37
+     /tmp/ccVfGEPJ.s:581    .text:00000000000003bc .L40
+     /tmp/ccVfGEPJ.s:607    .text:00000000000003e8 .L34
+     /tmp/ccVfGEPJ.s:536    .text:0000000000000364 .L36
+     /tmp/ccVfGEPJ.s:31     .text:000000000000001c .LEHB0
+     /tmp/ccVfGEPJ.s:10     .text:0000000000000000 .LFB22
+     /tmp/ccVfGEPJ.s:34     .text:0000000000000024 .LEHE0
+     /tmp/ccVfGEPJ.s:39     .text:0000000000000030 .LEHB1
+     /tmp/ccVfGEPJ.s:42     .text:0000000000000038 .LEHE1
+     /tmp/ccVfGEPJ.s:96     .text:00000000000000ac .L6
+     /tmp/ccVfGEPJ.s:49     .text:0000000000000044 .LEHB2
+     /tmp/ccVfGEPJ.s:52     .text:000000000000004c .LEHE2
+     /tmp/ccVfGEPJ.s:57     .text:0000000000000058 .LEHB3
+     /tmp/ccVfGEPJ.s:60     .text:0000000000000060 .LEHE3
+     /tmp/ccVfGEPJ.s:108    .text:00000000000000c8 .L7
+     /tmp/ccVfGEPJ.s:69     .text:0000000000000078 .LEHB4
+     /tmp/ccVfGEPJ.s:79     .text:0000000000000090 .LEHE4
+     /tmp/ccVfGEPJ.s:104    .text:00000000000000c0 .LEHB5
+     /tmp/ccVfGEPJ.s:107    .text:00000000000000c8 .LEHE5
+     /tmp/ccVfGEPJ.s:115    .text:00000000000000dc .LEHB6
+GAS LISTING /tmp/ccVfGEPJ.s 			page 24
 
 
-     /tmp/cco8uvzs.s:3551   .debug_str:0000000000000386 .LASF5
-     /tmp/cco8uvzs.s:3465   .debug_str:0000000000000070 .LASF6
-     /tmp/cco8uvzs.s:3613   .debug_str:000000000000054c .LASF7
-     /tmp/cco8uvzs.s:3557   .debug_str:00000000000003ae .LASF8
-     /tmp/cco8uvzs.s:3525   .debug_str:00000000000002cb .LASF9
-     /tmp/cco8uvzs.s:3531   .debug_str:00000000000002fc .LASF10
-     /tmp/cco8uvzs.s:3485   .debug_str:00000000000001be .LASF11
-     /tmp/cco8uvzs.s:3523   .debug_str:00000000000002bc .LASF12
-     /tmp/cco8uvzs.s:3497   .debug_str:000000000000021f .LASF13
-     /tmp/cco8uvzs.s:3483   .debug_str:00000000000001ae .LASF14
-     /tmp/cco8uvzs.s:3677   .debug_str:00000000000006ee .LASF15
-     /tmp/cco8uvzs.s:3519   .debug_str:0000000000000299 .LASF16
-     /tmp/cco8uvzs.s:3669   .debug_str:00000000000006b5 .LASF17
-     /tmp/cco8uvzs.s:3701   .debug_str:000000000000078b .LASF45
-     /tmp/cco8uvzs.s:3587   .debug_str:0000000000000482 .LASF18
-     /tmp/cco8uvzs.s:3625   .debug_str:00000000000005a7 .LASF19
-     /tmp/cco8uvzs.s:3763   .debug_str:000000000000095a .LASF20
-     /tmp/cco8uvzs.s:3505   .debug_str:0000000000000259 .LASF21
-     /tmp/cco8uvzs.s:3697   .debug_str:0000000000000778 .LASF22
-     /tmp/cco8uvzs.s:3735   .debug_str:000000000000088b .LASF23
-     /tmp/cco8uvzs.s:3751   .debug_str:00000000000008fa .LASF24
-     /tmp/cco8uvzs.s:3543   .debug_str:000000000000035e .LASF25
-     /tmp/cco8uvzs.s:3629   .debug_str:00000000000005cf .LASF26
-     /tmp/cco8uvzs.s:3565   .debug_str:00000000000003f8 .LASF27
-     /tmp/cco8uvzs.s:3739   .debug_str:000000000000089d .LASF28
-     /tmp/cco8uvzs.s:3639   .debug_str:0000000000000603 .LASF29
-     /tmp/cco8uvzs.s:3723   .debug_str:000000000000081b .LASF31
-     /tmp/cco8uvzs.s:3595   .debug_str:00000000000004cc .LASF33
-     /tmp/cco8uvzs.s:3683   .debug_str:0000000000000717 .LASF35
-     /tmp/cco8uvzs.s:3633   .debug_str:00000000000005e5 .LASF30
-     /tmp/cco8uvzs.s:3641   .debug_str:000000000000060c .LASF32
-     /tmp/cco8uvzs.s:3707   .debug_str:00000000000007a6 .LASF34
-     /tmp/cco8uvzs.s:3779   .debug_str:00000000000009b1 .LASF36
-     /tmp/cco8uvzs.s:3665   .debug_str:00000000000006a1 .LASF61
-     /tmp/cco8uvzs.s:3745   .debug_str:00000000000008c6 .LASF62
-     /tmp/cco8uvzs.s:3681   .debug_str:0000000000000707 .LASF37
-     /tmp/cco8uvzs.s:3783   .debug_str:00000000000009db .LASF38
-     /tmp/cco8uvzs.s:3615   .debug_str:000000000000055f .LASF39
-     /tmp/cco8uvzs.s:3585   .debug_str:0000000000000464 .LASF41
-     /tmp/cco8uvzs.s:3767   .debug_str:0000000000000977 .LASF40
-     /tmp/cco8uvzs.s:3573   .debug_str:0000000000000424 .LASF42
-     /tmp/cco8uvzs.s:3457   .debug_str:0000000000000016 .LASF43
-     /tmp/cco8uvzs.s:3693   .debug_str:0000000000000753 .LASF44
-     /tmp/cco8uvzs.s:3667   .debug_str:00000000000006ac .LASF46
-     /tmp/cco8uvzs.s:3663   .debug_str:0000000000000695 .LASF47
-     /tmp/cco8uvzs.s:3503   .debug_str:000000000000024d .LASF48
-     /tmp/cco8uvzs.s:3631   .debug_str:00000000000005d9 .LASF105
-     /tmp/cco8uvzs.s:3727   .debug_str:000000000000084a .LASF49
-     /tmp/cco8uvzs.s:3597   .debug_str:00000000000004d5 .LASF50
-     /tmp/cco8uvzs.s:3511   .debug_str:000000000000027a .LASF51
-     /tmp/cco8uvzs.s:3757   .debug_str:000000000000091c .LASF52
-     /tmp/cco8uvzs.s:3685   .debug_str:0000000000000733 .LASF53
-     /tmp/cco8uvzs.s:3553   .debug_str:0000000000000398 .LASF54
-     /tmp/cco8uvzs.s:3539   .debug_str:000000000000034b .LASF55
-     /tmp/cco8uvzs.s:3623   .debug_str:0000000000000597 .LASF56
-     /tmp/cco8uvzs.s:3773   .debug_str:0000000000000999 .LASF57
-     /tmp/cco8uvzs.s:3741   .debug_str:00000000000008a8 .LASF58
-GAS LISTING /tmp/cco8uvzs.s 			page 25
+     /tmp/ccVfGEPJ.s:118    .text:00000000000000e4 .LEHE6
+     /tmp/ccVfGEPJ.s:2398   .debug_abbrev:0000000000000000 .Ldebug_abbrev0
+     /tmp/ccVfGEPJ.s:3526   .debug_str:000000000000008e .LASF160
+     /tmp/ccVfGEPJ.s:3662   .debug_str:0000000000000509 .LASF161
+     /tmp/ccVfGEPJ.s:3532   .debug_str:000000000000016e .LASF162
+     /tmp/ccVfGEPJ.s:5      .text:0000000000000000 .Ltext0
+     /tmp/ccVfGEPJ.s:789    .text:0000000000000490 .Letext0
+     /tmp/ccVfGEPJ.s:3504   .debug_line:0000000000000000 .Ldebug_line0
+     /tmp/ccVfGEPJ.s:3598   .debug_str:0000000000000359 .LASF0
+     /tmp/ccVfGEPJ.s:3692   .debug_str:00000000000005f7 .LASF3
+     /tmp/ccVfGEPJ.s:3620   .debug_str:00000000000003ed .LASF1
+     /tmp/ccVfGEPJ.s:3704   .debug_str:0000000000000646 .LASF2
+     /tmp/ccVfGEPJ.s:3710   .debug_str:0000000000000670 .LASF4
+     /tmp/ccVfGEPJ.s:3608   .debug_str:000000000000038e .LASF5
+     /tmp/ccVfGEPJ.s:3520   .debug_str:0000000000000070 .LASF6
+     /tmp/ccVfGEPJ.s:3670   .debug_str:0000000000000554 .LASF7
+     /tmp/ccVfGEPJ.s:3614   .debug_str:00000000000003b6 .LASF8
+     /tmp/ccVfGEPJ.s:3582   .debug_str:00000000000002d3 .LASF9
+     /tmp/ccVfGEPJ.s:3588   .debug_str:0000000000000304 .LASF10
+     /tmp/ccVfGEPJ.s:3540   .debug_str:00000000000001be .LASF11
+     /tmp/ccVfGEPJ.s:3578   .debug_str:00000000000002bc .LASF12
+     /tmp/ccVfGEPJ.s:3552   .debug_str:000000000000021f .LASF13
+     /tmp/ccVfGEPJ.s:3538   .debug_str:00000000000001ae .LASF14
+     /tmp/ccVfGEPJ.s:3734   .debug_str:00000000000006f6 .LASF15
+     /tmp/ccVfGEPJ.s:3574   .debug_str:0000000000000299 .LASF16
+     /tmp/ccVfGEPJ.s:3726   .debug_str:00000000000006bd .LASF17
+     /tmp/ccVfGEPJ.s:3758   .debug_str:0000000000000793 .LASF45
+     /tmp/ccVfGEPJ.s:3644   .debug_str:000000000000048a .LASF18
+     /tmp/ccVfGEPJ.s:3682   .debug_str:00000000000005af .LASF19
+     /tmp/ccVfGEPJ.s:3822   .debug_str:000000000000096e .LASF20
+     /tmp/ccVfGEPJ.s:3560   .debug_str:0000000000000259 .LASF21
+     /tmp/ccVfGEPJ.s:3754   .debug_str:0000000000000780 .LASF22
+     /tmp/ccVfGEPJ.s:3792   .debug_str:0000000000000893 .LASF23
+     /tmp/ccVfGEPJ.s:3808   .debug_str:0000000000000902 .LASF24
+     /tmp/ccVfGEPJ.s:3600   .debug_str:0000000000000366 .LASF25
+     /tmp/ccVfGEPJ.s:3686   .debug_str:00000000000005d7 .LASF26
+     /tmp/ccVfGEPJ.s:3622   .debug_str:0000000000000400 .LASF27
+     /tmp/ccVfGEPJ.s:3796   .debug_str:00000000000008a5 .LASF28
+     /tmp/ccVfGEPJ.s:3696   .debug_str:000000000000060b .LASF29
+     /tmp/ccVfGEPJ.s:3780   .debug_str:0000000000000823 .LASF31
+     /tmp/ccVfGEPJ.s:3652   .debug_str:00000000000004d4 .LASF33
+     /tmp/ccVfGEPJ.s:3740   .debug_str:000000000000071f .LASF35
+     /tmp/ccVfGEPJ.s:3690   .debug_str:00000000000005ed .LASF30
+     /tmp/ccVfGEPJ.s:3698   .debug_str:0000000000000614 .LASF32
+     /tmp/ccVfGEPJ.s:3764   .debug_str:00000000000007ae .LASF34
+     /tmp/ccVfGEPJ.s:3838   .debug_str:00000000000009c5 .LASF36
+     /tmp/ccVfGEPJ.s:3722   .debug_str:00000000000006a9 .LASF61
+     /tmp/ccVfGEPJ.s:3802   .debug_str:00000000000008ce .LASF62
+     /tmp/ccVfGEPJ.s:3738   .debug_str:000000000000070f .LASF37
+     /tmp/ccVfGEPJ.s:3842   .debug_str:00000000000009ef .LASF38
+     /tmp/ccVfGEPJ.s:3672   .debug_str:0000000000000567 .LASF39
+     /tmp/ccVfGEPJ.s:3642   .debug_str:000000000000046c .LASF41
+     /tmp/ccVfGEPJ.s:3826   .debug_str:000000000000098b .LASF40
+     /tmp/ccVfGEPJ.s:3630   .debug_str:000000000000042c .LASF42
+     /tmp/ccVfGEPJ.s:3512   .debug_str:0000000000000016 .LASF43
+     /tmp/ccVfGEPJ.s:3750   .debug_str:000000000000075b .LASF44
+     /tmp/ccVfGEPJ.s:3724   .debug_str:00000000000006b4 .LASF46
+GAS LISTING /tmp/ccVfGEPJ.s 			page 25
 
 
-     /tmp/cco8uvzs.s:3621   .debug_str:0000000000000588 .LASF59
-     /tmp/cco8uvzs.s:3491   .debug_str:00000000000001ee .LASF60
-     /tmp/cco8uvzs.s:3619   .debug_str:0000000000000572 .LASF63
-     /tmp/cco8uvzs.s:3575   .debug_str:0000000000000446 .LASF64
-     /tmp/cco8uvzs.s:3649   .debug_str:000000000000064c .LASF65
-     /tmp/cco8uvzs.s:3645   .debug_str:0000000000000639 .LASF66
-     /tmp/cco8uvzs.s:3499   .debug_str:000000000000022f .LASF67
-     /tmp/cco8uvzs.s:3781   .debug_str:00000000000009ce .LASF68
-     /tmp/cco8uvzs.s:3691   .debug_str:0000000000000747 .LASF69
-     /tmp/cco8uvzs.s:3643   .debug_str:0000000000000629 .LASF114
-     /tmp/cco8uvzs.s:3679   .debug_str:00000000000006fa .LASF163
-     /tmp/cco8uvzs.s:3689   .debug_str:0000000000000742 .LASF70
-     /tmp/cco8uvzs.s:3659   .debug_str:0000000000000685 .LASF71
-     /tmp/cco8uvzs.s:3609   .debug_str:0000000000000532 .LASF72
-     /tmp/cco8uvzs.s:3749   .debug_str:00000000000008ec .LASF73
-     /tmp/cco8uvzs.s:3651   .debug_str:000000000000065c .LASF74
-     /tmp/cco8uvzs.s:3545   .debug_str:0000000000000368 .LASF75
-     /tmp/cco8uvzs.s:3577   .debug_str:000000000000044b .LASF76
-     /tmp/cco8uvzs.s:3521   .debug_str:00000000000002af .LASF77
-     /tmp/cco8uvzs.s:3737   .debug_str:0000000000000897 .LASF78
-     /tmp/cco8uvzs.s:3555   .debug_str:00000000000003a9 .LASF79
-     /tmp/cco8uvzs.s:3777   .debug_str:00000000000009a6 .LASF80
-     /tmp/cco8uvzs.s:3603   .debug_str:00000000000004f8 .LASF81
-     /tmp/cco8uvzs.s:3729   .debug_str:000000000000084f .LASF82
-     /tmp/cco8uvzs.s:3611   .debug_str:0000000000000540 .LASF83
-     /tmp/cco8uvzs.s:3527   .debug_str:00000000000002db .LASF84
-     /tmp/cco8uvzs.s:3583   .debug_str:000000000000045f .LASF85
-     /tmp/cco8uvzs.s:3671   .debug_str:00000000000006cb .LASF86
-     /tmp/cco8uvzs.s:3711   .debug_str:00000000000007ba .LASF88
-     /tmp/cco8uvzs.s:3517   .debug_str:0000000000000291 .LASF87
-     /tmp/cco8uvzs.s:3765   .debug_str:0000000000000964 .LASF89
-     /tmp/cco8uvzs.s:3473   .debug_str:000000000000015e .LASF90
-     /tmp/cco8uvzs.s:3487   .debug_str:00000000000001cd .LASF91
-     /tmp/cco8uvzs.s:3507   .debug_str:0000000000000262 .LASF92
-     /tmp/cco8uvzs.s:3467   .debug_str:0000000000000077 .LASF93
-     /tmp/cco8uvzs.s:3599   .debug_str:00000000000004e1 .LASF94
-     /tmp/cco8uvzs.s:3753   .debug_str:0000000000000907 .LASF95
-     /tmp/cco8uvzs.s:3513   .debug_str:000000000000027f .LASF96
-     /tmp/cco8uvzs.s:3687   .debug_str:000000000000073a .LASF164
-     /tmp/cco8uvzs.s:3771   .debug_str:0000000000000992 .LASF101
-     /tmp/cco8uvzs.s:3661   .debug_str:000000000000068d .LASF97
-     /tmp/cco8uvzs.s:3481   .debug_str:00000000000001a8 .LASF98
-     /tmp/cco8uvzs.s:3479   .debug_str:000000000000019f .LASF99
-     /tmp/cco8uvzs.s:3453   .debug_str:0000000000000009 .LASF100
-     /tmp/cco8uvzs.s:3533   .debug_str:000000000000030a .LASF102
-     /tmp/cco8uvzs.s:3549   .debug_str:0000000000000381 .LASF103
-     /tmp/cco8uvzs.s:3547   .debug_str:0000000000000376 .LASF104
-     /tmp/cco8uvzs.s:3493   .debug_str:0000000000000209 .LASF106
-     /tmp/cco8uvzs.s:3673   .debug_str:00000000000006d2 .LASF107
-     /tmp/cco8uvzs.s:3675   .debug_str:00000000000006e9 .LASF108
-     /tmp/cco8uvzs.s:3655   .debug_str:000000000000066f .LASF109
-     /tmp/cco8uvzs.s:3461   .debug_str:0000000000000044 .LASF110
-     /tmp/cco8uvzs.s:3571   .debug_str:000000000000041c .LASF111
-     /tmp/cco8uvzs.s:3731   .debug_str:0000000000000859 .LASF112
-     /tmp/cco8uvzs.s:3719   .debug_str:000000000000080a .LASF113
-     /tmp/cco8uvzs.s:3601   .debug_str:00000000000004eb .LASF115
-     /tmp/cco8uvzs.s:3721   .debug_str:0000000000000816 .LASF116
-GAS LISTING /tmp/cco8uvzs.s 			page 26
+     /tmp/ccVfGEPJ.s:3720   .debug_str:000000000000069d .LASF47
+     /tmp/ccVfGEPJ.s:3558   .debug_str:000000000000024d .LASF48
+     /tmp/ccVfGEPJ.s:3688   .debug_str:00000000000005e1 .LASF105
+     /tmp/ccVfGEPJ.s:3784   .debug_str:0000000000000852 .LASF49
+     /tmp/ccVfGEPJ.s:3654   .debug_str:00000000000004dd .LASF50
+     /tmp/ccVfGEPJ.s:3566   .debug_str:000000000000027a .LASF51
+     /tmp/ccVfGEPJ.s:3814   .debug_str:0000000000000924 .LASF52
+     /tmp/ccVfGEPJ.s:3742   .debug_str:000000000000073b .LASF53
+     /tmp/ccVfGEPJ.s:3610   .debug_str:00000000000003a0 .LASF54
+     /tmp/ccVfGEPJ.s:3596   .debug_str:0000000000000353 .LASF55
+     /tmp/ccVfGEPJ.s:3680   .debug_str:000000000000059f .LASF56
+     /tmp/ccVfGEPJ.s:3832   .debug_str:00000000000009ad .LASF57
+     /tmp/ccVfGEPJ.s:3798   .debug_str:00000000000008b0 .LASF58
+     /tmp/ccVfGEPJ.s:3678   .debug_str:0000000000000590 .LASF59
+     /tmp/ccVfGEPJ.s:3546   .debug_str:00000000000001ee .LASF60
+     /tmp/ccVfGEPJ.s:3676   .debug_str:000000000000057a .LASF63
+     /tmp/ccVfGEPJ.s:3632   .debug_str:000000000000044e .LASF64
+     /tmp/ccVfGEPJ.s:3706   .debug_str:0000000000000654 .LASF65
+     /tmp/ccVfGEPJ.s:3702   .debug_str:0000000000000641 .LASF66
+     /tmp/ccVfGEPJ.s:3554   .debug_str:000000000000022f .LASF67
+     /tmp/ccVfGEPJ.s:3840   .debug_str:00000000000009e2 .LASF68
+     /tmp/ccVfGEPJ.s:3748   .debug_str:000000000000074f .LASF69
+     /tmp/ccVfGEPJ.s:3700   .debug_str:0000000000000631 .LASF114
+     /tmp/ccVfGEPJ.s:3736   .debug_str:0000000000000702 .LASF163
+     /tmp/ccVfGEPJ.s:3746   .debug_str:000000000000074a .LASF70
+     /tmp/ccVfGEPJ.s:3716   .debug_str:000000000000068d .LASF71
+     /tmp/ccVfGEPJ.s:3666   .debug_str:000000000000053a .LASF72
+     /tmp/ccVfGEPJ.s:3806   .debug_str:00000000000008f4 .LASF73
+     /tmp/ccVfGEPJ.s:3708   .debug_str:0000000000000664 .LASF74
+     /tmp/ccVfGEPJ.s:3602   .debug_str:0000000000000370 .LASF75
+     /tmp/ccVfGEPJ.s:3634   .debug_str:0000000000000453 .LASF76
+     /tmp/ccVfGEPJ.s:3576   .debug_str:00000000000002af .LASF77
+     /tmp/ccVfGEPJ.s:3794   .debug_str:000000000000089f .LASF78
+     /tmp/ccVfGEPJ.s:3612   .debug_str:00000000000003b1 .LASF79
+     /tmp/ccVfGEPJ.s:3836   .debug_str:00000000000009ba .LASF80
+     /tmp/ccVfGEPJ.s:3660   .debug_str:0000000000000500 .LASF81
+     /tmp/ccVfGEPJ.s:3786   .debug_str:0000000000000857 .LASF82
+     /tmp/ccVfGEPJ.s:3668   .debug_str:0000000000000548 .LASF83
+     /tmp/ccVfGEPJ.s:3584   .debug_str:00000000000002e3 .LASF84
+     /tmp/ccVfGEPJ.s:3640   .debug_str:0000000000000467 .LASF85
+     /tmp/ccVfGEPJ.s:3728   .debug_str:00000000000006d3 .LASF86
+     /tmp/ccVfGEPJ.s:3768   .debug_str:00000000000007c2 .LASF88
+     /tmp/ccVfGEPJ.s:3572   .debug_str:0000000000000291 .LASF87
+     /tmp/ccVfGEPJ.s:3824   .debug_str:0000000000000978 .LASF89
+     /tmp/ccVfGEPJ.s:3528   .debug_str:000000000000015e .LASF90
+     /tmp/ccVfGEPJ.s:3542   .debug_str:00000000000001cd .LASF91
+     /tmp/ccVfGEPJ.s:3562   .debug_str:0000000000000262 .LASF92
+     /tmp/ccVfGEPJ.s:3522   .debug_str:0000000000000077 .LASF93
+     /tmp/ccVfGEPJ.s:3656   .debug_str:00000000000004e9 .LASF94
+     /tmp/ccVfGEPJ.s:3810   .debug_str:000000000000090f .LASF95
+     /tmp/ccVfGEPJ.s:3568   .debug_str:000000000000027f .LASF96
+     /tmp/ccVfGEPJ.s:3744   .debug_str:0000000000000742 .LASF164
+     /tmp/ccVfGEPJ.s:3830   .debug_str:00000000000009a6 .LASF101
+     /tmp/ccVfGEPJ.s:3718   .debug_str:0000000000000695 .LASF97
+     /tmp/ccVfGEPJ.s:3536   .debug_str:00000000000001a8 .LASF98
+     /tmp/ccVfGEPJ.s:3534   .debug_str:000000000000019f .LASF99
+     /tmp/ccVfGEPJ.s:3508   .debug_str:0000000000000009 .LASF100
+GAS LISTING /tmp/ccVfGEPJ.s 			page 26
 
 
-     /tmp/cco8uvzs.s:3637   .debug_str:00000000000005f4 .LASF117
-     /tmp/cco8uvzs.s:3509   .debug_str:0000000000000271 .LASF118
-     /tmp/cco8uvzs.s:3725   .debug_str:0000000000000837 .LASF119
-     /tmp/cco8uvzs.s:3607   .debug_str:000000000000051c .LASF120
-     /tmp/cco8uvzs.s:3567   .debug_str:0000000000000403 .LASF121
-     /tmp/cco8uvzs.s:3759   .debug_str:000000000000092b .LASF122
-     /tmp/cco8uvzs.s:3617   .debug_str:0000000000000568 .LASF123
-     /tmp/cco8uvzs.s:3495   .debug_str:0000000000000215 .LASF124
-     /tmp/cco8uvzs.s:3501   .debug_str:000000000000023f .LASF125
-     /tmp/cco8uvzs.s:3459   .debug_str:000000000000001c .LASF126
-     /tmp/cco8uvzs.s:3743   .debug_str:00000000000008ba .LASF127
-     /tmp/cco8uvzs.s:3717   .debug_str:00000000000007f2 .LASF128
-     /tmp/cco8uvzs.s:3561   .debug_str:00000000000003dd .LASF129
-     /tmp/cco8uvzs.s:3747   .debug_str:00000000000008e5 .LASF130
-     /tmp/cco8uvzs.s:3695   .debug_str:0000000000000773 .LASF131
-     /tmp/cco8uvzs.s:3455   .debug_str:0000000000000011 .LASF132
-     /tmp/cco8uvzs.s:3775   .debug_str:00000000000009a1 .LASF133
-     /tmp/cco8uvzs.s:3579   .debug_str:0000000000000450 .LASF134
-     /tmp/cco8uvzs.s:3705   .debug_str:000000000000079c .LASF135
-     /tmp/cco8uvzs.s:3703   .debug_str:0000000000000797 .LASF136
-     /tmp/cco8uvzs.s:3755   .debug_str:0000000000000914 .LASF137
-     /tmp/cco8uvzs.s:3709   .debug_str:00000000000007b0 .LASF138
-     /tmp/cco8uvzs.s:3581   .debug_str:0000000000000456 .LASF139
-     /tmp/cco8uvzs.s:3451   .debug_str:0000000000000000 .LASF140
-     /tmp/cco8uvzs.s:3475   .debug_str:0000000000000163 .LASF141
-     /tmp/cco8uvzs.s:3699   .debug_str:0000000000000783 .LASF142
-     /tmp/cco8uvzs.s:3515   .debug_str:0000000000000286 .LASF143
-     /tmp/cco8uvzs.s:3657   .debug_str:0000000000000674 .LASF144
-     /tmp/cco8uvzs.s:3569   .debug_str:0000000000000413 .LASF145
-     /tmp/cco8uvzs.s:3559   .debug_str:00000000000003c1 .LASF146
-     /tmp/cco8uvzs.s:3627   .debug_str:00000000000005b3 .LASF147
-     /tmp/cco8uvzs.s:3593   .debug_str:00000000000004ae .LASF148
-     /tmp/cco8uvzs.s:3535   .debug_str:000000000000030f .LASF149
-     /tmp/cco8uvzs.s:3761   .debug_str:000000000000093b .LASF150
-     /tmp/cco8uvzs.s:3715   .debug_str:00000000000007d3 .LASF151
-     /tmp/cco8uvzs.s:3489   .debug_str:00000000000001d2 .LASF152
-     /tmp/cco8uvzs.s:3589   .debug_str:000000000000048e .LASF153
-     /tmp/cco8uvzs.s:3733   .debug_str:000000000000086c .LASF154
-     /tmp/cco8uvzs.s:3463   .debug_str:0000000000000050 .LASF155
-     /tmp/cco8uvzs.s:3537   .debug_str:000000000000032d .LASF156
-     /tmp/cco8uvzs.s:646    .text:0000000000000424 .LFB30
-     /tmp/cco8uvzs.s:685    .text:000000000000044c .LFE30
-     /tmp/cco8uvzs.s:3154   .debug_loc:0000000000000000 .LLST15
-     /tmp/cco8uvzs.s:586    .text:00000000000003b8 .LFB29
-     /tmp/cco8uvzs.s:640    .text:0000000000000424 .LFE29
-     /tmp/cco8uvzs.s:3469   .debug_str:0000000000000087 .LASF157
-     /tmp/cco8uvzs.s:3161   .debug_loc:0000000000000023 .LLST11
-     /tmp/cco8uvzs.s:3175   .debug_loc:000000000000005c .LLST12
-     /tmp/cco8uvzs.s:3189   .debug_loc:0000000000000095 .LLST13
-     /tmp/cco8uvzs.s:3591   .debug_str:00000000000004a9 .LASF158
-     /tmp/cco8uvzs.s:3207   .debug_loc:00000000000000e1 .LLST14
-     /tmp/cco8uvzs.s:610    .text:00000000000003e8 .LVL42
-     /tmp/cco8uvzs.s:617    .text:00000000000003fc .LVL43
-     /tmp/cco8uvzs.s:622    .text:0000000000000408 .LVL44
-     /tmp/cco8uvzs.s:456    .text:00000000000002dc .LFB28
-     /tmp/cco8uvzs.s:580    .text:00000000000003b8 .LFE28
-     /tmp/cco8uvzs.s:3221   .debug_loc:000000000000011a .LLST5
-GAS LISTING /tmp/cco8uvzs.s 			page 27
+     /tmp/ccVfGEPJ.s:3590   .debug_str:0000000000000312 .LASF102
+     /tmp/ccVfGEPJ.s:3606   .debug_str:0000000000000389 .LASF103
+     /tmp/ccVfGEPJ.s:3604   .debug_str:000000000000037e .LASF104
+     /tmp/ccVfGEPJ.s:3548   .debug_str:0000000000000209 .LASF106
+     /tmp/ccVfGEPJ.s:3730   .debug_str:00000000000006da .LASF107
+     /tmp/ccVfGEPJ.s:3732   .debug_str:00000000000006f1 .LASF108
+     /tmp/ccVfGEPJ.s:3712   .debug_str:0000000000000677 .LASF109
+     /tmp/ccVfGEPJ.s:3516   .debug_str:0000000000000044 .LASF110
+     /tmp/ccVfGEPJ.s:3628   .debug_str:0000000000000424 .LASF111
+     /tmp/ccVfGEPJ.s:3788   .debug_str:0000000000000861 .LASF112
+     /tmp/ccVfGEPJ.s:3776   .debug_str:0000000000000812 .LASF113
+     /tmp/ccVfGEPJ.s:3658   .debug_str:00000000000004f3 .LASF115
+     /tmp/ccVfGEPJ.s:3778   .debug_str:000000000000081e .LASF116
+     /tmp/ccVfGEPJ.s:3694   .debug_str:00000000000005fc .LASF117
+     /tmp/ccVfGEPJ.s:3564   .debug_str:0000000000000271 .LASF118
+     /tmp/ccVfGEPJ.s:3782   .debug_str:000000000000083f .LASF119
+     /tmp/ccVfGEPJ.s:3664   .debug_str:0000000000000524 .LASF120
+     /tmp/ccVfGEPJ.s:3624   .debug_str:000000000000040b .LASF121
+     /tmp/ccVfGEPJ.s:3816   .debug_str:0000000000000933 .LASF122
+     /tmp/ccVfGEPJ.s:3674   .debug_str:0000000000000570 .LASF123
+     /tmp/ccVfGEPJ.s:3550   .debug_str:0000000000000215 .LASF124
+     /tmp/ccVfGEPJ.s:3556   .debug_str:000000000000023f .LASF125
+     /tmp/ccVfGEPJ.s:3514   .debug_str:000000000000001c .LASF126
+     /tmp/ccVfGEPJ.s:3800   .debug_str:00000000000008c2 .LASF127
+     /tmp/ccVfGEPJ.s:3774   .debug_str:00000000000007fa .LASF128
+     /tmp/ccVfGEPJ.s:3618   .debug_str:00000000000003e5 .LASF129
+     /tmp/ccVfGEPJ.s:3804   .debug_str:00000000000008ed .LASF130
+     /tmp/ccVfGEPJ.s:3752   .debug_str:000000000000077b .LASF131
+     /tmp/ccVfGEPJ.s:3510   .debug_str:0000000000000011 .LASF132
+     /tmp/ccVfGEPJ.s:3834   .debug_str:00000000000009b5 .LASF133
+     /tmp/ccVfGEPJ.s:3636   .debug_str:0000000000000458 .LASF134
+     /tmp/ccVfGEPJ.s:3762   .debug_str:00000000000007a4 .LASF135
+     /tmp/ccVfGEPJ.s:3760   .debug_str:000000000000079f .LASF136
+     /tmp/ccVfGEPJ.s:3812   .debug_str:000000000000091c .LASF137
+     /tmp/ccVfGEPJ.s:3766   .debug_str:00000000000007b8 .LASF138
+     /tmp/ccVfGEPJ.s:3638   .debug_str:000000000000045e .LASF139
+     /tmp/ccVfGEPJ.s:3506   .debug_str:0000000000000000 .LASF140
+     /tmp/ccVfGEPJ.s:3530   .debug_str:0000000000000163 .LASF141
+     /tmp/ccVfGEPJ.s:3756   .debug_str:000000000000078b .LASF142
+     /tmp/ccVfGEPJ.s:3570   .debug_str:0000000000000286 .LASF143
+     /tmp/ccVfGEPJ.s:3714   .debug_str:000000000000067c .LASF144
+     /tmp/ccVfGEPJ.s:3626   .debug_str:000000000000041b .LASF145
+     /tmp/ccVfGEPJ.s:3616   .debug_str:00000000000003c9 .LASF146
+     /tmp/ccVfGEPJ.s:3684   .debug_str:00000000000005bb .LASF147
+     /tmp/ccVfGEPJ.s:3650   .debug_str:00000000000004b6 .LASF148
+     /tmp/ccVfGEPJ.s:3592   .debug_str:0000000000000317 .LASF149
+     /tmp/ccVfGEPJ.s:3818   .debug_str:0000000000000943 .LASF150
+     /tmp/ccVfGEPJ.s:3772   .debug_str:00000000000007db .LASF151
+     /tmp/ccVfGEPJ.s:3544   .debug_str:00000000000001d2 .LASF152
+     /tmp/ccVfGEPJ.s:3646   .debug_str:0000000000000496 .LASF153
+     /tmp/ccVfGEPJ.s:3790   .debug_str:0000000000000874 .LASF154
+     /tmp/ccVfGEPJ.s:3518   .debug_str:0000000000000050 .LASF155
+     /tmp/ccVfGEPJ.s:3594   .debug_str:0000000000000335 .LASF156
+     /tmp/ccVfGEPJ.s:686    .text:0000000000000468 .LFB30
+     /tmp/ccVfGEPJ.s:725    .text:0000000000000490 .LFE30
+     /tmp/ccVfGEPJ.s:3219   .debug_loc:0000000000000000 .LLST15
+     /tmp/ccVfGEPJ.s:626    .text:00000000000003fc .LFB29
+GAS LISTING /tmp/ccVfGEPJ.s 			page 27
 
 
-     /tmp/cco8uvzs.s:3246   .debug_loc:000000000000017c .LLST6
-     /tmp/cco8uvzs.s:3271   .debug_loc:00000000000001de .LLST7
-     /tmp/cco8uvzs.s:3713   .debug_str:00000000000007cc .LASF159
-     /tmp/cco8uvzs.s:3296   .debug_loc:0000000000000240 .LLST8
-     /tmp/cco8uvzs.s:3318   .debug_loc:000000000000029f .LLST9
-     /tmp/cco8uvzs.s:3335   .debug_loc:00000000000002ea .LLST10
-     /tmp/cco8uvzs.s:553    .text:0000000000000394 .LVL37
-     /tmp/cco8uvzs.s:398    .text:0000000000000298 .LFB27
-     /tmp/cco8uvzs.s:445    .text:00000000000002dc .LFE27
-     /tmp/cco8uvzs.s:3365   .debug_loc:0000000000000342 .LLST4
-     /tmp/cco8uvzs.s:424    .text:00000000000002c0 .LVL24
-     /tmp/cco8uvzs.s:332    .text:0000000000000220 .LFB26
-     /tmp/cco8uvzs.s:392    .text:0000000000000298 .LFE26
-     /tmp/cco8uvzs.s:3376   .debug_loc:0000000000000378 .LLST3
-     /tmp/cco8uvzs.s:350    .text:0000000000000248 .LVL19
-     /tmp/cco8uvzs.s:265    .text:00000000000001a0 .LFB25
-     /tmp/cco8uvzs.s:326    .text:0000000000000220 .LFE25
-     /tmp/cco8uvzs.s:3383   .debug_loc:000000000000039b .LLST2
-     /tmp/cco8uvzs.s:312    .text:000000000000020c .LVL17
-     /tmp/cco8uvzs.s:199    .text:0000000000000128 .LFB24
-     /tmp/cco8uvzs.s:259    .text:00000000000001a0 .LFE24
-     /tmp/cco8uvzs.s:3406   .debug_loc:00000000000003fb .LLST1
-     /tmp/cco8uvzs.s:217    .text:0000000000000150 .LVL12
-     /tmp/cco8uvzs.s:140    .text:00000000000000b8 .LFB23
-     /tmp/cco8uvzs.s:193    .text:0000000000000128 .LFE23
-     /tmp/cco8uvzs.s:3413   .debug_loc:000000000000041e .LLST0
-     /tmp/cco8uvzs.s:179    .text:0000000000000114 .LVL10
-     /tmp/cco8uvzs.s:102    .text:00000000000000b8 .LFE22
-     /tmp/cco8uvzs.s:33     .text:0000000000000024 .LVL0
-     /tmp/cco8uvzs.s:41     .text:0000000000000038 .LVL1
-     /tmp/cco8uvzs.s:51     .text:000000000000004c .LVL2
-     /tmp/cco8uvzs.s:59     .text:0000000000000060 .LVL3
-     /tmp/cco8uvzs.s:84     .text:0000000000000090 .LVL4
-     /tmp/cco8uvzs.s:88     .text:000000000000009c .LVL5
-     /tmp/cco8uvzs.s:95     .text:00000000000000ac .LVL6
-     /tmp/cco8uvzs.s:99     .text:00000000000000b8 .LVL7
-     /tmp/cco8uvzs.s:3769   .debug_str:0000000000000983 .LASF165
-     /tmp/cco8uvzs.s:3529   .debug_str:00000000000002e4 .LASF166
-     /tmp/cco8uvzs.s:672    .text:000000000000043c .LVL46
-     /tmp/cco8uvzs.s:677    .text:0000000000000440 .LVL47
-     /tmp/cco8uvzs.s:589    .text:00000000000003b8 .LVL41
-     /tmp/cco8uvzs.s:631    .text:0000000000000414 .LVL45
-     /tmp/cco8uvzs.s:459    .text:00000000000002dc .LVL27
-     /tmp/cco8uvzs.s:495    .text:0000000000000320 .LVL30
-     /tmp/cco8uvzs.s:555    .text:0000000000000398 .LVL38
-     /tmp/cco8uvzs.s:561    .text:000000000000039c .LVL39
-     /tmp/cco8uvzs.s:540    .text:0000000000000378 .LVL35
-     /tmp/cco8uvzs.s:566    .text:00000000000003a4 .LVL40
-     /tmp/cco8uvzs.s:500    .text:0000000000000324 .LVL31
-     /tmp/cco8uvzs.s:511    .text:0000000000000334 .LVL32
-     /tmp/cco8uvzs.s:532    .text:0000000000000364 .LVL34
-     /tmp/cco8uvzs.s:545    .text:000000000000037c .LVL36
-     /tmp/cco8uvzs.s:483    .text:0000000000000310 .LVL28
-     /tmp/cco8uvzs.s:492    .text:000000000000031c .LVL29
-     /tmp/cco8uvzs.s:526    .text:000000000000035c .LVL33
-     /tmp/cco8uvzs.s:401    .text:0000000000000298 .LVL22
-     /tmp/cco8uvzs.s:413    .text:00000000000002b0 .LVL23
-GAS LISTING /tmp/cco8uvzs.s 			page 28
+     /tmp/ccVfGEPJ.s:680    .text:0000000000000468 .LFE29
+     /tmp/ccVfGEPJ.s:3524   .debug_str:0000000000000087 .LASF157
+     /tmp/ccVfGEPJ.s:3226   .debug_loc:0000000000000023 .LLST11
+     /tmp/ccVfGEPJ.s:3240   .debug_loc:000000000000005c .LLST12
+     /tmp/ccVfGEPJ.s:3254   .debug_loc:0000000000000095 .LLST13
+     /tmp/ccVfGEPJ.s:3648   .debug_str:00000000000004b1 .LASF158
+     /tmp/ccVfGEPJ.s:3272   .debug_loc:00000000000000e1 .LLST14
+     /tmp/ccVfGEPJ.s:650    .text:000000000000042c .LVL44
+     /tmp/ccVfGEPJ.s:657    .text:0000000000000440 .LVL45
+     /tmp/ccVfGEPJ.s:662    .text:000000000000044c .LVL46
+     /tmp/ccVfGEPJ.s:496    .text:0000000000000320 .LFB28
+     /tmp/ccVfGEPJ.s:620    .text:00000000000003fc .LFE28
+     /tmp/ccVfGEPJ.s:3286   .debug_loc:000000000000011a .LLST5
+     /tmp/ccVfGEPJ.s:3311   .debug_loc:000000000000017c .LLST6
+     /tmp/ccVfGEPJ.s:3336   .debug_loc:00000000000001de .LLST7
+     /tmp/ccVfGEPJ.s:3770   .debug_str:00000000000007d4 .LASF159
+     /tmp/ccVfGEPJ.s:3361   .debug_loc:0000000000000240 .LLST8
+     /tmp/ccVfGEPJ.s:3383   .debug_loc:000000000000029f .LLST9
+     /tmp/ccVfGEPJ.s:3400   .debug_loc:00000000000002ea .LLST10
+     /tmp/ccVfGEPJ.s:593    .text:00000000000003d8 .LVL39
+     /tmp/ccVfGEPJ.s:438    .text:00000000000002dc .LFB27
+     /tmp/ccVfGEPJ.s:485    .text:0000000000000320 .LFE27
+     /tmp/ccVfGEPJ.s:3430   .debug_loc:0000000000000342 .LLST4
+     /tmp/ccVfGEPJ.s:464    .text:0000000000000304 .LVL26
+     /tmp/ccVfGEPJ.s:371    .text:000000000000026c .LFB26
+     /tmp/ccVfGEPJ.s:432    .text:00000000000002dc .LFE26
+     /tmp/ccVfGEPJ.s:3441   .debug_loc:0000000000000378 .LLST3
+     /tmp/ccVfGEPJ.s:389    .text:0000000000000294 .LVL21
+     /tmp/ccVfGEPJ.s:295    .text:00000000000001d4 .LFB25
+     /tmp/ccVfGEPJ.s:365    .text:000000000000026c .LFE25
+     /tmp/ccVfGEPJ.s:3448   .debug_loc:000000000000039b .LLST2
+     /tmp/ccVfGEPJ.s:351    .text:0000000000000258 .LVL19
+     /tmp/ccVfGEPJ.s:228    .text:0000000000000164 .LFB24
+     /tmp/ccVfGEPJ.s:289    .text:00000000000001d4 .LFE24
+     /tmp/ccVfGEPJ.s:3466   .debug_loc:00000000000003e7 .LLST1
+     /tmp/ccVfGEPJ.s:246    .text:000000000000018c .LVL14
+     /tmp/ccVfGEPJ.s:162    .text:00000000000000e4 .LFB23
+     /tmp/ccVfGEPJ.s:222    .text:0000000000000164 .LFE23
+     /tmp/ccVfGEPJ.s:3473   .debug_loc:000000000000040a .LLST0
+     /tmp/ccVfGEPJ.s:208    .text:0000000000000150 .LVL12
+     /tmp/ccVfGEPJ.s:120    .text:00000000000000e4 .LFE22
+     /tmp/ccVfGEPJ.s:33     .text:0000000000000024 .LVL0
+     /tmp/ccVfGEPJ.s:41     .text:0000000000000038 .LVL1
+     /tmp/ccVfGEPJ.s:51     .text:000000000000004c .LVL2
+     /tmp/ccVfGEPJ.s:59     .text:0000000000000060 .LVL3
+     /tmp/ccVfGEPJ.s:71     .text:0000000000000080 .LVL4
+     /tmp/ccVfGEPJ.s:78     .text:0000000000000090 .LVL5
+     /tmp/ccVfGEPJ.s:102    .text:00000000000000bc .LVL6
+     /tmp/ccVfGEPJ.s:106    .text:00000000000000c8 .LVL7
+     /tmp/ccVfGEPJ.s:113    .text:00000000000000d8 .LVL8
+     /tmp/ccVfGEPJ.s:117    .text:00000000000000e4 .LVL9
+     /tmp/ccVfGEPJ.s:3820   .debug_str:0000000000000962 .LASF165
+     /tmp/ccVfGEPJ.s:3580   .debug_str:00000000000002cb .LASF166
+     /tmp/ccVfGEPJ.s:3828   .debug_str:0000000000000997 .LASF167
+     /tmp/ccVfGEPJ.s:3586   .debug_str:00000000000002ec .LASF168
+     /tmp/ccVfGEPJ.s:712    .text:0000000000000480 .LVL48
+     /tmp/ccVfGEPJ.s:717    .text:0000000000000484 .LVL49
+GAS LISTING /tmp/ccVfGEPJ.s 			page 28
 
 
-     /tmp/cco8uvzs.s:440    .text:00000000000002d4 .LVL26
-     /tmp/cco8uvzs.s:362    .text:0000000000000264 .LVL20
-     /tmp/cco8uvzs.s:372    .text:000000000000027c .LVL21
-     /tmp/cco8uvzs.s:268    .text:00000000000001a0 .LVL15
-     /tmp/cco8uvzs.s:310    .text:0000000000000204 .LVL16
-     /tmp/cco8uvzs.s:322    .text:000000000000021c .LVL18
-     /tmp/cco8uvzs.s:229    .text:000000000000016c .LVL13
-     /tmp/cco8uvzs.s:239    .text:0000000000000184 .LVL14
-     /tmp/cco8uvzs.s:143    .text:00000000000000b8 .LVL8
-     /tmp/cco8uvzs.s:177    .text:000000000000010c .LVL9
-     /tmp/cco8uvzs.s:189    .text:0000000000000124 .LVL11
-     /tmp/cco8uvzs.s:758    .debug_info:0000000000000000 .Ldebug_info0
-     /tmp/cco8uvzs.s:105    .gcc_except_table:0000000000000000 .LLSDA22
+     /tmp/ccVfGEPJ.s:629    .text:00000000000003fc .LVL43
+     /tmp/ccVfGEPJ.s:671    .text:0000000000000458 .LVL47
+     /tmp/ccVfGEPJ.s:499    .text:0000000000000320 .LVL29
+     /tmp/ccVfGEPJ.s:535    .text:0000000000000364 .LVL32
+     /tmp/ccVfGEPJ.s:595    .text:00000000000003dc .LVL40
+     /tmp/ccVfGEPJ.s:601    .text:00000000000003e0 .LVL41
+     /tmp/ccVfGEPJ.s:580    .text:00000000000003bc .LVL37
+     /tmp/ccVfGEPJ.s:606    .text:00000000000003e8 .LVL42
+     /tmp/ccVfGEPJ.s:540    .text:0000000000000368 .LVL33
+     /tmp/ccVfGEPJ.s:551    .text:0000000000000378 .LVL34
+     /tmp/ccVfGEPJ.s:572    .text:00000000000003a8 .LVL36
+     /tmp/ccVfGEPJ.s:585    .text:00000000000003c0 .LVL38
+     /tmp/ccVfGEPJ.s:523    .text:0000000000000354 .LVL30
+     /tmp/ccVfGEPJ.s:532    .text:0000000000000360 .LVL31
+     /tmp/ccVfGEPJ.s:566    .text:00000000000003a0 .LVL35
+     /tmp/ccVfGEPJ.s:441    .text:00000000000002dc .LVL24
+     /tmp/ccVfGEPJ.s:453    .text:00000000000002f4 .LVL25
+     /tmp/ccVfGEPJ.s:480    .text:0000000000000318 .LVL28
+     /tmp/ccVfGEPJ.s:402    .text:00000000000002ac .LVL22
+     /tmp/ccVfGEPJ.s:412    .text:00000000000002c0 .LVL23
+     /tmp/ccVfGEPJ.s:298    .text:00000000000001d4 .LVL17
+     /tmp/ccVfGEPJ.s:349    .text:0000000000000250 .LVL18
+     /tmp/ccVfGEPJ.s:361    .text:0000000000000268 .LVL20
+     /tmp/ccVfGEPJ.s:259    .text:00000000000001a4 .LVL15
+     /tmp/ccVfGEPJ.s:269    .text:00000000000001b8 .LVL16
+     /tmp/ccVfGEPJ.s:165    .text:00000000000000e4 .LVL10
+     /tmp/ccVfGEPJ.s:206    .text:0000000000000148 .LVL11
+     /tmp/ccVfGEPJ.s:218    .text:0000000000000160 .LVL13
+     /tmp/ccVfGEPJ.s:799    .debug_info:0000000000000000 .Ldebug_info0
+     /tmp/ccVfGEPJ.s:123    .gcc_except_table:0000000000000000 .LLSDA22
 
 UNDEFINED SYMBOLS
 _ZN3SCBnwEm
 _ZN3SCBC1Em
+_Z7kmallocm
 _ZN3SCBdlEPv
 _Unwind_Resume
 __gxx_personality_v0

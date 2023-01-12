@@ -1,9 +1,9 @@
 #ifndef XV6_THREADS_C_API_TEST_HPP
 #define XV6_THREADS_C_API_TEST_HPP
 
-#include "../../../h/syscall_c.h"
+#include "../../../h/user/syscall_c.h"
 
-#include "../../../h/printing.hpp"
+#include "../../../h/user/printing.hpp"
 
 bool finishedA = false;
 bool finishedB = false;

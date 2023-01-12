@@ -5,8 +5,8 @@
 #ifndef OS1_KERNEL_TCB_HPP
 #define OS1_KERNEL_TCB_HPP
 
-#include "../lib/hw.h"
-#include "../h/slab.hpp"
+#include "../../lib/hw.h"
+#include "slab.hpp"
 
 class SCB;
 class TCBWrapper;

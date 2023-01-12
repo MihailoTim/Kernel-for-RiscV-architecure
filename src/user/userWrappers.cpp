@@ -1,9 +1,9 @@
 //
 // Created by os on 1/10/23.
 //
-#include "../../h/userWrappers.hpp"
-#include "../../h/syscall_c.h"
-#include "../../src/user/tests/userMain.hpp"
+#include "../../h/user/userWrappers.hpp"
+#include "../../h/user/syscall_c.h"
+#include "tests/userMain.hpp"
 
 void bodyWrapper(void (*body)(void*), void* args)
 {

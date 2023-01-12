@@ -1,55 +1,53 @@
-build/src/kernel/tcb.o: src/kernel/tcb.cpp src/kernel/../../h/tcb.hpp \
- src/kernel/../../h/../lib/hw.h src/kernel/../../h/../h/slab.hpp \
- src/kernel/../../h/../h/../h/slabAllocator.hpp \
- src/kernel/../../h/../h/../h/../h/utility.hpp \
- src/kernel/../../h/../h/../h/../h/buddyAllocator.hpp \
- src/kernel/../../h/../h/../h/../h/../h/utility.hpp \
- src/kernel/../../h/../h/../h/../h/consoleUtil.hpp \
- src/kernel/../../h/../h/../h/../h/cache_t.hpp \
- src/kernel/../../h/../h/../h/../h/../h/slab_t.hpp \
- src/kernel/../../h/memoryAllocator.hpp \
- src/kernel/../../h/../h/utility.hpp src/kernel/../../h/scheduler.hpp \
- src/kernel/../../h/../h/tcb.hpp src/kernel/../../h/syscall_c.h \
- src/kernel/../../h/../h/_thread.hpp \
- src/kernel/../../h/../h/_semaphore.hpp src/kernel/../../h/printing.hpp \
- src/kernel/../../h/syscall_c.h src/kernel/../../h/riscv.hpp
+build/src/kernel/tcb.o: src/kernel/tcb.cpp \
+ src/kernel/../../h/kernel/tcb.hpp \
+ src/kernel/../../h/kernel/../../lib/hw.h \
+ src/kernel/../../h/kernel/slab.hpp \
+ src/kernel/../../h/kernel/slabAllocator.hpp \
+ src/kernel/../../h/kernel/utility.hpp \
+ src/kernel/../../h/kernel/buddyAllocator.hpp \
+ src/kernel/../../h/kernel/consoleUtil.hpp \
+ src/kernel/../../h/kernel/cache_t.hpp \
+ src/kernel/../../h/kernel/slab_t.hpp \
+ src/kernel/../../h/kernel/memoryAllocator.hpp \
+ src/kernel/../../h/kernel/scheduler.hpp \
+ src/kernel/../../h/kernel/tcb.hpp src/kernel/../../h/user/syscall_c.h \
+ src/kernel/../../h/user/_thread.hpp \
+ src/kernel/../../h/user/_semaphore.hpp \
+ src/kernel/../../h/user/printing.hpp src/kernel/../../h/user/syscall_c.h \
+ src/kernel/../../h/kernel/riscv.hpp
 
-src/kernel/../../h/tcb.hpp:
+src/kernel/../../h/kernel/tcb.hpp:
 
-src/kernel/../../h/../lib/hw.h:
+src/kernel/../../h/kernel/../../lib/hw.h:
 
-src/kernel/../../h/../h/slab.hpp:
+src/kernel/../../h/kernel/slab.hpp:
 
-src/kernel/../../h/../h/../h/slabAllocator.hpp:
+src/kernel/../../h/kernel/slabAllocator.hpp:
 
-src/kernel/../../h/../h/../h/../h/utility.hpp:
+src/kernel/../../h/kernel/utility.hpp:
 
-src/kernel/../../h/../h/../h/../h/buddyAllocator.hpp:
+src/kernel/../../h/kernel/buddyAllocator.hpp:
 
-src/kernel/../../h/../h/../h/../h/../h/utility.hpp:
+src/kernel/../../h/kernel/consoleUtil.hpp:
 
-src/kernel/../../h/../h/../h/../h/consoleUtil.hpp:
+src/kernel/../../h/kernel/cache_t.hpp:
 
-src/kernel/../../h/../h/../h/../h/cache_t.hpp:
+src/kernel/../../h/kernel/slab_t.hpp:
 
-src/kernel/../../h/../h/../h/../h/../h/slab_t.hpp:
+src/kernel/../../h/kernel/memoryAllocator.hpp:
 
-src/kernel/../../h/memoryAllocator.hpp:
+src/kernel/../../h/kernel/scheduler.hpp:
 
-src/kernel/../../h/../h/utility.hpp:
+src/kernel/../../h/kernel/tcb.hpp:
 
-src/kernel/../../h/scheduler.hpp:
+src/kernel/../../h/user/syscall_c.h:
 
-src/kernel/../../h/../h/tcb.hpp:
+src/kernel/../../h/user/_thread.hpp:
 
-src/kernel/../../h/syscall_c.h:
+src/kernel/../../h/user/_semaphore.hpp:
 
-src/kernel/../../h/../h/_thread.hpp:
+src/kernel/../../h/user/printing.hpp:
 
-src/kernel/../../h/../h/_semaphore.hpp:
+src/kernel/../../h/user/syscall_c.h:
 
-src/kernel/../../h/printing.hpp:
-
-src/kernel/../../h/syscall_c.h:
-
-src/kernel/../../h/riscv.hpp:
+src/kernel/../../h/kernel/riscv.hpp:

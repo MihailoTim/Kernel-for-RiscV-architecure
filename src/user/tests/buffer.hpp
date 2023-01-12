@@ -5,8 +5,8 @@
 #ifndef OS1_BUFFER_CPP_H
 #define OS1_BUFFER_CPP_H
 
-#include "../../../h/syscall_c.h"
-#include "../../../h/printing.hpp"
+#include "../../../h/user/syscall_c.h"
+#include "../../../h/user/printing.hpp"
 
 class Buffer {
 private:

@@ -2,13 +2,13 @@
 // Created by os on 4/28/22.
 //
 
-#include "../../h/riscv.hpp"
-#include "../../h/memoryAllocator.hpp"
-#include "../../h/tcb.hpp"
-#include "../../h/scheduler.hpp"
-#include "../../h/printing.hpp"
-#include "../../h/scb.hpp"
-#include "../../h/userWrappers.hpp"
+#include "../../h/kernel/riscv.hpp"
+#include "../../h/kernel/memoryAllocator.hpp"
+#include "../../h/kernel/tcb.hpp"
+#include "../../h/kernel/scheduler.hpp"
+#include "../../h/user/printing.hpp"
+#include "../../h/kernel/scb.hpp"
+#include "../../h/user/userWrappers.hpp"
 
 uint64 RiscV::globalTime = 0;
 bool RiscV::userMainFinished = false;
@@ -645,7 +645,7 @@ void RiscV::executeSemaphoreFreeSyscall() {
 void RiscV::executeForkSyscall() {
 
     //create new stack and copy stack from currently running stack into the new one
-    uint64 *stack = (uint64*)kmalloc(DEFAULT_STACK_SIZE);
+    uint64 *stack = (uint64*)MemoryAllocator::kmalloc((DEFAULT_STACK_SIZE+MEM_BLOCK_SIZE-1)/MEM_BLOCK_SIZE);
 
     MemoryAllocator::memcpy((void*)TCB::running->stack,(void*)stack,DEFAULT_STACK_SIZE);
 
@@ -722,7 +722,7 @@ void RiscV::threadCreateUtil(TCB **handle, void (*start_routine)(void *), void *
     uint64 istack = 0;
 
     if(start_routine) {
-        istack = (uint64) MemoryAllocator::kmalloc(DEFAULT_STACK_SIZE);
+        istack = (uint64) MemoryAllocator::kmalloc((DEFAULT_STACK_SIZE+MEM_BLOCK_SIZE-1)/MEM_BLOCK_SIZE);
         if(istack == 0) {
             *handle = nullptr;
             return;

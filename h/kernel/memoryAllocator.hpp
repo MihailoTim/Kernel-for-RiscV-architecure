@@ -5,8 +5,8 @@
 #ifndef OS1_KERNEL_MEMORYALLOCATOR_HPP
 #define OS1_KERNEL_MEMORYALLOCATOR_HPP
 
-#include "../lib/hw.h"
-#include "../h/utility.hpp"
+#include "../../lib/hw.h"
+#include "utility.hpp"
 
 
 class MemoryAllocator {

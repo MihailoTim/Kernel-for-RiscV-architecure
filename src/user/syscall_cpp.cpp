@@ -2,7 +2,7 @@
 // Created by os on 4/28/22.
 //
 
-#include "../../h/syscall_cpp.hpp"
+#include "../../h/user/syscall_cpp.hpp"
 
 //CPP API for Threads, Semaphores, and others that rely on C API layer
 //CPP API is implemented in this way, as the task was to not change given interface or add any non-static members or functions to any class in CPP layer

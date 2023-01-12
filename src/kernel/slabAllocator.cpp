@@ -1,11 +1,12 @@
 //
 // Created by os on 12/25/22.
 //
-#include "../../h/slabAllocator.hpp"
-#include "../../h/utility.hpp"
-#include "../../h/riscv.hpp"
+#include "../../h/kernel/slabAllocator.hpp"
+#include "../../h/kernel/utility.hpp"
+#include "../../h/kernel/riscv.hpp"
 
 Cache* SlabAllocator::cache = nullptr;
+Cache* SlabAllocator::largeSlabCache = nullptr;
 Cache* SlabAllocator::sizeN[BUCKET_SIZE] = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
 const char* SlabAllocator::names[13] = {"Buffer Cache No. 0", "Buffer Cache No. 1", "Buffer Cache No. 2", "Buffer Cache No. 3", "Buffer Cache No. 4", "Buffer Cache No. 5", "Buffer Cache No. 6", "Buffer Cache No. 7", "Buffer Cache No. 8", "Buffer Cache No. 9", "Buffer Cache No. 10", "Buffer Cache No. 11", "Buffer Cache No. 12"};
 
@@ -21,6 +22,17 @@ void SlabAllocator::initialize(void* space, uint64 blockNum) {
     cache->slabSize = DEFAULT_SLAB_SIZE;
     strcpy("Main Cache", cache->name);
 
+    largeSlabCache = (Cache*)BUDDY_META_ADDR_CONST;
+    largeSlabCache->ctor = nullptr;
+    largeSlabCache->dtor = nullptr;
+    largeSlabCache->emptyHead = nullptr;
+    largeSlabCache->partialHead = nullptr;
+    largeSlabCache->fullHead = nullptr;
+    largeSlabCache->objectSize = sizeof(Cache);
+    largeSlabCache->slabSize = 4;
+    strcpy("Large Slab Cache", cache->name);
+
+
     for(int i=0;i<BUCKET_SIZE;i++){
         sizeN[i] = SlabAllocator::createCache(names[i], 1<<(i+CACHE_LOWER_BOUND), nullptr, nullptr);
     }
@@ -32,6 +44,8 @@ bool SlabAllocator::allocateSlab(Cache *cache) {
         return false;
     SlabAllocator::insertIntoList(cache->emptyHead, slab);
     slab->totalNumOfSlots = slab->numOfFreeSlots = (((1<<cache->slabSize) << BLOCK_SIZE_BITS) - sizeof(Slab)) / cache->objectSize;
+    if(slab->totalNumOfSlots > 1024*8)
+        slab->totalNumOfSlots = 1024*8;
     slab->objectOffset = (void*)((uint64)slab + sizeof(Slab));
     slab->parent = cache;
     for(uint64 i=0;i<slab->totalNumOfSlots/8 + 1;i++)
@@ -71,10 +85,33 @@ void* SlabAllocator::allocateObject(Cache *cache) {
     if(ret){
         return ret;
     }
-    if(!SlabAllocator::allocateSlab(cache))
-        return nullptr;
+    if(cache->objectSize <= sizeof(Slab)) {
+        if (!SlabAllocator::allocateSlab(cache))
+            return nullptr;
 
-    ret = SlabAllocator::allocateSlot(cache->emptyHead);
+        ret = SlabAllocator::allocateSlot(cache->emptyHead);
+    }
+    else{
+        Slab* slab = (Slab*)SlabAllocator::allocateObject(largeSlabCache);
+        slab->totalNumOfSlots = slab->numOfFreeSlots = (((1<<cache->slabSize) << BLOCK_SIZE_BITS)) / cache->objectSize;
+        if(slab->totalNumOfSlots > 1024*8)
+            slab->totalNumOfSlots = 1024*8;
+        void* slabOffset = Buddy::alloc(cache->slabSize);
+        slab->objectOffset = slabOffset;
+        slab->parent = cache;
+        slab->next = nullptr;
+        for(uint64 i=0;i<slab->totalNumOfSlots/8 + 1;i++)
+            slab->allocated[i] = 0;
+
+        if(cache->ctor) {
+            for (uint64 i = 0; i < slab->totalNumOfSlots; i++) {
+                cache->ctor((void *) ((uint64) slab->objectOffset + i * slab->parent->objectSize));
+            }
+        }
+
+        SlabAllocator::insertIntoList(cache->emptyHead, slab);
+        ret = SlabAllocator::allocateSlot(cache->emptyHead);
+    }
 
     return ret;
 }
@@ -97,7 +134,13 @@ void SlabAllocator::freeSlot(Slab *slab, uint64 index) {
 
         if(slab->isEmpty()) {
             SlabAllocator::removeFromList(headFrom, slab);
-            Buddy::free(slab, slab->parent->slabSize);
+            if(slab->parent->objectSize <= sizeof(Slab)) {
+                Buddy::free(slab, slab->parent->slabSize);
+            }
+            else{
+                Buddy::free(slab->objectOffset, slab->parent->slabSize);
+                SlabAllocator::freeObject(largeSlabCache, slab);
+            }
         }
         else
             if (headTo != headFrom)
@@ -135,7 +178,7 @@ Cache* SlabAllocator::createCache(const char *name, size_t size, void (*ctor)(vo
     ret->emptyHead = ret->partialHead = ret->fullHead = nullptr;
     ret->objectSize = size;
     int deg = Buddy::getDeg(Buddy::ceil(size));
-    if(deg < 12){
+    if(size <= sizeof(Slab)){
         ret->slabSize = DEFAULT_SLAB_SIZE;
     }
     else{
@@ -167,11 +210,11 @@ int SlabAllocator::shrinkCache(Cache *cache) {
 void SlabAllocator::printSlab(Slab *slab) {
     if(slab) {
         ConsoleUtil::print("Slab address:", (uint64) slab, "\n");
-        ConsoleUtil::print("Number of slots:", (uint64) slab->totalNumOfSlots, "\n");
-        ConsoleUtil::print("Number of free slots:", (uint64) slab->numOfFreeSlots, "\n");
-        ConsoleUtil::print("Slab object size:", (uint64) sizeof(Slab), "\n");
+        ConsoleUtil::print("Number of slots:", (uint64) slab->totalNumOfSlots, "\n",10);
+        ConsoleUtil::print("Number of free slots:", (uint64) slab->numOfFreeSlots, "\n",10);
+        ConsoleUtil::print("Slab object size:", (uint64) sizeof(Slab), "\n",10);
         ConsoleUtil::print("Object offset:", (uint64) slab->objectOffset, "\n");
-        ConsoleUtil::print("Slab allocated array address:", (uint64) slab->allocated, "\n");
+        ConsoleUtil::print("Slab allocated array address:", (uint64) (&slab->allocated), "\n");
         ConsoleUtil::printString("Allocated status array:\n");
         for (uint64 i = 0; i < slab->totalNumOfSlots/8 + 1; i++) {
             ConsoleUtil::print("", slab->allocated[i], " ");

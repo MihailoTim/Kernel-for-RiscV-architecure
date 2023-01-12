@@ -5,9 +5,9 @@
 #ifndef SYSCALL_C_H
 #define SYSCALL_C_H
 
-#include "../lib/hw.h"
-#include "../h/_thread.hpp"
-#include "../h/_semaphore.hpp"
+#include "../../lib/hw.h"
+#include "_thread.hpp"
+#include "_semaphore.hpp"
 
 
 void *mem_alloc(size_t size);

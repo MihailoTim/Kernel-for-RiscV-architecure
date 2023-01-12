@@ -5,10 +5,10 @@
 #ifndef KERNEL_FOR_RISCV_ARCHITECURE_SLAN_HPP
 #define KERNEL_FOR_RISCV_ARCHITECURE_SLAN_HPP
 
-#include "../h/utility.hpp"
-#include "../h/buddyAllocator.hpp"
-#include "../h/consoleUtil.hpp"
-#include "../h/cache_t.hpp"
+#include "utility.hpp"
+#include "buddyAllocator.hpp"
+#include "consoleUtil.hpp"
+#include "cache_t.hpp"
 
 class SlabAllocator{
 public:
@@ -41,7 +41,7 @@ public:
 
     static Cache *sizeN[13];
     static Cache *cache;
-    static Cache *slabHeaders;
+    static Cache *largeSlabCache;
 
 private:
     static void insertIntoList(Slab* &head, Slab* slab);

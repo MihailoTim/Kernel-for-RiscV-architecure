@@ -5,7 +5,7 @@
 #ifndef OS1_KERNEL_CONSOLEUTIL_HPP
 #define OS1_KERNEL_CONSOLEUTIL_HPP
 
-#include "../lib/hw.h"
+#include "../../lib/hw.h"
 
 class SCB;
 
@@ -20,8 +20,8 @@ class ConsoleUtil {
 
     //Buffer size should be dynamically allocated, for now leaving it as is
     static uint64 bufferSize;
-    static char inputBuffer[8192];
-    static char outputBuffer[8192];
+    static char *inputBuffer;
+    static char *outputBuffer;
 
     static uint64 inputHead, inputTail, outputHead, outputTail;
 

@@ -2,11 +2,11 @@
 // Created by os on 5/23/22.
 //
 
-#include "../../h/scb.hpp"
-#include "../../h/scheduler.hpp"
-#include "../../h/memoryAllocator.hpp"
-#include "../../h/printing.hpp"
-#include "../../h/consoleUtil.hpp"
+#include "../../h/kernel/scb.hpp"
+#include "../../h/kernel/scheduler.hpp"
+#include "../../h/kernel/memoryAllocator.hpp"
+#include "../../h/user/printing.hpp"
+#include "../../h/kernel/consoleUtil.hpp"
 
 kmem_cache_t* SCB::scbCache = nullptr;
 

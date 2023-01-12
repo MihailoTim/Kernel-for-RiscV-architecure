@@ -5,7 +5,7 @@
 #ifndef OS1_KERNEL_SCHEDULER_HPP
 #define OS1_KERNEL_SCHEDULER_HPP
 
-#include "../h/tcb.hpp"
+#include "tcb.hpp"
 
 class Scheduler {
 

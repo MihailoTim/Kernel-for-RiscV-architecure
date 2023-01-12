@@ -5,7 +5,7 @@
 #ifndef KERNEL_FOR_RISCV_ARCHITECURE_UTILITY_HPP
 #define KERNEL_FOR_RISCV_ARCHITECURE_UTILITY_HPP
 
-#include "../lib/hw.h"
+#include "../../lib/hw.h"
 
 #define BUDDY_BLOCK_BITS 12
 #define BUDDY_BLOCK_SIZE 4096
@@ -19,7 +19,7 @@
 #define CACHE_UPPER_BOUND 17
 #define NUMBER_OF_CACHES 13
 #define CACHE_MAX_NAME_LENGTH 64
-#define DEFAULT_SLAB_SIZE 1
+#define DEFAULT_SLAB_SIZE 2
 #define BLOCK_SIZE 4096
 #define BLOCK_SIZE_BITS 12
 

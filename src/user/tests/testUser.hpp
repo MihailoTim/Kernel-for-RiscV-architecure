@@ -1,6 +1,6 @@
-#include "../../../h/syscall_c.h"
-#include "../../../h/syscall_cpp.hpp"
-#include "../../../h/printing.hpp"
+#include "../../../h/user/syscall_c.h"
+#include "../../../h/user/syscall_cpp.hpp"
+#include "../../../h/user/printing.hpp"
 
 
 struct thread_data {

@@ -4,7 +4,7 @@
 
 #ifndef KERNEL_FOR_RISCV_ARCHITECURE_TEST2_HPP
 #define KERNEL_FOR_RISCV_ARCHITECURE_TEST2_HPP
-#include "../../../h/slab.hpp"
+#include "../../../h/kernel/slab.hpp"
 
 #define RUN_NUM (5)
 #define ITERATIONS (1000)
@@ -26,7 +26,7 @@ const char * const CACHE_NAMES[] = {"tc_0",
 
 void memset(const void *data, int size, int value) {
     for (int j = 0; j < size; j++) {
-        *(char *)((uint64)data+j) = value;
+        *((char *)data + j) = value;
     }
 }
 

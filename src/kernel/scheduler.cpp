@@ -2,10 +2,10 @@
 // Created by os on 5/18/22.
 //
 
-#include "../../h/scheduler.hpp"
-#include "../../h/printing.hpp"
-#include "../../h/consoleUtil.hpp"
-#include "../../h/riscv.hpp"
+#include "../../h/kernel/scheduler.hpp"
+#include "../../h/user/printing.hpp"
+#include "../../h/kernel/consoleUtil.hpp"
+#include "../../h/kernel/riscv.hpp"
 
 TCB* Scheduler::readyHead = nullptr;
 TCB* Scheduler::readyTail = nullptr;

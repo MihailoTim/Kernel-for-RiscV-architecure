@@ -1,9 +1,9 @@
 //
 // Created by os on 5/15/22.
 //
-#include "../../h/memoryAllocator.hpp"
-#include "../../h/printing.hpp"
-#include "../../h/buddyAllocator.hpp"
+#include "../../h/kernel/memoryAllocator.hpp"
+#include "../../h/user/printing.hpp"
+#include "../../h/kernel/buddyAllocator.hpp"
 
 MemoryAllocator::BlockHeader* MemoryAllocator::freeMemHead = nullptr;
 

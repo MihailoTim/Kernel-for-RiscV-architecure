@@ -1,45 +1,43 @@
 build/src/kernel/consoleUtil.o: src/kernel/consoleUtil.cpp \
- src/kernel/../../h/consoleUtil.hpp src/kernel/../../h/../lib/hw.h \
- src/kernel/../../h/printing.hpp src/kernel/../../h/syscall_c.h \
- src/kernel/../../h/../h/_thread.hpp \
- src/kernel/../../h/../h/_semaphore.hpp src/kernel/../../h/scb.hpp \
- src/kernel/../../h/tcb.hpp src/kernel/../../h/../h/slab.hpp \
- src/kernel/../../h/../h/../h/slabAllocator.hpp \
- src/kernel/../../h/../h/../h/../h/utility.hpp \
- src/kernel/../../h/../h/../h/../h/buddyAllocator.hpp \
- src/kernel/../../h/../h/../h/../h/../h/utility.hpp \
- src/kernel/../../h/../h/../h/../h/consoleUtil.hpp \
- src/kernel/../../h/../h/../h/../h/cache_t.hpp \
- src/kernel/../../h/../h/../h/../h/../h/slab_t.hpp
+ src/kernel/../../h/kernel/consoleUtil.hpp \
+ src/kernel/../../h/kernel/../../lib/hw.h \
+ src/kernel/../../h/user/printing.hpp src/kernel/../../h/user/syscall_c.h \
+ src/kernel/../../h/user/_thread.hpp \
+ src/kernel/../../h/user/_semaphore.hpp src/kernel/../../h/kernel/scb.hpp \
+ src/kernel/../../h/kernel/tcb.hpp src/kernel/../../h/kernel/slab.hpp \
+ src/kernel/../../h/kernel/slabAllocator.hpp \
+ src/kernel/../../h/kernel/utility.hpp \
+ src/kernel/../../h/kernel/buddyAllocator.hpp \
+ src/kernel/../../h/kernel/consoleUtil.hpp \
+ src/kernel/../../h/kernel/cache_t.hpp \
+ src/kernel/../../h/kernel/slab_t.hpp
 
-src/kernel/../../h/consoleUtil.hpp:
+src/kernel/../../h/kernel/consoleUtil.hpp:
 
-src/kernel/../../h/../lib/hw.h:
+src/kernel/../../h/kernel/../../lib/hw.h:
 
-src/kernel/../../h/printing.hpp:
+src/kernel/../../h/user/printing.hpp:
 
-src/kernel/../../h/syscall_c.h:
+src/kernel/../../h/user/syscall_c.h:
 
-src/kernel/../../h/../h/_thread.hpp:
+src/kernel/../../h/user/_thread.hpp:
 
-src/kernel/../../h/../h/_semaphore.hpp:
+src/kernel/../../h/user/_semaphore.hpp:
 
-src/kernel/../../h/scb.hpp:
+src/kernel/../../h/kernel/scb.hpp:
 
-src/kernel/../../h/tcb.hpp:
+src/kernel/../../h/kernel/tcb.hpp:
 
-src/kernel/../../h/../h/slab.hpp:
+src/kernel/../../h/kernel/slab.hpp:
 
-src/kernel/../../h/../h/../h/slabAllocator.hpp:
+src/kernel/../../h/kernel/slabAllocator.hpp:
 
-src/kernel/../../h/../h/../h/../h/utility.hpp:
+src/kernel/../../h/kernel/utility.hpp:
 
-src/kernel/../../h/../h/../h/../h/buddyAllocator.hpp:
+src/kernel/../../h/kernel/buddyAllocator.hpp:
 
-src/kernel/../../h/../h/../h/../h/../h/utility.hpp:
+src/kernel/../../h/kernel/consoleUtil.hpp:
 
-src/kernel/../../h/../h/../h/../h/consoleUtil.hpp:
+src/kernel/../../h/kernel/cache_t.hpp:
 
-src/kernel/../../h/../h/../h/../h/cache_t.hpp:
-
-src/kernel/../../h/../h/../h/../h/../h/slab_t.hpp:
+src/kernel/../../h/kernel/slab_t.hpp:

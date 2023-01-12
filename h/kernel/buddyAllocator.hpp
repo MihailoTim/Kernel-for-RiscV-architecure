@@ -5,8 +5,8 @@
 #ifndef KERNEL_FOR_RISCV_ARCHITECURE_BUDDYALLOCATOR_HPP
 #define KERNEL_FOR_RISCV_ARCHITECURE_BUDDYALLOCATOR_HPP
 
-#include "../lib/hw.h"
-#include "../h/utility.hpp"
+#include "../../lib/hw.h"
+#include "utility.hpp"
 
 class SlabAllocator;
 

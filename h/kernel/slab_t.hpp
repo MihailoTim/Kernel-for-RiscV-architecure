@@ -4,7 +4,7 @@
 
 #ifndef KERNEL_FOR_RISCV_ARCHITECURE_SLAB_T_HPP
 #define KERNEL_FOR_RISCV_ARCHITECURE_SLAB_T_HPP
-#include "../lib/hw.h"
+#include "../../lib/hw.h"
 
 typedef class Cache kmem_cache_t;
 

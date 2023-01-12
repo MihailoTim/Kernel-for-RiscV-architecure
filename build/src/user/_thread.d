@@ -1,40 +1,36 @@
 build/src/user/_thread.o: src/user/_thread.cpp \
- src/user/../../h/_thread.hpp src/user/../../h/tcb.hpp \
- src/user/../../h/../lib/hw.h src/user/../../h/../h/slab.hpp \
- src/user/../../h/../h/../h/slabAllocator.hpp \
- src/user/../../h/../h/../h/../h/utility.hpp \
- src/user/../../h/../h/../h/../h/buddyAllocator.hpp \
- src/user/../../h/../h/../h/../h/../h/utility.hpp \
- src/user/../../h/../h/../h/../h/consoleUtil.hpp \
- src/user/../../h/../h/../h/../h/cache_t.hpp \
- src/user/../../h/../h/../h/../h/../h/slab_t.hpp \
- src/user/../../h/syscall_c.h src/user/../../h/../h/_thread.hpp \
- src/user/../../h/../h/_semaphore.hpp
+ src/user/../../h/user/_thread.hpp src/user/../../h/kernel/tcb.hpp \
+ src/user/../../h/kernel/../../lib/hw.h src/user/../../h/kernel/slab.hpp \
+ src/user/../../h/kernel/slabAllocator.hpp \
+ src/user/../../h/kernel/utility.hpp \
+ src/user/../../h/kernel/buddyAllocator.hpp \
+ src/user/../../h/kernel/consoleUtil.hpp \
+ src/user/../../h/kernel/cache_t.hpp src/user/../../h/kernel/slab_t.hpp \
+ src/user/../../h/user/syscall_c.h src/user/../../h/user/_thread.hpp \
+ src/user/../../h/user/_semaphore.hpp
 
-src/user/../../h/_thread.hpp:
+src/user/../../h/user/_thread.hpp:
 
-src/user/../../h/tcb.hpp:
+src/user/../../h/kernel/tcb.hpp:
 
-src/user/../../h/../lib/hw.h:
+src/user/../../h/kernel/../../lib/hw.h:
 
-src/user/../../h/../h/slab.hpp:
+src/user/../../h/kernel/slab.hpp:
 
-src/user/../../h/../h/../h/slabAllocator.hpp:
+src/user/../../h/kernel/slabAllocator.hpp:
 
-src/user/../../h/../h/../h/../h/utility.hpp:
+src/user/../../h/kernel/utility.hpp:
 
-src/user/../../h/../h/../h/../h/buddyAllocator.hpp:
+src/user/../../h/kernel/buddyAllocator.hpp:
 
-src/user/../../h/../h/../h/../h/../h/utility.hpp:
+src/user/../../h/kernel/consoleUtil.hpp:
 
-src/user/../../h/../h/../h/../h/consoleUtil.hpp:
+src/user/../../h/kernel/cache_t.hpp:
 
-src/user/../../h/../h/../h/../h/cache_t.hpp:
+src/user/../../h/kernel/slab_t.hpp:
 
-src/user/../../h/../h/../h/../h/../h/slab_t.hpp:
+src/user/../../h/user/syscall_c.h:
 
-src/user/../../h/syscall_c.h:
+src/user/../../h/user/_thread.hpp:
 
-src/user/../../h/../h/_thread.hpp:
-
-src/user/../../h/../h/_semaphore.hpp:
+src/user/../../h/user/_semaphore.hpp:

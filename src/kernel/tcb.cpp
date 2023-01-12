@@ -2,12 +2,12 @@
 // Created by os on 5/18/22.
 //
 
-#include "../../h/tcb.hpp"
-#include "../../h/memoryAllocator.hpp"
-#include "../../h/scheduler.hpp"
-#include "../../h/syscall_c.h"
-#include "../../h/printing.hpp"
-#include "../../h/riscv.hpp"
+#include "../../h/kernel/tcb.hpp"
+#include "../../h/kernel/memoryAllocator.hpp"
+#include "../../h/kernel/scheduler.hpp"
+#include "../../h/user/syscall_c.h"
+#include "../../h/user/printing.hpp"
+#include "../../h/kernel/riscv.hpp"
 
 TCB* TCB::running = nullptr;
 
@@ -31,7 +31,7 @@ void TCB::initialize() {
 
     TCB::running->mode = Mode::SUPERVISOR;
     //stack for thread that will be running console output
-    uint64 *putcStack = (uint64*)MemoryAllocator::kmalloc((DEFAULT_STACK_SIZE+MEM_BLOCK_SIZE-1)/MEM_BLOCK_SIZE);
+    uint64 *putcStack = (uint64*)kmalloc(DEFAULT_STACK_SIZE);
 
     //console output thread
     putcThread = new TCB(RiscV::putcWrapper, nullptr, putcStack, DEFAULT_TIME_SLICE);

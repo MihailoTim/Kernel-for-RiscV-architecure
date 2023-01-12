@@ -2,7 +2,7 @@
 // Created by os on 4/29/22.
 //
 
-#include "../../h/syscall_c.h"
+#include "../../h/user/syscall_c.h"
 
 //syscall_c.c contains definitions of all implemented syscalls accessible to user
 //syscall parameters (if has any) are put into registers a1-a7

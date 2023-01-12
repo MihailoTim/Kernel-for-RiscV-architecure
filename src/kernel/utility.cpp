@@ -1,7 +1,7 @@
 //
 // Created by os on 1/8/23.
 //
-#include "../../h/utility.hpp"
+#include "../../h/kernel/utility.hpp"
 
 char* strcpy(const char* src, char* dst){
     while(*src != '\0')

@@ -4,7 +4,7 @@
 
 #ifndef OS1_KERNEL_RISCV_HPP
 #define OS1_KERNEL_RISCV_HPP
-#include "../lib/hw.h"
+#include "../../lib/hw.h"
 class TCB;
 class SlabAllocator;
 

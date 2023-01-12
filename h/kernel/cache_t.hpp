@@ -5,9 +5,9 @@
 #ifndef KERNEL_FOR_RISCV_ARCHITECURE_CACHE_HPP
 #define KERNEL_FOR_RISCV_ARCHITECURE_CACHE_HPP
 
-#include "../lib/hw.h"
-#include "../h/utility.hpp"
-#include "../h/slab_t.hpp"
+#include "../../lib/hw.h"
+#include "utility.hpp"
+#include "slab_t.hpp"
 
 typedef class Cache{
 public:

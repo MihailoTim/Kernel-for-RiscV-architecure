@@ -45,11 +45,6 @@ SECTIONS
     *(.bss .bss.*)
   }
 
-  .eh_frame : {
-    EXCLUDE_FILE(build/src/user/*)
-    *(.eh_frame .eh_frame.*)
-  }
-
   .user : {
     . = ALIGN(0x1000);
     PROVIDE(userTextStart = .);
@@ -62,7 +57,6 @@ SECTIONS
     *(.data .data.*)
     *(.sbss .sbss.*)
     *(.bss .bss.*)
-    *(.eh_frame .eh_frame.*)
     . = ALIGN(0x1000);
     PROVIDE(userDataEnd = .);
   }
