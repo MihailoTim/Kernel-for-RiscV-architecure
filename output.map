@@ -146,7 +146,7 @@ Linker script and memory map
                 0x00000000800029d0                ConsoleUtil::printInt(int, int, int)
                 0x0000000080002aac                ConsoleUtil::print(char const*, int, char const*, int)
                 0x0000000080002b18                ConsoleUtil::putcUtilSyscall()
- .text          0x0000000080002b40     0x1530 build/src/kernel/riscv.o
+ .text          0x0000000080002b40     0x1570 build/src/kernel/riscv.o
                 0x0000000080002b40                RiscV::popSppSpie()
                 0x0000000080002b98                RiscV::executeThreadDispatchSyscall()
                 0x0000000080002bd4                RiscV::executePutcSyscall()
@@ -168,129 +168,129 @@ Linker script and memory map
                 0x00000000800032dc                RiscV::executePutcUtilSyscall()
                 0x0000000080003310                RiscV::executeThreadFreeSyscall()
                 0x0000000080003378                RiscV::executeSemaphoreFreeSyscall()
-                0x00000000800033d4                RiscV::executeForkSyscall()
-                0x0000000080003528                RiscV::getPC()
-                0x0000000080003554                RiscV::handleSupervisorTrap()
-                0x00000000800039b4                RiscV::threadCreateUtil(TCB**, void (*)(void*), void*)
-                0x0000000080003a30                RiscV::threadExitUtil()
-                0x0000000080003a50                RiscV::threadDispatchUtil()
-                0x0000000080003a70                RiscV::putcWrapper(void*)
-                0x0000000080003af8                RiscV::getPMT()
-                0x0000000080003b44                RiscV::handlePageFault(void*, unsigned long, unsigned long)
-                0x0000000080003c24                RiscV::buildSection(void*, unsigned long, unsigned long, unsigned long)
-                0x0000000080003c98                RiscV::mapConsoleRegisters(void*)
-                0x0000000080003d2c                RiscV::buildKernelPMT()
-                0x0000000080003e6c                RiscV::buildUserPMT()
-                0x0000000080003fac                RiscV::initialize()
- .text          0x0000000080004070       0x8c build/src/kernel/utility.o
-                0x0000000080004070                strcpy(char const*, char*)
-                0x00000000800040ac                strcat(char*, char const*)
- .text          0x00000000800040fc      0x214 build/src/kernel/scheduler.o
-                0x00000000800040fc                Scheduler::initialize()
-                0x0000000080004114                Scheduler::put(TCB*)
-                0x000000008000415c                Scheduler::get()
-                0x0000000080004190                Scheduler::sleep(TCB*)
-                0x00000000800041e8                Scheduler::awake()
-                0x0000000080004250                Scheduler::showScheduler()
-                0x00000000800042b0                Scheduler::showSleeping()
- .text          0x0000000080004310      0x198 build/src/kernel/slab.o
-                0x0000000080004310                kmem_init(void*, int)
-                0x0000000080004338                kmem_cache_create(char const*, unsigned long, void (*)(void*), void (*)(void*))
-                0x0000000080004360                kmem_cache_alloc(Cache*)
-                0x0000000080004388                kmem_cache_free(Cache*, void*)
-                0x00000000800043b0                kmem_cache_destroy(Cache*)
-                0x00000000800043e0                kmem_cache_info(Cache*)
-                0x0000000080004408                kmem_cache_shrink(Cache*)
-                0x0000000080004430                kmalloc(unsigned long)
-                0x0000000080004458                kfree(void const*)
-                0x0000000080004480                kmem_cache_error(Cache*)
- .text          0x00000000800044a8      0xee0 build/src/kernel/slab_allocator.o
-                0x00000000800044a8                SlabAllocator::shrinkCache(Cache*)
-                0x0000000080004510                SlabAllocator::printSlab(Slab*)
-                0x000000008000466c                SlabAllocator::printCache(Cache*)
-                0x000000008000484c                SlabAllocator::insertIntoList(Slab*&, Slab*)
-                0x000000008000487c                SlabAllocator::allocateSlab(Cache*)
-                0x0000000080004998                SlabAllocator::removeFromList(Slab*&, Slab*)
-                0x00000000800049ec                SlabAllocator::move(Slab*&, Slab*&, Slab*)
-                0x0000000080004a40                SlabAllocator::allocateSlot(Slab*)
-                0x0000000080004b38                SlabAllocator::allocateObject(Cache*)
-                0x0000000080004cc8                SlabAllocator::allocateBuffer(unsigned long)
-                0x0000000080004d68                SlabAllocator::createCache(char const*, unsigned long, void (*)(void*), void (*)(void*))
-                0x0000000080004e78                SlabAllocator::initialize(void*, unsigned long)
-                0x0000000080004fac                SlabAllocator::freeSlot(Slab*, unsigned long)
-                0x00000000800050c8                SlabAllocator::freeObject(Cache*, void const*)
-                0x00000000800051bc                SlabAllocator::freeBuffer(void const*)
-                0x0000000080005228                SlabAllocator::deleteCache(Cache*&)
-                0x0000000080005304                SlabAllocator::cacheErrorHandler(Cache*)
- .text          0x0000000080005388        0x0 ./lib/hw.lib(entry.o)
- .text          0x0000000080005388      0x18c ./lib/hw.lib(start.o)
-                0x0000000080005388                start
-                0x0000000080005488                timerinit
- .text          0x0000000080005514       0xd8 ./lib/hw.lib(main.o)
-                0x0000000080005514                system_main
- .text          0x00000000800055ec      0x100 ./lib/hw.lib(proc.o)
-                0x00000000800055ec                cpuid
-                0x000000008000560c                mycpu
-                0x000000008000563c                userinit
-                0x0000000080005658                either_copyout
-                0x00000000800056a4                either_copyin
- .text          0x00000000800056ec      0x32c ./lib/hw.lib(trap.o)
-                0x00000000800056ec                trapinit
-                0x0000000080005718                trapinithart
-                0x000000008000573c                usertrap
-                0x0000000080005754                usertrapret
-                0x000000008000576c                kerneltrap
-                0x00000000800058b4                clockintr
-                0x000000008000590c                devintr
- *fill*         0x0000000080005a18        0x8 
- .text          0x0000000080005a20      0x150 ./lib/hw.lib(kernelvec.o)
-                0x0000000080005a20                kernelvec
-                0x0000000080005b30                timervec
- .text          0x0000000080005b70       0xf0 ./lib/hw.lib(plic.o)
-                0x0000000080005b70                plicinit
-                0x0000000080005b98                plicinithart
-                0x0000000080005be4                plic_claim
-                0x0000000080005c1c                plic_complete
- .text          0x0000000080005c60        0x0 ./lib/hw.lib(support_cpp.o)
- .text          0x0000000080005c60        0x0 ./lib/hw.lib(hw.o)
- .text          0x0000000080005c60      0x36c ./lib/hw.lib(console.o)
-                0x0000000080005c60                consolewrite
-                0x0000000080005d04                consoleread
-                0x0000000080005e44                consputc
-                0x0000000080005e94                consoleintr
-                0x0000000080005f28                consoleinit
-                0x0000000080005f8c                console_read
-                0x0000000080005fac                console_write
- .text          0x0000000080005fcc      0x738 ./lib/hw.lib(printf.o)
-                0x0000000080005fcc                panic
-                0x0000000080006028                __printf
-                0x00000000800066bc                printfinit
- .text          0x0000000080006704      0x344 ./lib/hw.lib(uart.o)
-                0x0000000080006704                uartinit
-                0x0000000080006748                uartputc
-                0x0000000080006840                uartputc_sync
-                0x0000000080006884                uartstart
-                0x00000000800068f8                uartgetc
-                0x0000000080006930                uartintr
- .text          0x0000000080006a48      0x290 ./lib/hw.lib(kalloc.o)
-                0x0000000080006a48                kinit
-                0x0000000080006b20                freerange
-                0x0000000080006c00                kfree
-                0x0000000080006c80                kalloc
- .text          0x0000000080006cd8      0x3e0 ./lib/hw.lib(spinlock.o)
-                0x0000000080006cd8                initlock
-                0x0000000080006cfc                acquire
-                0x0000000080006dc8                release
-                0x0000000080006e90                holding
-                0x0000000080006edc                push_off
-                0x0000000080006f50                pop_off
-                0x0000000080006fcc                push_on
-                0x0000000080007040                pop_on
- .text          0x00000000800070b8      0x394 ./lib/hw.lib(string.o)
-                0x00000000800070b8                __memset
-                0x00000000800072d4                __memmove
+                0x00000000800033d4                RiscV::getPC()
+                0x0000000080003400                RiscV::threadExitUtil()
+                0x0000000080003420                RiscV::threadDispatchUtil()
+                0x0000000080003440                RiscV::putcWrapper(void*)
+                0x00000000800034c8                RiscV::getPMT()
+                0x0000000080003514                RiscV::handlePageFault(void*, unsigned long, unsigned long)
+                0x00000000800035f4                RiscV::executeForkSyscall()
+                0x0000000080003760                RiscV::handleSupervisorTrap()
+                0x0000000080003bc0                RiscV::threadCreateUtil(TCB**, void (*)(void*), void*)
+                0x0000000080003c64                RiscV::buildSection(void*, unsigned long, unsigned long, unsigned long)
+                0x0000000080003cd8                RiscV::mapConsoleRegisters(void*)
+                0x0000000080003d6c                RiscV::buildKernelPMT()
+                0x0000000080003eac                RiscV::buildUserPMT()
+                0x0000000080003fec                RiscV::initialize()
+ .text          0x00000000800040b0       0x8c build/src/kernel/utility.o
+                0x00000000800040b0                strcpy(char const*, char*)
+                0x00000000800040ec                strcat(char*, char const*)
+ .text          0x000000008000413c      0x214 build/src/kernel/scheduler.o
+                0x000000008000413c                Scheduler::initialize()
+                0x0000000080004154                Scheduler::put(TCB*)
+                0x000000008000419c                Scheduler::get()
+                0x00000000800041d0                Scheduler::sleep(TCB*)
+                0x0000000080004228                Scheduler::awake()
+                0x0000000080004290                Scheduler::showScheduler()
+                0x00000000800042f0                Scheduler::showSleeping()
+ .text          0x0000000080004350      0x198 build/src/kernel/slab.o
+                0x0000000080004350                kmem_init(void*, int)
+                0x0000000080004378                kmem_cache_create(char const*, unsigned long, void (*)(void*), void (*)(void*))
+                0x00000000800043a0                kmem_cache_alloc(Cache*)
+                0x00000000800043c8                kmem_cache_free(Cache*, void*)
+                0x00000000800043f0                kmem_cache_destroy(Cache*)
+                0x0000000080004420                kmem_cache_info(Cache*)
+                0x0000000080004448                kmem_cache_shrink(Cache*)
+                0x0000000080004470                kmalloc(unsigned long)
+                0x0000000080004498                kfree(void const*)
+                0x00000000800044c0                kmem_cache_error(Cache*)
+ .text          0x00000000800044e8      0xee0 build/src/kernel/slab_allocator.o
+                0x00000000800044e8                SlabAllocator::shrinkCache(Cache*)
+                0x0000000080004550                SlabAllocator::printSlab(Slab*)
+                0x00000000800046ac                SlabAllocator::printCache(Cache*)
+                0x000000008000488c                SlabAllocator::insertIntoList(Slab*&, Slab*)
+                0x00000000800048bc                SlabAllocator::allocateSlab(Cache*)
+                0x00000000800049d8                SlabAllocator::removeFromList(Slab*&, Slab*)
+                0x0000000080004a2c                SlabAllocator::move(Slab*&, Slab*&, Slab*)
+                0x0000000080004a80                SlabAllocator::allocateSlot(Slab*)
+                0x0000000080004b78                SlabAllocator::allocateObject(Cache*)
+                0x0000000080004d08                SlabAllocator::allocateBuffer(unsigned long)
+                0x0000000080004da8                SlabAllocator::createCache(char const*, unsigned long, void (*)(void*), void (*)(void*))
+                0x0000000080004eb8                SlabAllocator::initialize(void*, unsigned long)
+                0x0000000080004fec                SlabAllocator::freeSlot(Slab*, unsigned long)
+                0x0000000080005108                SlabAllocator::freeObject(Cache*, void const*)
+                0x00000000800051fc                SlabAllocator::freeBuffer(void const*)
+                0x0000000080005268                SlabAllocator::deleteCache(Cache*&)
+                0x0000000080005344                SlabAllocator::cacheErrorHandler(Cache*)
+ .text          0x00000000800053c8        0x0 ./lib/hw.lib(entry.o)
+ .text          0x00000000800053c8      0x18c ./lib/hw.lib(start.o)
+                0x00000000800053c8                start
+                0x00000000800054c8                timerinit
+ .text          0x0000000080005554       0xd8 ./lib/hw.lib(main.o)
+                0x0000000080005554                system_main
+ .text          0x000000008000562c      0x100 ./lib/hw.lib(proc.o)
+                0x000000008000562c                cpuid
+                0x000000008000564c                mycpu
+                0x000000008000567c                userinit
+                0x0000000080005698                either_copyout
+                0x00000000800056e4                either_copyin
+ .text          0x000000008000572c      0x32c ./lib/hw.lib(trap.o)
+                0x000000008000572c                trapinit
+                0x0000000080005758                trapinithart
+                0x000000008000577c                usertrap
+                0x0000000080005794                usertrapret
+                0x00000000800057ac                kerneltrap
+                0x00000000800058f4                clockintr
+                0x000000008000594c                devintr
+ *fill*         0x0000000080005a58        0x8 
+ .text          0x0000000080005a60      0x150 ./lib/hw.lib(kernelvec.o)
+                0x0000000080005a60                kernelvec
+                0x0000000080005b70                timervec
+ .text          0x0000000080005bb0       0xf0 ./lib/hw.lib(plic.o)
+                0x0000000080005bb0                plicinit
+                0x0000000080005bd8                plicinithart
+                0x0000000080005c24                plic_claim
+                0x0000000080005c5c                plic_complete
+ .text          0x0000000080005ca0        0x0 ./lib/hw.lib(support_cpp.o)
+ .text          0x0000000080005ca0        0x0 ./lib/hw.lib(hw.o)
+ .text          0x0000000080005ca0      0x36c ./lib/hw.lib(console.o)
+                0x0000000080005ca0                consolewrite
+                0x0000000080005d44                consoleread
+                0x0000000080005e84                consputc
+                0x0000000080005ed4                consoleintr
+                0x0000000080005f68                consoleinit
+                0x0000000080005fcc                console_read
+                0x0000000080005fec                console_write
+ .text          0x000000008000600c      0x738 ./lib/hw.lib(printf.o)
+                0x000000008000600c                panic
+                0x0000000080006068                __printf
+                0x00000000800066fc                printfinit
+ .text          0x0000000080006744      0x344 ./lib/hw.lib(uart.o)
+                0x0000000080006744                uartinit
+                0x0000000080006788                uartputc
+                0x0000000080006880                uartputc_sync
+                0x00000000800068c4                uartstart
+                0x0000000080006938                uartgetc
+                0x0000000080006970                uartintr
+ .text          0x0000000080006a88      0x290 ./lib/hw.lib(kalloc.o)
+                0x0000000080006a88                kinit
+                0x0000000080006b60                freerange
+                0x0000000080006c40                kfree
+                0x0000000080006cc0                kalloc
+ .text          0x0000000080006d18      0x3e0 ./lib/hw.lib(spinlock.o)
+                0x0000000080006d18                initlock
+                0x0000000080006d3c                acquire
+                0x0000000080006e08                release
+                0x0000000080006ed0                holding
+                0x0000000080006f1c                push_off
+                0x0000000080006f90                pop_off
+                0x000000008000700c                push_on
+                0x0000000080007080                pop_on
+ .text          0x00000000800070f8      0x394 ./lib/hw.lib(string.o)
+                0x00000000800070f8                __memset
+                0x0000000080007314                __memmove
                 0x0000000080008000                . = ALIGN (0x1000)
- *fill*         0x000000008000744c      0xbb4 
+ *fill*         0x000000008000748c      0xb74 
                 0x0000000080008000                PROVIDE (kernelTextEnd = .)
 
 .rodata         0x0000000080008000      0x7c7
@@ -658,7 +658,7 @@ Linker script and memory map
                 0x000000008000d66c                BufferCPP::getCnt()
                 0x000000008000d6f4                BufferCPP::~BufferCPP()
                 0x000000008000d6f4                BufferCPP::~BufferCPP()
- .text          0x000000008000d7f4      0xb50 build/src/user/tests/userMain.o
+ .text          0x000000008000d7f4      0xb48 build/src/user/tests/userMain.o
                 0x000000008000d7f4                workerBodyA(void*)
                 0x000000008000d8c0                workerBodyB(void*)
                 0x000000008000d994                fibonacci(unsigned long)
@@ -669,103 +669,103 @@ Linker script and memory map
                 0x000000008000e254                testUser()
                 0x000000008000e314                userMain()
  .text._ZN19ConsumerProducerCPP8Consumer3runEv
-                0x000000008000e344       0xd0 build/src/user/tests/userMain.o
-                0x000000008000e344                ConsumerProducerCPP::Consumer::run()
+                0x000000008000e33c       0xd0 build/src/user/tests/userMain.o
+                0x000000008000e33c                ConsumerProducerCPP::Consumer::run()
  .text._ZN19ConsumerProducerCPP8ConsumerD2Ev
-                0x000000008000e414       0x34 build/src/user/tests/userMain.o
-                0x000000008000e414                ConsumerProducerCPP::Consumer::~Consumer()
-                0x000000008000e414                ConsumerProducerCPP::Consumer::~Consumer()
+                0x000000008000e40c       0x34 build/src/user/tests/userMain.o
+                0x000000008000e40c                ConsumerProducerCPP::Consumer::~Consumer()
+                0x000000008000e40c                ConsumerProducerCPP::Consumer::~Consumer()
  .text._ZN19ConsumerProducerCPP8ConsumerD0Ev
-                0x000000008000e448       0x4c build/src/user/tests/userMain.o
-                0x000000008000e448                ConsumerProducerCPP::Consumer::~Consumer()
+                0x000000008000e440       0x4c build/src/user/tests/userMain.o
+                0x000000008000e440                ConsumerProducerCPP::Consumer::~Consumer()
  .text._ZN19ConsumerProducerCPP16ProducerKeyboradD2Ev
-                0x000000008000e494       0x34 build/src/user/tests/userMain.o
-                0x000000008000e494                ConsumerProducerCPP::ProducerKeyborad::~ProducerKeyborad()
-                0x000000008000e494                ConsumerProducerCPP::ProducerKeyborad::~ProducerKeyborad()
+                0x000000008000e48c       0x34 build/src/user/tests/userMain.o
+                0x000000008000e48c                ConsumerProducerCPP::ProducerKeyborad::~ProducerKeyborad()
+                0x000000008000e48c                ConsumerProducerCPP::ProducerKeyborad::~ProducerKeyborad()
  .text._ZN19ConsumerProducerCPP16ProducerKeyboradD0Ev
-                0x000000008000e4c8       0x4c build/src/user/tests/userMain.o
-                0x000000008000e4c8                ConsumerProducerCPP::ProducerKeyborad::~ProducerKeyborad()
+                0x000000008000e4c0       0x4c build/src/user/tests/userMain.o
+                0x000000008000e4c0                ConsumerProducerCPP::ProducerKeyborad::~ProducerKeyborad()
  .text._ZN19ConsumerProducerCPP8ProducerD2Ev
-                0x000000008000e514       0x34 build/src/user/tests/userMain.o
-                0x000000008000e514                ConsumerProducerCPP::Producer::~Producer()
-                0x000000008000e514                ConsumerProducerCPP::Producer::~Producer()
+                0x000000008000e50c       0x34 build/src/user/tests/userMain.o
+                0x000000008000e50c                ConsumerProducerCPP::Producer::~Producer()
+                0x000000008000e50c                ConsumerProducerCPP::Producer::~Producer()
  .text._ZN19ConsumerProducerCPP8ProducerD0Ev
-                0x000000008000e548       0x4c build/src/user/tests/userMain.o
-                0x000000008000e548                ConsumerProducerCPP::Producer::~Producer()
+                0x000000008000e540       0x4c build/src/user/tests/userMain.o
+                0x000000008000e540                ConsumerProducerCPP::Producer::~Producer()
  .text._ZN10ForkThreadD2Ev
-                0x000000008000e594       0x34 build/src/user/tests/userMain.o
-                0x000000008000e594                ForkThread::~ForkThread()
-                0x000000008000e594                ForkThread::~ForkThread()
+                0x000000008000e58c       0x34 build/src/user/tests/userMain.o
+                0x000000008000e58c                ForkThread::~ForkThread()
+                0x000000008000e58c                ForkThread::~ForkThread()
  .text._ZN10ForkThreadD0Ev
-                0x000000008000e5c8       0x4c build/src/user/tests/userMain.o
-                0x000000008000e5c8                ForkThread::~ForkThread()
+                0x000000008000e5c0       0x4c build/src/user/tests/userMain.o
+                0x000000008000e5c0                ForkThread::~ForkThread()
  .text._ZN19ConsumerProducerCPP16ProducerKeyborad3runEv
-                0x000000008000e614       0x84 build/src/user/tests/userMain.o
-                0x000000008000e614                ConsumerProducerCPP::ProducerKeyborad::run()
+                0x000000008000e60c       0x84 build/src/user/tests/userMain.o
+                0x000000008000e60c                ConsumerProducerCPP::ProducerKeyborad::run()
  .text._ZN19ConsumerProducerCPP8Producer3runEv
-                0x000000008000e698       0x94 build/src/user/tests/userMain.o
-                0x000000008000e698                ConsumerProducerCPP::Producer::run()
+                0x000000008000e690       0x94 build/src/user/tests/userMain.o
+                0x000000008000e690                ConsumerProducerCPP::Producer::run()
  .text._ZN10ForkThread3runEv
-                0x000000008000e72c      0x220 build/src/user/tests/userMain.o
-                0x000000008000e72c                ForkThread::run()
- .text          0x000000008000e94c      0x320 build/src/user/tests/buffer.o
-                0x000000008000e94c                Buffer::Buffer(int)
-                0x000000008000e94c                Buffer::Buffer(int)
-                0x000000008000e9e8                Buffer::put(int)
-                0x000000008000ea78                Buffer::get()
-                0x000000008000eb04                Buffer::getCnt()
-                0x000000008000eb8c                Buffer::~Buffer()
-                0x000000008000eb8c                Buffer::~Buffer()
- .text          0x000000008000ec6c      0x2ac build/src/user/printing.o
-                0x000000008000ec6c                printString(char const*)
-                0x000000008000ece8                getString(char*, int)
-                0x000000008000edb4                stringToInt(char const*)
-                0x000000008000ee04                printInt(int, int, int)
- .text          0x000000008000ef18      0x460 build/src/user/syscall_cpp.o
-                0x000000008000ef18                Thread::wrapper(void*)
-                0x000000008000ef44                Semaphore::~Semaphore()
-                0x000000008000ef44                Semaphore::~Semaphore()
-                0x000000008000ef7c                Thread::~Thread()
-                0x000000008000ef7c                Thread::~Thread()
-                0x000000008000efbc                operator new(unsigned long)
-                0x000000008000efe4                operator new[](unsigned long)
-                0x000000008000f00c                operator delete(void*)
-                0x000000008000f034                Semaphore::~Semaphore()
-                0x000000008000f074                Thread::~Thread()
-                0x000000008000f0b4                Semaphore::Semaphore(unsigned int)
-                0x000000008000f0b4                Semaphore::Semaphore(unsigned int)
-                0x000000008000f0ec                Semaphore::wait()
-                0x000000008000f118                Semaphore::signal()
-                0x000000008000f144                Thread::Thread(void (*)(void*), void*)
-                0x000000008000f144                Thread::Thread(void (*)(void*), void*)
-                0x000000008000f198                Thread::Thread()
-                0x000000008000f198                Thread::Thread()
-                0x000000008000f1f8                Thread::sleep(unsigned long)
-                0x000000008000f220                PeriodicThread::wrapper(void*)
-                0x000000008000f260                Thread::dispatch()
-                0x000000008000f288                Thread::start()
-                0x000000008000f2b4                PeriodicThread::PeriodicThread(unsigned long)
-                0x000000008000f2b4                PeriodicThread::PeriodicThread(unsigned long)
-                0x000000008000f328                Console::getc()
-                0x000000008000f350                Console::putc(char)
+                0x000000008000e724      0x220 build/src/user/tests/userMain.o
+                0x000000008000e724                ForkThread::run()
+ .text          0x000000008000e944      0x320 build/src/user/tests/buffer.o
+                0x000000008000e944                Buffer::Buffer(int)
+                0x000000008000e944                Buffer::Buffer(int)
+                0x000000008000e9e0                Buffer::put(int)
+                0x000000008000ea70                Buffer::get()
+                0x000000008000eafc                Buffer::getCnt()
+                0x000000008000eb84                Buffer::~Buffer()
+                0x000000008000eb84                Buffer::~Buffer()
+ .text          0x000000008000ec64      0x2ac build/src/user/printing.o
+                0x000000008000ec64                printString(char const*)
+                0x000000008000ece0                getString(char*, int)
+                0x000000008000edac                stringToInt(char const*)
+                0x000000008000edfc                printInt(int, int, int)
+ .text          0x000000008000ef10      0x460 build/src/user/syscall_cpp.o
+                0x000000008000ef10                Thread::wrapper(void*)
+                0x000000008000ef3c                Semaphore::~Semaphore()
+                0x000000008000ef3c                Semaphore::~Semaphore()
+                0x000000008000ef74                Thread::~Thread()
+                0x000000008000ef74                Thread::~Thread()
+                0x000000008000efb4                operator new(unsigned long)
+                0x000000008000efdc                operator new[](unsigned long)
+                0x000000008000f004                operator delete(void*)
+                0x000000008000f02c                Semaphore::~Semaphore()
+                0x000000008000f06c                Thread::~Thread()
+                0x000000008000f0ac                Semaphore::Semaphore(unsigned int)
+                0x000000008000f0ac                Semaphore::Semaphore(unsigned int)
+                0x000000008000f0e4                Semaphore::wait()
+                0x000000008000f110                Semaphore::signal()
+                0x000000008000f13c                Thread::Thread(void (*)(void*), void*)
+                0x000000008000f13c                Thread::Thread(void (*)(void*), void*)
+                0x000000008000f190                Thread::Thread()
+                0x000000008000f190                Thread::Thread()
+                0x000000008000f1f0                Thread::sleep(unsigned long)
+                0x000000008000f218                PeriodicThread::wrapper(void*)
+                0x000000008000f258                Thread::dispatch()
+                0x000000008000f280                Thread::start()
+                0x000000008000f2ac                PeriodicThread::PeriodicThread(unsigned long)
+                0x000000008000f2ac                PeriodicThread::PeriodicThread(unsigned long)
+                0x000000008000f320                Console::getc()
+                0x000000008000f348                Console::putc(char)
  .text._ZN6Thread3runEv
-                0x000000008000f378       0x18 build/src/user/syscall_cpp.o
-                0x000000008000f378                Thread::run()
+                0x000000008000f370       0x18 build/src/user/syscall_cpp.o
+                0x000000008000f370                Thread::run()
  .text._ZN14PeriodicThread18periodicActivationEv
-                0x000000008000f390       0x18 build/src/user/syscall_cpp.o
-                0x000000008000f390                PeriodicThread::periodicActivation()
+                0x000000008000f388       0x18 build/src/user/syscall_cpp.o
+                0x000000008000f388                PeriodicThread::periodicActivation()
  .text._ZN14PeriodicThreadD2Ev
-                0x000000008000f3a8       0x34 build/src/user/syscall_cpp.o
-                0x000000008000f3a8                PeriodicThread::~PeriodicThread()
-                0x000000008000f3a8                PeriodicThread::~PeriodicThread()
+                0x000000008000f3a0       0x34 build/src/user/syscall_cpp.o
+                0x000000008000f3a0                PeriodicThread::~PeriodicThread()
+                0x000000008000f3a0                PeriodicThread::~PeriodicThread()
  .text._ZN14PeriodicThreadD0Ev
-                0x000000008000f3dc       0x4c build/src/user/syscall_cpp.o
-                0x000000008000f3dc                PeriodicThread::~PeriodicThread()
- .text          0x000000008000f428       0x5c build/src/user/user_wrappers.o
-                0x000000008000f428                bodyWrapper(void (*)(void*), void*)
-                0x000000008000f45c                userMainWrapper(void*)
+                0x000000008000f3d4       0x4c build/src/user/syscall_cpp.o
+                0x000000008000f3d4                PeriodicThread::~PeriodicThread()
+ .text          0x000000008000f420       0x5c build/src/user/user_wrappers.o
+                0x000000008000f420                bodyWrapper(void (*)(void*), void*)
+                0x000000008000f454                userMainWrapper(void*)
                 0x0000000080010000                . = ALIGN (0x1000)
- *fill*         0x000000008000f484      0xb7c 
+ *fill*         0x000000008000f47c      0xb84 
                 0x0000000080010000                PROVIDE (userDataStart = .)
  *(.srodata .srodata.*)
  *(.rodata .rodata.*)
@@ -867,7 +867,7 @@ LOAD ./lib/hw.lib
 LOAD ./lib/hw.lib
 OUTPUT(kernel elf64-littleriscv)
 
-.debug_line     0x0000000000000000     0xa1f0
+.debug_line     0x0000000000000000     0xa202
  .debug_line    0x0000000000000000       0x74 build/src/kernel/supervisorTrap.o
  .debug_line    0x0000000000000074       0x65 build/src/kernel/contextSwitch.o
  .debug_line    0x00000000000000d9       0x6c build/src/user/lock.o
@@ -878,22 +878,22 @@ OUTPUT(kernel elf64-littleriscv)
  .debug_line    0x00000000000016c9      0x4fb build/src/kernel/tcb.o
  .debug_line    0x0000000000001bc4      0xa2a build/src/kernel/memory_allocator.o
  .debug_line    0x00000000000025ee      0x63f build/src/kernel/console_util.o
- .debug_line    0x0000000000002c2d     0x2220 build/src/kernel/riscv.o
- .debug_line    0x0000000000004e4d      0x185 build/src/kernel/utility.o
- .debug_line    0x0000000000004fd2      0x42e build/src/kernel/scheduler.o
- .debug_line    0x0000000000005400      0x21b build/src/kernel/slab.o
- .debug_line    0x000000000000561b     0x1968 build/src/kernel/slab_allocator.o
- .debug_line    0x0000000000006f83      0x843 build/src/user/syscall_c.o
- .debug_line    0x00000000000077c6       0xc6 build/src/user/_semaphore.o
- .debug_line    0x000000000000788c       0xe9 build/src/user/_thread.o
- .debug_line    0x0000000000007975      0x5ab build/src/user/tests/buffer_CPP_API.o
- .debug_line    0x0000000000007f20     0x1480 build/src/user/tests/userMain.o
- .debug_line    0x00000000000093a0      0x4b8 build/src/user/tests/buffer.o
- .debug_line    0x0000000000009858      0x3b4 build/src/user/printing.o
- .debug_line    0x0000000000009c0c      0x4dc build/src/user/syscall_cpp.o
- .debug_line    0x000000000000a0e8      0x108 build/src/user/user_wrappers.o
+ .debug_line    0x0000000000002c2d     0x2244 build/src/kernel/riscv.o
+ .debug_line    0x0000000000004e71      0x185 build/src/kernel/utility.o
+ .debug_line    0x0000000000004ff6      0x42e build/src/kernel/scheduler.o
+ .debug_line    0x0000000000005424      0x21b build/src/kernel/slab.o
+ .debug_line    0x000000000000563f     0x1968 build/src/kernel/slab_allocator.o
+ .debug_line    0x0000000000006fa7      0x843 build/src/user/syscall_c.o
+ .debug_line    0x00000000000077ea       0xc6 build/src/user/_semaphore.o
+ .debug_line    0x00000000000078b0       0xe9 build/src/user/_thread.o
+ .debug_line    0x0000000000007999      0x5ab build/src/user/tests/buffer_CPP_API.o
+ .debug_line    0x0000000000007f44     0x146e build/src/user/tests/userMain.o
+ .debug_line    0x00000000000093b2      0x4b8 build/src/user/tests/buffer.o
+ .debug_line    0x000000000000986a      0x3b4 build/src/user/printing.o
+ .debug_line    0x0000000000009c1e      0x4dc build/src/user/syscall_cpp.o
+ .debug_line    0x000000000000a0fa      0x108 build/src/user/user_wrappers.o
 
-.debug_info     0x0000000000000000     0xfe0d
+.debug_info     0x0000000000000000     0xfe48
  .debug_info    0x0000000000000000       0x2e build/src/kernel/supervisorTrap.o
  .debug_info    0x000000000000002e       0x2e build/src/kernel/contextSwitch.o
  .debug_info    0x000000000000005c       0x2e build/src/user/lock.o
@@ -904,20 +904,20 @@ OUTPUT(kernel elf64-littleriscv)
  .debug_info    0x0000000000002e1b      0xf6a build/src/kernel/tcb.o
  .debug_info    0x0000000000003d85      0x693 build/src/kernel/memory_allocator.o
  .debug_info    0x0000000000004418      0xd72 build/src/kernel/console_util.o
- .debug_info    0x000000000000518a     0x2cef build/src/kernel/riscv.o
- .debug_info    0x0000000000007e79      0x209 build/src/kernel/utility.o
- .debug_info    0x0000000000008082      0xa1c build/src/kernel/scheduler.o
- .debug_info    0x0000000000008a9e      0x8fc build/src/kernel/slab.o
- .debug_info    0x000000000000939a     0x1abe build/src/kernel/slab_allocator.o
- .debug_info    0x000000000000ae58      0x79e build/src/user/syscall_c.o
- .debug_info    0x000000000000b5f6      0x1c2 build/src/user/_semaphore.o
- .debug_info    0x000000000000b7b8      0x228 build/src/user/_thread.o
- .debug_info    0x000000000000b9e0      0x751 build/src/user/tests/buffer_CPP_API.o
- .debug_info    0x000000000000c131     0x2157 build/src/user/tests/userMain.o
- .debug_info    0x000000000000e288      0x6ae build/src/user/tests/buffer.o
- .debug_info    0x000000000000e936      0x432 build/src/user/printing.o
- .debug_info    0x000000000000ed68      0xed3 build/src/user/syscall_cpp.o
- .debug_info    0x000000000000fc3b      0x1d2 build/src/user/user_wrappers.o
+ .debug_info    0x000000000000518a     0x2d37 build/src/kernel/riscv.o
+ .debug_info    0x0000000000007ec1      0x209 build/src/kernel/utility.o
+ .debug_info    0x00000000000080ca      0xa1c build/src/kernel/scheduler.o
+ .debug_info    0x0000000000008ae6      0x8fc build/src/kernel/slab.o
+ .debug_info    0x00000000000093e2     0x1abe build/src/kernel/slab_allocator.o
+ .debug_info    0x000000000000aea0      0x79e build/src/user/syscall_c.o
+ .debug_info    0x000000000000b63e      0x1c2 build/src/user/_semaphore.o
+ .debug_info    0x000000000000b800      0x228 build/src/user/_thread.o
+ .debug_info    0x000000000000ba28      0x751 build/src/user/tests/buffer_CPP_API.o
+ .debug_info    0x000000000000c179     0x214a build/src/user/tests/userMain.o
+ .debug_info    0x000000000000e2c3      0x6ae build/src/user/tests/buffer.o
+ .debug_info    0x000000000000e971      0x432 build/src/user/printing.o
+ .debug_info    0x000000000000eda3      0xed3 build/src/user/syscall_cpp.o
+ .debug_info    0x000000000000fc76      0x1d2 build/src/user/user_wrappers.o
 
 .debug_abbrev   0x0000000000000000     0x39fb
  .debug_abbrev  0x0000000000000000       0x14 build/src/kernel/supervisorTrap.o
@@ -1016,7 +1016,7 @@ OUTPUT(kernel elf64-littleriscv)
  .debug_str     0x00000000000021e3      0x1a1 build/src/kernel/console_util.o
                                         0xa1c (size before relaxing)
  .debug_str     0x0000000000002384      0x1c1 build/src/kernel/riscv.o
-                                       0x1952 (size before relaxing)
+                                       0x195e (size before relaxing)
  .debug_str     0x0000000000002545       0x48 build/src/kernel/utility.o
                                         0x294 (size before relaxing)
  .debug_str     0x000000000000258d       0x68 build/src/kernel/scheduler.o
@@ -1044,27 +1044,27 @@ OUTPUT(kernel elf64-littleriscv)
  .debug_str     0x0000000000003706       0x65 build/src/user/user_wrappers.o
                                         0x2ab (size before relaxing)
 
-.debug_loc      0x0000000000000000     0x7991
+.debug_loc      0x0000000000000000     0x79ca
  .debug_loc     0x0000000000000000      0x45e build/src/kernel/system.o
  .debug_loc     0x000000000000045e      0x325 build/src/kernel/scb.o
  .debug_loc     0x0000000000000783      0x8b1 build/src/kernel/buddy_allocator.o
  .debug_loc     0x0000000000001034      0x293 build/src/kernel/tcb.o
  .debug_loc     0x00000000000012c7      0x600 build/src/kernel/memory_allocator.o
  .debug_loc     0x00000000000018c7      0x456 build/src/kernel/console_util.o
- .debug_loc     0x0000000000001d1d     0x16a9 build/src/kernel/riscv.o
- .debug_loc     0x00000000000033c6      0x15f build/src/kernel/utility.o
- .debug_loc     0x0000000000003525      0x15c build/src/kernel/scheduler.o
- .debug_loc     0x0000000000003681      0x355 build/src/kernel/slab.o
- .debug_loc     0x00000000000039d6     0x11e3 build/src/kernel/slab_allocator.o
- .debug_loc     0x0000000000004bb9      0xbda build/src/user/syscall_c.o
- .debug_loc     0x0000000000005793       0x39 build/src/user/_semaphore.o
- .debug_loc     0x00000000000057cc       0x39 build/src/user/_thread.o
- .debug_loc     0x0000000000005805      0x322 build/src/user/tests/buffer_CPP_API.o
- .debug_loc     0x0000000000005b27     0x10c4 build/src/user/tests/userMain.o
- .debug_loc     0x0000000000006beb      0x27e build/src/user/tests/buffer.o
- .debug_loc     0x0000000000006e69      0x37a build/src/user/printing.o
- .debug_loc     0x00000000000071e3      0x6f0 build/src/user/syscall_cpp.o
- .debug_loc     0x00000000000078d3       0xbe build/src/user/user_wrappers.o
+ .debug_loc     0x0000000000001d1d     0x16e2 build/src/kernel/riscv.o
+ .debug_loc     0x00000000000033ff      0x15f build/src/kernel/utility.o
+ .debug_loc     0x000000000000355e      0x15c build/src/kernel/scheduler.o
+ .debug_loc     0x00000000000036ba      0x355 build/src/kernel/slab.o
+ .debug_loc     0x0000000000003a0f     0x11e3 build/src/kernel/slab_allocator.o
+ .debug_loc     0x0000000000004bf2      0xbda build/src/user/syscall_c.o
+ .debug_loc     0x00000000000057cc       0x39 build/src/user/_semaphore.o
+ .debug_loc     0x0000000000005805       0x39 build/src/user/_thread.o
+ .debug_loc     0x000000000000583e      0x322 build/src/user/tests/buffer_CPP_API.o
+ .debug_loc     0x0000000000005b60     0x10c4 build/src/user/tests/userMain.o
+ .debug_loc     0x0000000000006c24      0x27e build/src/user/tests/buffer.o
+ .debug_loc     0x0000000000006ea2      0x37a build/src/user/printing.o
+ .debug_loc     0x000000000000721c      0x6f0 build/src/user/syscall_cpp.o
+ .debug_loc     0x000000000000790c       0xbe build/src/user/user_wrappers.o
 
 .debug_ranges   0x0000000000000000      0x750
  .debug_ranges  0x0000000000000000       0x60 build/src/kernel/system.o
