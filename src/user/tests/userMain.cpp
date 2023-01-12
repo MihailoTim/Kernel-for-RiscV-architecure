@@ -10,8 +10,8 @@
 #include "../../../h/kernel/buddy_allocator.hpp"
 
 void userMain() {
-    uint64 *x = (uint64*)HEAP_START_ADDR;
-    *x=3;
+//    uint64 *x = (uint64*)HEAP_START_ADDR;
+//    *x=3;
 //    Threads_C_API_test(); // zadatak 2., niti C API i sinhrona promena konteksta
 //    Threads_CPP_API_test(); // zadatak 2., niti CPP API i sinhrona promena konteksta
 

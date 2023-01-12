@@ -640,7 +640,7 @@ void RiscV::executeSemaphoreFreeSyscall() {
 void RiscV::executeForkSyscall() {
 
     //create new stack and copy stack from currently running stack into the new one
-    uint64 *stack = (uint64*)kmalloc(DEFAULT_STACK_SIZE);
+    uint64 *stack = (uint64*)MemoryAllocator::kmalloc((DEFAULT_STACK_SIZE+MEM_BLOCK_SIZE-1)/MEM_BLOCK_SIZE);
     handlePageFault(kPMT, (uint64)stack, 0x17);
 
     MemoryAllocator::memcpy((void*)TCB::running->stack,(void*)stack,DEFAULT_STACK_SIZE);
@@ -718,12 +718,11 @@ void RiscV::threadCreateUtil(TCB **handle, void (*start_routine)(void *), void *
     uint64 istack = 0;
 
     if(start_routine) {
-        istack = (uint64) kmalloc(DEFAULT_STACK_SIZE);
+        istack = (uint64) MemoryAllocator::kmalloc((DEFAULT_STACK_SIZE+MEM_BLOCK_SIZE-1)/MEM_BLOCK_SIZE);
         if(istack == 0) {
             *handle = nullptr;
             return;
         }
-        handlePageFault(kPMT, istack, 0x17);
     }
 
     asm("mv a7, %[istack]" : : [istack] "r" (istack));
