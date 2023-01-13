@@ -116,9 +116,9 @@ class RiscV{
 
     static void jumpToDesignatedPrivilegeMode();
 
-    static void popSppSpie();
+    static void popSppSpieSystem();
 
-    static void popSppSpie2();
+    static void popSppSpieUser();
 
     static void getPC();
 

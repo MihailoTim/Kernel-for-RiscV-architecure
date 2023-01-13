@@ -17,6 +17,8 @@ public:
     void operator delete(void *addr);
 };
 
+void popSppSpieUserWrapper(void (*body)(void*), void* args);
+
 typedef _thread *thread_t;
 
 

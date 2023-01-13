@@ -10,3 +10,9 @@
 void _thread::operator delete(void *addr){
     tcb_free(addr);
 }
+
+void popSppSpieUserWrapper(void (*body)(void*), void* args)
+{
+    body(args);
+    thread_exit();
+}

@@ -87,7 +87,10 @@ void TCB::dispatch() {
 
 //wrapper function to run body function
 void TCB::wrapper(void *args) {
-    RiscV::popSppSpie();
+    if(running->mode == TCB::Mode::SUPERVISOR)
+        RiscV::popSppSpieSystem();
+    else
+        RiscV::popSppSpieUser();
 
     running->body(running->args);
     RiscV::threadExitUtil();

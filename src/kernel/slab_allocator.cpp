@@ -137,17 +137,17 @@ void SlabAllocator::freeSlot(Slab *slab, uint64 index) {
         slab->numOfFreeSlots++;
         Slab *&headTo = slab->isEmpty() ? slab->parent->emptyHead : slab->parent->partialHead;
 
-        if(slab->isEmpty()) {
-            SlabAllocator::removeFromList(headFrom, slab);
-            if(slab->parent->objectSize <= sizeof(Slab)) {
-                Buddy::free(slab, slab->parent->slabSize);
-            }
-            else{
-                Buddy::free(slab->objectOffset, slab->parent->slabSize);
-                SlabAllocator::freeObject(largeSlabCache, slab);
-            }
-        }
-        else
+//        if(slab->isEmpty()) {
+//            SlabAllocator::removeFromList(headFrom, slab);
+//            if(slab->parent->objectSize <= sizeof(Slab)) {
+//                Buddy::free(slab, slab->parent->slabSize);
+//            }
+//            else{
+//                Buddy::free(slab->objectOffset, slab->parent->slabSize);
+//                SlabAllocator::freeObject(largeSlabCache, slab);
+//            }
+//        }
+//        else
             if (headTo != headFrom)
                 SlabAllocator::move(headFrom, headTo, slab);
     }
@@ -202,8 +202,14 @@ void SlabAllocator::deleteCache(Cache* &cache) {
 int SlabAllocator::shrinkCache(Cache *cache) {
     int ret = 0;
     while(cache->emptyHead){
-        Buddy::free(cache->emptyHead, cache->slabSize);
-        ret += cache->emptyHead->totalNumOfSlots;
+        ret += (1<<cache->slabSize);
+        if(cache->objectSize <= sizeof(Slab)) {
+            Buddy::free(cache->emptyHead, cache->slabSize);
+        }
+        else{
+            Buddy::free(cache->emptyHead->objectOffset, cache->slabSize);
+            SlabAllocator::freeObject(largeSlabCache, cache->emptyHead);
+        }
         cache->emptyHead = cache->emptyHead->next;
     }
     return ret;
@@ -211,6 +217,7 @@ int SlabAllocator::shrinkCache(Cache *cache) {
 
 void SlabAllocator::printSlab(Slab *slab) {
     if(slab) {
+        ConsoleUtil::printString("\nNOW SHOWING SLAB INFO\n");
         ConsoleUtil::print("Slab address:", (uint64) slab, "\n");
         ConsoleUtil::print("Number of slots:", (uint64) slab->totalNumOfSlots, "\n",10);
         ConsoleUtil::print("Number of free slots:", (uint64) slab->numOfFreeSlots, "\n",10);
@@ -225,38 +232,41 @@ void SlabAllocator::printSlab(Slab *slab) {
 }
 
 void SlabAllocator::printCache(Cache *cache) {
-    ConsoleUtil::printString("Cache name: ");
-    ConsoleUtil::printString(cache->name);
-    ConsoleUtil::printString("\n");
-    ConsoleUtil::print("Cache address: ", (uint64)cache, "\n");
-    ConsoleUtil::print("Cache slab size: ", (uint64)cache->slabSize, "\n",10);
-    ConsoleUtil::print("Cache object size: ", (uint64)cache->objectSize, "\n",10);
-    ConsoleUtil::print("Empty head: ", (uint64)cache->emptyHead, "\n");
+    if(cache) {
+        ConsoleUtil::printString("\nNOW SHOWING CACHE INFO\n");
+        ConsoleUtil::printString("Cache name: ");
+        ConsoleUtil::printString(cache->name);
+        ConsoleUtil::printString("\n");
+        ConsoleUtil::print("Cache address: ", (uint64) cache, "\n");
+        ConsoleUtil::print("Cache slab size: ", (uint64) cache->slabSize, "\n", 10);
+        ConsoleUtil::print("Cache object size: ", (uint64) cache->objectSize, "\n", 10);
+        ConsoleUtil::print("Empty head: ", (uint64) cache->emptyHead, "\n");
 
-    Slab* iter = cache->emptyHead;
-    while(iter){
-        ConsoleUtil::print("", (uint64)iter, " ");
-        iter = iter->next;
+        Slab *iter = cache->emptyHead;
+        while (iter) {
+            ConsoleUtil::print("", (uint64) iter, " ");
+            iter = iter->next;
+        }
+        ConsoleUtil::printString("\n");
+
+        ConsoleUtil::print("Partial head: ", (uint64) cache->partialHead, "\n");
+
+        iter = cache->partialHead;
+        while (iter) {
+            ConsoleUtil::print("", (uint64) iter, " ");
+            iter = iter->next;
+        }
+        ConsoleUtil::printString("\n");
+
+        ConsoleUtil::print("Full head: ", (uint64) cache->fullHead, "\n");
+
+        iter = cache->fullHead;
+        while (iter) {
+            ConsoleUtil::print("", (uint64) iter, " ");
+            iter = iter->next;
+        }
+        ConsoleUtil::printString("\n");
     }
-    ConsoleUtil::printString("\n");
-
-    ConsoleUtil::print("Partial head: ", (uint64)cache->partialHead, "\n");
-
-    iter = cache->partialHead;
-    while(iter){
-        ConsoleUtil::print("", (uint64)iter, " ");
-        iter = iter->next;
-    }
-    ConsoleUtil::printString("\n");
-
-    ConsoleUtil::print("Full head: ", (uint64)cache->fullHead, "\n");
-
-    iter = cache->fullHead;
-    while(iter){
-        ConsoleUtil::print("", (uint64)iter, " ");
-        iter = iter->next;
-    }
-    ConsoleUtil::printString("\n");
 }
 
 void SlabAllocator::insertIntoList(Slab *&head, Slab *slab) {

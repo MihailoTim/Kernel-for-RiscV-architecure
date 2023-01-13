@@ -7,4 +7,6 @@
 
 void userMain();
 
+void userMainWrapper(void* args);
+
 #endif //OS1_KERNEL_USERMAIN_HPP

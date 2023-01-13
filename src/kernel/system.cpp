@@ -10,20 +10,9 @@
 #include "../../h/user/printing.hpp"
 #include "../../h/kernel/tcb.hpp"
 #include "../../h/kernel/scheduler.hpp"
-#include "../../h/user/user_wrappers.hpp"
+#include "../../src/user/tests/userMain.hpp"
 
 bool System::initialized = false;
-
-struct Test{
-    uint64 a,b,c,d,e,f;
-};
-
-void ctor(void* tst){
-    ((Test*)tst)->a = 17;
-    ((Test*)tst)->b = 32;
-    ((Test*)tst)->c = 13;
-
-}
 
 
 System::System() {
@@ -34,7 +23,7 @@ System::System() {
         //initialize the machine
         RiscV::initialize();
 
-        Cache *tmp1 = kmem_cache_create("TMP1", 2048, nullptr, nullptr);
+        Cache *tmp1 = kmem_cache_create("TMP1", 1<<17, nullptr, nullptr);
 //        Cache *tmp2 = kmem_cache_create("TMP2", 2048, nullptr, nullptr);
         void* ret1 = kmem_cache_alloc(tmp1);
         void* ret2 = kmem_cache_alloc(tmp1);
@@ -45,6 +34,11 @@ System::System() {
             SlabAllocator::printSlab(tmp1->partialHead);
             kmem_cache_free(tmp1, ret2);
             kmem_cache_free(tmp1, ret1);
+            kmem_cache_info(tmp1);
+            Buddy::printList();
+            int ret = kmem_cache_shrink(tmp1);
+            Buddy::printList();
+            ConsoleUtil::print("",ret,"\n",10);
             kmem_cache_info(tmp1);
             kmem_cache_alloc(tmp1);
             SlabAllocator::printSlab(tmp1->partialHead);

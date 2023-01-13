@@ -77,8 +77,13 @@ private:
 
     static inline void deleteList(Slab* &head){
         while(head){
-            Slab* tmp = head;
-            Buddy::free(tmp, head->parent->slabSize);
+            if(head->parent->objectSize <= sizeof(Slab)) {
+                Buddy::free(head, head->parent->slabSize);
+            }
+            else{
+                Buddy::free(head->objectOffset, head->parent->slabSize);
+                SlabAllocator::freeObject(largeSlabCache, head);
+            }
             head = head->next;
         }
     }

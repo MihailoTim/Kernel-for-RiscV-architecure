@@ -8,7 +8,7 @@
 #include "../../h/kernel/scheduler.hpp"
 #include "../../h/user/printing.hpp"
 #include "../../h/kernel/scb.hpp"
-#include "../../h/user/user_wrappers.hpp"
+#include "../../h/user/_thread.hpp"
 
 uint64 RiscV::globalTime = 0;
 bool RiscV::userMainFinished = false;
@@ -33,16 +33,18 @@ void RiscV::initialize(){
 }
 
 //get previous privilege and previous interrupt status
-void RiscV::popSppSpie() {
-    if(TCB::running->mode == TCB::Mode::SUPERVISOR)
-        asm("csrw sepc, ra");
-    else{
-        asm("mv a0, %[iarg]" : : [iarg] "r" (TCB::running->body));
-        asm("mv a1, %[iarg]" : : [iarg] "r" (TCB::running->args));
-        asm("csrw sepc, %[ra]" : : [ra] "r" ((uint64)bodyWrapper));
-    }
+void RiscV::popSppSpieSystem() {
+    asm("csrw sepc, ra");
     asm("sret");
 }
+
+void RiscV::popSppSpieUser() {
+    asm("csrw sepc, %[ra]" : : [ra] "r" ((uint64)popSppSpieUserWrapper));
+    asm("mv a0, %[iarg]" : : [iarg] "r" (TCB::running->body));
+    asm("mv a1, %[iarg]" : : [iarg] "r" (TCB::running->args));
+    asm("sret");
+}
+
 
 //handler function for traps
 void RiscV::handleSupervisorTrap() {
@@ -188,11 +190,12 @@ void RiscV::handleSupervisorTrap() {
         ConsoleUtil::printString("scause: ");
         uint64  scause = RiscV::r_scause();
         ConsoleUtil::printInt(scause);
+        ConsoleUtil::printString("\n");
         ConsoleUtil::printString("sepc: ");
         uint64 sepc = RiscV::r_sepc();
         ConsoleUtil::printInt(sepc,16);
         ConsoleUtil::printString("\n");
-        ConsoleUtil::print("stvec: ",stval,"\n");
+        ConsoleUtil::print("stval: ",stval,"\n");
         TCB* old = TCB::running;
         old->status = TCB::Status::FINISHED;
         ConsoleUtil::printString("Exiting thread...\n");
@@ -756,7 +759,7 @@ void RiscV::threadDispatchUtil() {
 }
 
 void RiscV::buildSection(void *PMT, uint64 start, uint64 end, uint64 mask) {
-    for(uint64 i=start;i< end;i+=0x1000) {
+    for(uint64 i=start;i<end;i+=0x1000) {
         handlePageFault(PMT,i, mask);
     }
 }
@@ -794,7 +797,9 @@ void RiscV::buildUserPMT() {
 }
 
 void* RiscV::getPMT(){
-    void* ret = Buddy::alloc(1);
+    void* ret = Buddy::alloc(0);
+    if(!ret)
+        return nullptr;
     uint64* arr = (uint64*)ret;
     for(int i=0;i<512;i++)
         arr[i] = 0;
@@ -802,29 +807,30 @@ void* RiscV::getPMT(){
 }
 
 void RiscV::handlePageFault(void* PMT, uint64 addr, uint64 mask){
-    uint64 pmt2Entry = RiscV::getPMT2Entry(addr);
-    uint64 pmt1Entry = RiscV::getPMT1Entry(addr);
-    uint64 pmt0Entry = RiscV::getPMT0Entry(addr);
-    uint64 pmt2Desc = ((uint64*)PMT)[pmt2Entry];
+    uint64 pmt2Desc = ((uint64*)PMT)[RiscV::getPMT2Entry(addr)];
     void* pmt1 = nullptr;
     if(pmt2Desc == 0){
         pmt1 = RiscV::getPMT();
+        if(pmt1 == nullptr)
+            return;
         uint64 frame = (uint64)pmt1 >> 12;
-        ((uint64*)PMT)[pmt2Entry] = (frame << 10) | (uint64)1;
+        ((uint64*)PMT)[RiscV::getPMT2Entry(addr)] = (frame << 10) | (uint64)1;
     }
     else
         pmt1 = (void*)((pmt2Desc >> 10) << 12);
-    uint64 pmt1Desc = ((uint64*)pmt1)[pmt1Entry];
+    uint64 pmt1Desc = ((uint64*)pmt1)[RiscV::getPMT1Entry(addr)];
     void* pmt0 = nullptr;
     if(pmt1Desc == 0){
         pmt0 = RiscV::getPMT();
+        if(pmt0 == nullptr)
+            return;
         uint64 frame = (uint64)pmt0 >> 12;
-        ((uint64*)pmt1)[pmt1Entry] = (frame << 10) | (uint64)1;
+        ((uint64*)pmt1)[RiscV::getPMT1Entry(addr)] = (frame << 10) | (uint64)1;
     }
     else
         pmt0 = (void*)((pmt1Desc >> 10) << 12);
     uint64 frame = addr >> 12;
-    ((uint64 *) pmt0)[pmt0Entry] = (frame << 10) | mask;
+    ((uint64 *) pmt0)[RiscV::getPMT0Entry(addr)] = (frame << 10) | mask;
 }
 
 void RiscV::mapConsoleRegisters(void *PMT) {
